@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.auth-input {
+  @apply w-full  border rounded-lg px-4 py-3 outline-none;
+  @apply text-white focus:border-amber-500 bg-neutral-900 border-neutral-700;
+}
+
+.auth-button {
+  @apply text-lg text-black font-medium w-full px-6 py-3 rounded-lg;
+  @apply transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  @apply bg-amber-500 hover:bg-amber-600;
+}
