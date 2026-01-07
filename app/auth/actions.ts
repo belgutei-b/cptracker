@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { signUp, signIn } from "@/lib/user";
+import { signUp, signIn } from "@/lib/auth";
 
 export async function actionSignUp(initialState: any, formData: FormData) {
   const rawFormData = {

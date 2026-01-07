@@ -34,3 +34,9 @@ export async function decrypt(session: string | undefined = "") {
     console.log("Failed to verify session");
   }
 }
+
+export async function getSession() {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
+  return session;
+}
