@@ -1,5 +1,5 @@
 import Auth from "@/components/Auth";
 
 export default async function Page() {
-  return <Auth isSignUp={false} />;
+  return <Auth isSignUp={true} />;
 }
