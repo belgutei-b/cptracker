@@ -2,17 +2,15 @@
 import Link from "next/link";
 import { Brain } from "lucide-react";
 import { useActionState } from "react";
-import { actionSignUp } from "@/app/auth/sign-up/actions";
+import { actionSignIn, actionSignUp } from "@/app/auth/actions";
 
 const initialState = {
   message: "",
 };
 
 export default function Auth({ isSignUp }: { isSignUp: boolean }) {
-  const [state, formAction, pending] = useActionState(
-    actionSignUp,
-    initialState
-  );
+  const authAction = isSignUp ? actionSignUp : actionSignIn;
+  const [state, formAction, pending] = useActionState(authAction, initialState);
 
   return (
     <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center p-6 text-center">
@@ -53,11 +51,18 @@ export default function Auth({ isSignUp }: { isSignUp: boolean }) {
             {isSignUp ? "Sign Up" : "Sign In"}
           </button>
         </div>
-        <div className="flex justify-center mt-8">
-          <p className="text-gray-400 mr-3">Have an account?</p>
-          <Link href="/auth/sign-in">Sign In</Link>
-        </div>
-
+        {isSignUp && (
+          <div className="flex justify-center mt-8">
+            <p className="text-gray-400 mr-3">Have an account?</p>
+            <Link href="/auth/sign-in">Sign In</Link>
+          </div>
+        )}
+        {!isSignUp && (
+          <div className="flex justify-center mt-8">
+            <p className="text-gray-400 mr-3">Don't have an account?</p>
+            <Link href="/auth/sign-up">Sign Up</Link>
+          </div>
+        )}
         <div className="text-small text-gray-400 mt-8">
           or you can {isSignUp ? "sign up" : "sign in"} with
         </div>
