@@ -78,3 +78,16 @@ export async function serverPostProblem({
   return true;
   // 4. invalidate /dashboard
 }
+
+export async function getProblems({ userId }: { userId: string }) {
+  const problems = await prisma.userProblem.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      problem: true,
+    },
+  });
+
+  return problems;
+}

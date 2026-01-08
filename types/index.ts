@@ -1,3 +1,4 @@
+import { Prisma } from "../app/generated/prisma/client";
 import { Difficulty } from "../app/generated/prisma/enums";
 
 export interface ProblemLeetcodeAPI {
@@ -10,3 +11,7 @@ export interface ProblemLeetcodeAPI {
     slug: string;
   }[];
 }
+
+export type UserProblemFull = Prisma.UserProblemGetPayload<{
+  include: { problem: true };
+}>;
