@@ -1,4 +1,3 @@
-import SignoutButton from "../../components/SignoutButton";
 import { deleteSession, getSession } from "../../lib/session";
 import { getUser } from "../../lib/user";
 
@@ -15,10 +14,5 @@ export default async function Page() {
     await deleteSession();
   }
 
-  return (
-    <div>
-      {user?.username}
-      <SignoutButton />
-    </div>
-  );
+  return <div>{user?.username}</div>;
 }

@@ -26,7 +26,8 @@ query questionTitle($titleSlug: String!) {
 */
 // https://github.com/akarsh1995/leetcode-graphql-queries/blob/main/problem_solve_page/problem_solve_page.graphql
 
-export async function getProblemTags(slug: string) {
+export async function getProblemData(slug: string) {
+  // TODO: check if exists in the database
   const query = `
     query singleQuestionTopicTags($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
@@ -53,6 +54,7 @@ export async function getProblemTags(slug: string) {
   });
   const data = await res.json();
 
+  // TODO: store the data in our database
   console.log(res);
   console.log(data);
   console.log(data.data.question.topicTags);
