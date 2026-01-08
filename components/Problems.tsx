@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { UserProblemFull } from "../types";
-import { CheckCircle, ExternalLink, Clock } from "lucide-react";
+import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
 
 export default function DashboardProblems({
   problems,
@@ -56,6 +58,18 @@ export default function DashboardProblems({
                     {tag}
                   </span>
                 ))}
+              </div>
+            </div>
+
+            <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
+              <button
+                className={`p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]`}
+              >
+                <Play size={18} />
+              </button>
+
+              <div className={`text-sm text-white font-semibold`}>
+                {problem.status}
               </div>
             </div>
           </div>
