@@ -1,4 +1,5 @@
-import { getSession } from "../../lib/session";
+import SignoutButton from "../../components/SignoutButton";
+import { deleteSession, getSession } from "../../lib/session";
 import { getUser } from "../../lib/user";
 
 export default async function Page() {
@@ -10,5 +11,14 @@ export default async function Page() {
   const user = await getUser({ userId: session.userId as string });
   console.log(user);
 
-  return <div>{user?.username}</div>;
+  async function actionLogout() {
+    await deleteSession();
+  }
+
+  return (
+    <div>
+      {user?.username}
+      <SignoutButton />
+    </div>
+  );
 }
