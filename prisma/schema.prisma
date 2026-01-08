@@ -13,21 +13,10 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        Int     @id @default(autoincrement())
-  email     String? @unique
-  username  String? @unique
-  passwordHash String?
-  problems Problem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-}
-
 enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
+  Easy
+  Medium
+  Hard
 }
 
 enum Status {
@@ -37,17 +26,41 @@ enum Status {
   SOLVED
 }
 
-model Problem {
-  id        Int     @id @default(autoincrement())
-  link      String
-  name      String
-  difficulty Difficulty
-  status    Status  @default(TODO)
-  tags      String[]
-  note      String  @default("")
-  userId    Int
-  user      User    @relation(fields: [userId], references: [id])
+model User {
+  id        String @id @default(cuid())
+  email     String? @unique
+  username  String? @unique
+  passwordHash String?
+  userProblems UserProblem[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Problem {
+  id            String @id @default(cuid())
+  questionId    String
+  link          String @unique
+  title         String
+  titleSlug     String
+  difficulty    Difficulty
+  tags          String[]
+  userProblems  UserProblem[]
+
+  createdAt DateTime @default(now())
+}
+
+model UserProblem {
+  userId    String 
+  problemId String 
+
+  status    Status @default(TODO)
+  note      String @default("")
+
+  user      User    @relation(fields: [userId], references: [id])
+  problem   Problem  @relation(fields: [problemId], references: [id])
+
+  @@id([userId, problemId])
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }

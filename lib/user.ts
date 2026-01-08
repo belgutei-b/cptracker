@@ -5,7 +5,7 @@ import prisma from "./prisma";
 export async function getUser({ userId }: { userId: string }) {
   const user = await prisma.user.findFirst({
     where: {
-      id: parseInt(userId),
+      id: userId,
     },
     select: {
       id: true,
