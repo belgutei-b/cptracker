@@ -61,6 +61,9 @@ model UserProblem {
   problem   Problem  @relation(fields: [problemId], references: [id])
 
   @@id([userId, problemId])
+  duration Int @default(0)
+  solvedAt  DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
