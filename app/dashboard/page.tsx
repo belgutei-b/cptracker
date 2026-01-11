@@ -23,7 +23,7 @@ export default async function Page() {
       </div>
       <div className="w-full lg:w-5/8 mt-5">
         <div className="text-lg text-white font-bold mb-5">My Dashboard</div>
-        <DashboardProblems problems={problems} />
+        <DashboardProblems receivedProblems={problems} />
       </div>
     </div>
   );

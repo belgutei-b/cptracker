@@ -1,7 +1,9 @@
+// components/ProblemSolving.tsx
 "use client";
 
-import { UserProblemFull } from "@/types";
-import { useEffect } from "react";
+import type { UserProblemFullClient } from "../types/client";
+import { getDisplayedSeconds, formatMMSS } from "../lib/timer";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 
@@ -9,10 +11,14 @@ export default function ProblemSolving({
   open,
   onClose,
   problem,
+  nowMs,
+  onNoteLocalChange,
 }: {
   open: boolean;
   onClose: () => void;
-  problem: UserProblemFull | null;
+  problem: UserProblemFullClient | null;
+  nowMs: number;
+  onNoteLocalChange: (problemId: string, note: string) => void;
 }) {
   // Close on Escape
   useEffect(() => {
@@ -24,7 +30,62 @@ export default function ProblemSolving({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
+  const [note, setNote] = useState("");
+
+  // Initialize note when opening / switching problems
+  useEffect(() => {
+    if (!open || !problem) return;
+    setNote(problem.note ?? "");
+  }, [open, problem?.problemId]);
+
+  // Track last note successfully sent
+  const lastSentNoteRef = useRef<string>("");
+
+  // Reset lastSent when problem changes
+  useEffect(() => {
+    if (!problem) return;
+    lastSentNoteRef.current = problem.note ?? "";
+  }, [problem?.problemId]);
+
+  // Heartbeat every 30s ONLY when running
+  useEffect(() => {
+    if (!open || !problem) return;
+    if (!(problem.status === "IN_PROGRESS" && problem.lastStartedAt)) return;
+
+    let cancelled = false;
+
+    async function sendBeat() {
+      if (cancelled) return;
+
+      const noteChanged = note !== lastSentNoteRef.current;
+      const payload = noteChanged ? { note } : {};
+
+      try {
+        await fetch(`/api/problems/${problem!.problemId}/beat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (noteChanged) lastSentNoteRef.current = note;
+      } catch {
+        // optionally handle errors
+      }
+    }
+
+    // Optional: beat immediately on open
+    sendBeat();
+
+    const id = window.setInterval(sendBeat, 30_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [open, problem?.problemId, problem?.status, problem?.lastStartedAt, note]);
+
   if (!open || !problem) return null;
+
+  const displayedSeconds = getDisplayedSeconds(problem, nowMs);
 
   return (
     <div
@@ -33,16 +94,13 @@ export default function ProblemSolving({
       aria-modal="true"
       aria-label={`Problem modal for ${problem.problem.title}`}
     >
-      {/* Backdrop (click to close) */}
       <button
         className="absolute inset-0 bg-black/60"
         onClick={onClose}
         aria-label="Close modal"
       />
 
-      {/* Panel */}
       <div className="relative z-10 w-full max-w-3xl rounded-2xl border border-[#3e3e3e] bg-[#282828] shadow-xl">
-        {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-[#3e3e3e] p-4">
           <div>
             <div className="flex items-center gap-2">
@@ -77,15 +135,13 @@ export default function ProblemSolving({
 
           <div className="flex flex-col justify-end items-end text-gray-400">
             <div className="flex items-center gap-4">
-              {/* {activeProblemId === focusedProblem.id && ( */}
               <div className="flex items-center gap-2 bg-[#ffa116] text-black px-4 py-1.5 rounded-full font-mono text-sm font-bold shadow-lg shadow-[#ffa11633]">
                 <Timer size={14} className="animate-pulse" />
-                15m 0s
-                {/* {formatTime(elapsedTime)} */}
+                {formatMMSS(displayedSeconds)}
               </div>
 
               <button
-                // onClick={() => setFocusProblemId(null)}
+                onClick={onClose}
                 className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
               >
                 <X size={24} />
@@ -94,7 +150,6 @@ export default function ProblemSolving({
           </div>
         </div>
 
-        {/* Body */}
         <div className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-sm text-gray-300">
@@ -103,26 +158,23 @@ export default function ProblemSolving({
             </div>
           </div>
 
-          {/* Example “problem-dependent” content */}
-          <textarea className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-4 text-gray-200 w-full h-40" />
+          <textarea
+            value={note}
+            onChange={(e) => {
+              const next = e.target.value;
+              setNote(next);
+              onNoteLocalChange(problem.problemId, next);
+            }}
+            className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-4 text-gray-200 w-full h-40"
+          />
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-end gap-2 border-t border-[#3e3e3e] p-4">
           <button
             onClick={onClose}
             className="rounded-lg border border-[#3e3e3e] px-3 py-2 text-sm text-white hover:bg-white/10"
           >
             Close
-          </button>
-          <button
-            className="rounded-lg bg-[#3e3e3e] px-3 py-2 text-sm text-white hover:bg-[#4e4e4e]"
-            onClick={() => {
-              // do something with problem
-              console.log("Start", problem.problemId);
-            }}
-          >
-            Start
           </button>
         </div>
       </div>

@@ -2,38 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/user";
 
+/* Start */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const problemId = (await params).id;
   const userId = await getCurrentUserId();
-
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  let body: { note?: string } = {};
-  try {
-    body = await request.json();
-  } catch {
-    // allow empty body
-  }
-
   const now = new Date();
-
-  // Only update note if provided (client sends it only when changed)
   await prisma.userProblem.updateMany({
     where: {
       userId,
       problemId,
-      status: "IN_PROGRESS",
     },
     data: {
+      status: "IN_PROGRESS",
       lastBeatAt: now,
-      ...(typeof body.note === "string" ? { note: body.note } : {}),
+      lastStartedAt: now,
     },
   });
-
-  return NextResponse.json({ ok: true, beatAt: now.toISOString() });
+  return NextResponse.json({ ok: true });
 }

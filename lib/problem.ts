@@ -1,5 +1,6 @@
 "use server";
 
+import { serializeDates } from "../types/client";
 import { getProblemData } from "./leetcode";
 import prisma from "./prisma";
 
@@ -38,7 +39,7 @@ export async function serverPostProblem({
         title: problemData.title,
         titleSlug: problemData.titleSlug,
         difficulty: problemData.difficulty,
-        tags: problemData.topicTags.map((tag) => tag.name),
+        tags: problemData.topicTags.map((tag: { name: string }) => tag.name),
       },
       select: {
         id: true,
@@ -89,5 +90,5 @@ export async function getProblems({ userId }: { userId: string }) {
     },
   });
 
-  return problems;
+  return serializeDates(problems);
 }
