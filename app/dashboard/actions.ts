@@ -2,6 +2,7 @@
 
 import { serverPostProblem } from "../../lib/problem";
 import { getSession } from "../../lib/session";
+import { revalidatePath } from "next/cache";
 
 export async function actionPostProblem(link: string) {
   try {
@@ -26,6 +27,8 @@ export async function actionPostProblem(link: string) {
     if (!res) {
       throw new Error("Error in server");
     }
+
+    revalidatePath("/dashboard");
 
     return {
       success: true,

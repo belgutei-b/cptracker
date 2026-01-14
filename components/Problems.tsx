@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ProblemSolving from "./ProblemSolving";
 import type { UserProblemFullClient } from "../types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "../lib/timer";
@@ -27,9 +27,32 @@ export default function DashboardProblems({
   );
   const nowMs = useNowTick(anyRunning);
 
+  useEffect(() => {
+    setProblems(receivedProblems);
+  }, [receivedProblems]);
+
   function onNoteLocalChange(problemId: string, note: string) {
     setProblems((prev) =>
       prev.map((p) => (p.problemId === problemId ? { ...p, note } : p))
+    );
+  }
+
+  function onFinishLocal(
+    problemId: string,
+    newStatus: "TRIED" | "SOLVED",
+    duration?: number | null
+  ) {
+    setProblems((prev) =>
+      prev.map((p) =>
+        p.problemId === problemId
+          ? {
+              ...p,
+              status: newStatus,
+              lastStartedAt: null,
+              ...(typeof duration === "number" ? { duration } : {}),
+            }
+          : p
+      )
     );
   }
 
@@ -41,6 +64,7 @@ export default function DashboardProblems({
 
     // If already running, DO NOT call /start
     if (existing?.status === "IN_PROGRESS" && existing.lastStartedAt) return;
+    if (existing?.status === "SOLVED") return;
 
     const startedAtIso = new Date().toISOString();
 
@@ -131,6 +155,7 @@ export default function DashboardProblems({
         problem={activeProblem}
         nowMs={nowMs}
         onNoteLocalChange={onNoteLocalChange}
+        onFinishLocal={onFinishLocal}
       />
     </>
   );

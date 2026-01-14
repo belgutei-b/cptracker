@@ -1,4 +1,3 @@
-// components/ProblemSolving.tsx
 "use client";
 
 import type { UserProblemFullClient } from "../types/client";
@@ -13,12 +12,18 @@ export default function ProblemSolving({
   problem,
   nowMs,
   onNoteLocalChange,
+  onFinishLocal,
 }: {
   open: boolean;
   onClose: () => void;
   problem: UserProblemFullClient | null;
   nowMs: number;
   onNoteLocalChange: (problemId: string, note: string) => void;
+  onFinishLocal: (
+    problemId: string,
+    newStatus: "TRIED" | "SOLVED",
+    duration?: number | null
+  ) => void;
 }) {
   // Close on Escape
   useEffect(() => {
@@ -31,6 +36,7 @@ export default function ProblemSolving({
   }, [open, onClose]);
 
   const [note, setNote] = useState("");
+  const [isFinishing, setIsFinishing] = useState(false);
 
   // Initialize note when opening / switching problems
   useEffect(() => {
@@ -82,6 +88,33 @@ export default function ProblemSolving({
       window.clearInterval(id);
     };
   }, [open, problem?.problemId, problem?.status, problem?.lastStartedAt, note]);
+
+  async function handleFinish({ isSolved }: { isSolved: boolean }) {
+    console.log(isSolved);
+    const payload: {
+      newStatus: "SOLVED" | "TRIED";
+    } = {
+      newStatus: isSolved ? "SOLVED" : "TRIED",
+    };
+    try {
+      setIsFinishing(true);
+      const res = await fetch(`/api/problems/${problem!.problemId}/finish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 200) {
+        const data = (await res.json()) as { duration?: number | null };
+        onFinishLocal(problem!.problemId, payload.newStatus, data.duration);
+      }
+      // TODO: toast message
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsFinishing(false);
+    }
+  }
 
   if (!open || !problem) return null;
 
@@ -169,14 +202,24 @@ export default function ProblemSolving({
           />
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-[#3e3e3e] p-4">
-          <button
-            onClick={onClose}
-            className="rounded-lg border border-[#3e3e3e] px-3 py-2 text-sm text-white hover:bg-white/10"
-          >
-            Close
-          </button>
-        </div>
+        {problem.status !== "SOLVED" && (
+          <div className="border-t border-[#3e3e3e] flex items-center justify-end gap-2 p-4">
+            <button
+              onClick={() => handleFinish({ isSolved: false })}
+              disabled={isFinishing}
+              className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Tried
+            </button>
+            <button
+              onClick={() => handleFinish({ isSolved: true })}
+              disabled={isFinishing}
+              className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-emerald-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Solved
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
