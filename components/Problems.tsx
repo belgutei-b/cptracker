@@ -16,6 +16,7 @@ export default function DashboardProblems({
   const [problems, setProblems] =
     useState<UserProblemFullClient[]>(receivedProblems);
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   const activeProblem = useMemo(
     () => problems.find((p) => p.problemId === activeProblemId) ?? null,
@@ -25,11 +26,15 @@ export default function DashboardProblems({
   const anyRunning = problems.some(
     (p) => p.status === "IN_PROGRESS" && p.lastStartedAt
   );
-  const nowMs = useNowTick(anyRunning);
+  const nowMs = useNowTick(isClient && anyRunning);
+  const displayNowMs = isClient ? nowMs : 0;
 
   useEffect(() => {
     setProblems(receivedProblems);
   }, [receivedProblems]);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   function onNoteLocalChange(problemId: string, note: string) {
     setProblems((prev) =>
@@ -117,7 +122,7 @@ export default function DashboardProblems({
                 </div>
 
                 <div className="text-sm font-mono text-amber-500">
-                  {formatMMSS(getDisplayedSeconds(problem, nowMs))}
+                  {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
                 </div>
               </div>
             </div>
