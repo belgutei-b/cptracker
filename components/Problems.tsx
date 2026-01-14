@@ -139,12 +139,19 @@ export default function DashboardProblems({
             </div>
 
             <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
-              <button
-                onClick={() => startProblem(problem.problemId)}
-                className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
-              >
-                <Play size={18} />
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={() => startProblem(problem.problemId)}
+                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
+                >
+                  <Play size={18} />
+                </button>
+                {problem.status === "TODO" && (
+                  <div className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded bg-black/80 px-2 py-1 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    Start solving
+                  </div>
+                )}
+              </div>
 
               <div className="text-sm text-white font-semibold">
                 {problem.status}
