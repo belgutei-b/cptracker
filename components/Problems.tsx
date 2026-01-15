@@ -41,7 +41,7 @@ export default function DashboardProblems({
     );
   }
 
-  function onFinishLocal(
+  function onFinishLocalAction(
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
     duration?: number | null
@@ -162,11 +162,11 @@ export default function DashboardProblems({
 
       <ProblemSolving
         open={activeProblem !== null}
-        onClose={() => setActiveProblemId(null)}
+        onCloseAction={() => setActiveProblemId(null)}
         problem={activeProblem}
         nowMs={nowMs}
-        onNoteLocalChange={onNoteLocalChange}
-        onFinishLocal={onFinishLocal}
+        onNoteLocalChangeAction={onNoteLocalChange}
+        onFinishLocalAction={onFinishLocalAction}
       />
     </>
   );

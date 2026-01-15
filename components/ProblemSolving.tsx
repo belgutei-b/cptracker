@@ -8,18 +8,18 @@ import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 
 export default function ProblemSolving({
   open,
-  onClose,
+  onCloseAction,
   problem,
   nowMs,
-  onNoteLocalChange,
-  onFinishLocal,
+  onNoteLocalChangeAction,
+  onFinishLocalAction,
 }: {
   open: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
   problem: UserProblemFullClient | null;
   nowMs: number;
-  onNoteLocalChange: (problemId: string, note: string) => void;
-  onFinishLocal: (
+  onNoteLocalChangeAction: (problemId: string, note: string) => void;
+  onFinishLocalAction: (
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
     duration?: number | null
@@ -29,11 +29,11 @@ export default function ProblemSolving({
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseAction();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+  }, [open, onCloseAction]);
 
   const [note, setNote] = useState("");
   const [isFinishing, setIsFinishing] = useState(false);
@@ -105,7 +105,7 @@ export default function ProblemSolving({
       });
       if (res.status === 200) {
         const data = (await res.json()) as { duration?: number | null };
-        onFinishLocal(problem!.problemId, payload.newStatus, data.duration);
+        onFinishLocalAction(problem!.problemId, payload.newStatus, data.duration);
       }
       // TODO: toast message
       console.log(res);
@@ -129,7 +129,7 @@ export default function ProblemSolving({
     >
       <button
         className="absolute inset-0 bg-black/60"
-        onClick={onClose}
+        onClick={onCloseAction}
         aria-label="Close modal"
       />
 
@@ -174,7 +174,7 @@ export default function ProblemSolving({
               </div>
 
               <button
-                onClick={onClose}
+                onClick={onCloseAction}
                 className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
               >
                 <X size={24} />
@@ -196,7 +196,7 @@ export default function ProblemSolving({
             onChange={(e) => {
               const next = e.target.value;
               setNote(next);
-              onNoteLocalChange(problem.problemId, next);
+              onNoteLocalChangeAction(problem.problemId, next);
             }}
             className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-4 text-gray-200 w-full h-40"
           />
