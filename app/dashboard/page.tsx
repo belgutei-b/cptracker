@@ -1,15 +1,21 @@
 import { redirect } from "next/navigation";
 import AddProblem from "../../components/AddProblem";
 import { getProblems } from "../../lib/problem";
-import { getSession } from "../../lib/session";
 import DashboardProblems from "../../components/Problems";
+import { auth } from "../../lib/auth";
+import { headers } from "next/headers";
 
 export default async function Page() {
-  const session = await getSession();
-  const userId = session?.userId as string;
+  // const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const userId = session?.user.id as string;
   if (!session || !userId) {
-    redirect("/auth/sign-in");
+    redirect("/auth");
   }
+  console.log(session);
+  console.log(userId);
   const problems = await getProblems({ userId });
   if (!problems) {
     return <div>Error fetching problems</div>;

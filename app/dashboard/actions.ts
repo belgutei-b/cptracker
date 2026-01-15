@@ -1,13 +1,17 @@
 "use server";
 
+import { headers } from "next/headers";
+import { auth } from "../../lib/auth";
 import { serverPostProblem } from "../../lib/problem";
-import { getSession } from "../../lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function actionPostProblem(link: string) {
   try {
-    const session = await getSession();
-    const userId = session?.userId as string;
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    const userId = session?.user.id;
+
     if (!session || !userId) {
       throw new Error("Error validating session");
     }

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decrypt } from "./lib/session";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
+import { auth } from "./lib/auth";
 
-const protectedRoutes = ["/profile"];
+const protectedRoutes = ["/profile", "/dashboard"];
 const authRoutes = ["/auth/sign-in", "/auth/sign-up"];
 
 export default async function proxy(req: NextRequest) {
@@ -10,16 +10,16 @@ export default async function proxy(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
 
-  // Decrypt the session from the cookie
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   // 4. Redirect to /login if the user is not authenticated
-  if (isProtectedRoute && !session?.userId) {
-    return NextResponse.redirect(new URL("/auth/sign-in", req.nextUrl));
+  if (isProtectedRoute && !session?.session) {
+    return NextResponse.redirect(new URL("/auth", req.nextUrl));
   }
 
-  if (isAuthRoute && session?.userId) {
+  if (isAuthRoute && session?.session) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 

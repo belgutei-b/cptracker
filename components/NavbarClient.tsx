@@ -1,13 +1,17 @@
 "use client";
 import { Brain, UserIcon, Search, LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { handleLogout } from "../app/profile/action";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "../lib/auth-client";
 
 export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
-  console.log(signedIn);
-  console.log(pathname);
+  const router = useRouter();
+
+  const handleBetterLogout = async () => {
+    await signOut();
+    router.refresh();
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-[#1a1a1a]/80 backdrop-blur-md border-b border-neutral-700 px-6 py-4">
@@ -54,7 +58,7 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
                 <UserIcon size={18} />
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={handleBetterLogout}
                 className="w-9 h-9 rounded-full bg-[#3e3e3e] flex items-center justify-center text-red-400 hover:bg-red-900/30 transition-colors"
               >
                 <LogOut size={18} />
@@ -67,12 +71,12 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
             <Link
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                 ${
-                  pathname === "/auth/sign-in"
+                  pathname === "/auth"
                     ? "bg-[#333] text-white"
                     : "text-gray-400 hover:text-white"
                 }
               `}
-              href="/auth/sign-in"
+              href="/auth"
             >
               Sign in
             </Link>

@@ -1,19 +1,14 @@
-import type {
-  UserProblem,
-  Problem,
-  Status,
-  Difficulty,
-} from "../app/generated/prisma/client";
+import type { UserProblem, Problem } from "../app/generated/prisma/client";
 
 type DateToString<T> = T extends Date
   ? string
   : T extends Date | null
-  ? string | null
-  : T extends (infer U)[]
-  ? DateToString<U>[]
-  : T extends object
-  ? { [K in keyof T]: DateToString<T[K]> }
-  : T;
+    ? string | null
+    : T extends (infer U)[]
+      ? DateToString<U>[]
+      : T extends object
+        ? { [K in keyof T]: DateToString<T[K]> }
+        : T;
 
 export type UserProblemFullServer = UserProblem & { problem: Problem };
 

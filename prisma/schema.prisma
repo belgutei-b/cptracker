@@ -27,45 +27,100 @@ enum Status {
 }
 
 model User {
-  id        String @id @default(cuid())
-  email     String? @unique
-  username  String? @unique
+  id           String        @id @default(cuid())
+  email        String?       @unique
+  username     String?       @unique
   passwordHash String?
   userProblems UserProblem[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  name          String
+  emailVerified Boolean   @default(false)
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
 model Problem {
-  id            String @id @default(cuid())
-  questionId    String
-  link          String @unique
-  title         String
-  titleSlug     String
-  difficulty    Difficulty
-  tags          String[]
-  userProblems  UserProblem[]
+  id           String        @id @default(cuid())
+  questionId   String
+  link         String        @unique
+  title        String
+  titleSlug    String
+  difficulty   Difficulty
+  tags         String[]
+  userProblems UserProblem[]
 
   createdAt DateTime @default(now())
 }
 
 model UserProblem {
-  userId    String 
-  problemId String 
-
+  userId    String
+  problemId String
   status    Status @default(TODO)
   note      String @default("")
 
-  user      User    @relation(fields: [userId], references: [id])
-  problem   Problem  @relation(fields: [problemId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  problem Problem @relation(fields: [problemId], references: [id])
 
-  @@id([userId, problemId])
-  duration      Int @default(0)
-  solvedAt      DateTime?
+  duration Int       @default(0)
+  solvedAt DateTime?
 
   lastStartedAt DateTime?
   lastBeatAt    DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  @@id([userId, problemId])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
