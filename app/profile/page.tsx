@@ -1,18 +1,17 @@
-import { deleteSession, getSession } from "../../lib/session";
 import { getUser } from "../../lib/user";
+import { auth } from "../../lib/auth";
+import { headers } from "next/headers";
 
 export default async function Page() {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (!session) {
     return <div>Login first</div>;
   }
 
-  const user = await getUser({ userId: session.userId as string });
+  const user = await getUser({ userId: session.user.id });
   console.log(user);
-
-  async function actionLogout() {
-    await deleteSession();
-  }
 
   return <div>{user?.username}</div>;
 }

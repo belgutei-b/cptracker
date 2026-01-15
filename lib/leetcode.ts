@@ -1,7 +1,5 @@
 "use server";
 
-import { ProblemLeetcodeAPI } from "../types";
-
 /*
 query singleQuestionTopicTags($titleSlug: String!) {
   question(titleSlug: $titleSlug) {
@@ -60,10 +58,5 @@ export async function getProblemData(slug: string) {
   }
   const data = await res.json();
 
-  // TODO: store the data in our database
-  // console.log(res);
-  // console.log(data);
-  // console.log(data.data.question.topicTags);
-  // console.log(data.data.question);
-  return data.data.question as ProblemLeetcodeAPI;
+  return data.data.question;
 }

@@ -6,16 +6,13 @@ import { auth } from "../../lib/auth";
 import { headers } from "next/headers";
 
 export default async function Page() {
-  // const session = await getSession();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  const userId = session?.user.id as string;
-  if (!session || !userId) {
+  if (!session) {
     redirect("/auth");
   }
-  console.log(session);
-  console.log(userId);
+  const userId = session.user.id;
   const problems = await getProblems({ userId });
   if (!problems) {
     return <div>Error fetching problems</div>;
