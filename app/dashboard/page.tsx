@@ -6,18 +6,23 @@ import { auth } from "../../lib/auth";
 import { headers } from "next/headers";
 
 export default async function Page() {
+  console.log("session");
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  console.log("session");
   if (!session) {
     redirect("/auth");
   }
   const userId = session.user.id;
+
+  console.log("getproblems");
   const problems = await getProblems({ userId });
+  console.log("getproblems");
   if (!problems) {
     return <div>Error fetching problems</div>;
   }
-  console.log(problems);
+  // console.log(problems);
 
   return (
     <div className="w-full flex flex-col lg:flex-row-reverse px-4 gap-3">

@@ -5,9 +5,15 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3000",
 });
 
-export const signIn = async () => {
+export const googleSignIn = async () => {
   await authClient.signIn.social({
     provider: "google",
+  });
+};
+
+export const githubSignIn = async () => {
+  const data = await authClient.signIn.social({
+    provider: "github",
   });
 };
 

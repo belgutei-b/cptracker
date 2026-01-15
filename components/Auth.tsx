@@ -1,6 +1,6 @@
 "use client";
 import { Brain } from "lucide-react";
-import { signIn } from "../lib/auth-client";
+import { githubSignIn, googleSignIn } from "../lib/auth-client";
 
 export default function Auth() {
   return (
@@ -16,7 +16,9 @@ export default function Auth() {
           Start Tracking Now
         </h2>
         {/* TODO: google logo */}
-        <button onClick={signIn}>Sign in with Google</button>
+        <button onClick={googleSignIn}>Sign in with Google</button>
+
+        <button onClick={githubSignIn}>Sign in with Github</button>
       </div>
     </div>
   );
