@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
-import ProblemSolving from "./ProblemSolving";
-import type { UserProblemFullClient } from "../types/client";
-import { useNowTick, getDisplayedSeconds, formatMMSS } from "../lib/timer";
+import ProblemSolving from "../ProblemSolving";
+import type { UserProblemFullClient } from "../../types/client";
+import { useNowTick, getDisplayedSeconds, formatMMSS } from "../../lib/timer";
 
-export default function DashboardProblems({
+export default function ProblemListClient({
   receivedProblems,
 }: {
   receivedProblems: UserProblemFullClient[];
