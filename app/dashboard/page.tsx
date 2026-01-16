@@ -4,6 +4,7 @@ import { getProblems } from "../../lib/problem";
 import DashboardProblems from "../../components/Problems";
 import { auth } from "../../lib/auth";
 import { headers } from "next/headers";
+import AverageDurationServer from "../../components/stat/AverageDuration.server";
 
 export default async function Page() {
   console.log("session");
@@ -18,11 +19,11 @@ export default async function Page() {
 
   console.log("getproblems");
   const problems = await getProblems({ userId });
+  console.log(problems);
   console.log("getproblems");
   if (!problems) {
     return <div>Error fetching problems</div>;
   }
-  // console.log(problems);
 
   return (
     <div className="w-full flex flex-col lg:flex-row-reverse px-4 gap-3">
@@ -32,6 +33,7 @@ export default async function Page() {
       <div className="w-full lg:w-5/8 mt-5">
         <div className="text-lg text-white font-bold mb-5">My Dashboard</div>
         <DashboardProblems receivedProblems={problems} />
+        <AverageDurationServer userId={userId} />
       </div>
     </div>
   );
