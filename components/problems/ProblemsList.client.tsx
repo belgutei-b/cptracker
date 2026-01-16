@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import ProblemSolving from "../ProblemSolving";
 import type { UserProblemFullClient } from "../../types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "../../lib/timer";
+import { DIFFICULTY_COLORS } from "../stat/AverageDuration.client";
 
 export default function ProblemListClient({
   receivedProblems,
@@ -96,10 +97,20 @@ export default function ProblemListClient({
             <div className="flex justify-between items-start mb-2">
               <div className="w-60">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-emerald-500 text-xs font-bold tracking-wider uppercase">
+                  <span
+                    className="text-emerald-500 text-xs font-bold tracking-wider uppercase"
+                    style={{
+                      color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                    }}
+                  >
                     {problem.problem.difficulty}
                   </span>
-                  <CheckCircle size={16} className="text-[#00af9b]" />
+                  <CheckCircle
+                    size={16}
+                    style={{
+                      color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                    }}
+                  />
                 </div>
 
                 <div className="text-lg font-semibold flex items-center gap-2 text-white">

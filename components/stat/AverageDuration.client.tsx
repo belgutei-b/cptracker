@@ -1,16 +1,17 @@
 import type { SolvedDurationStats } from "../../lib/userStat";
 import { BarChart2 } from "lucide-react";
 
+export const DIFFICULTY_COLORS = {
+  Easy: "#00af9b",
+  Medium: "#ffb800",
+  Hard: "#ff2d55",
+};
+
 export default function AverageDurationClient({
   stats,
 }: {
   stats: SolvedDurationStats;
 }) {
-  const DIFFICULTY_COLORS = {
-    Easy: "#00af9b",
-    Medium: "#ffb800",
-    Hard: "#ff2d55",
-  };
   return (
     <div className="bg-[#282828] p-6 rounded-xl border border-[#3e3e3e]">
       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6 flex items-center gap-2">
