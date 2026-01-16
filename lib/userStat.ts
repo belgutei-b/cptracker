@@ -10,7 +10,7 @@ export type SolvedDurationStats = {
   averageMin: number;
 }[];
 
-export async function getAverageSolvedDuration({
+export async function getUserStats({
   userId,
 }: {
   userId: string;

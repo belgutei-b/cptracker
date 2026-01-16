@@ -7,13 +7,13 @@ export const DIFFICULTY_COLORS = {
   Hard: "#ff2d55",
 };
 
-export default function AverageDurationClient({
+export default function AverageDuration({
   stats,
 }: {
   stats: SolvedDurationStats;
 }) {
   return (
-    <div className="bg-[#282828] p-6 rounded-xl border border-[#3e3e3e]">
+    <div className="bg-[#282828] p-6 rounded-xl border border-[#3e3e3e] w-80">
       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6 flex items-center gap-2">
         <BarChart2 size={14} /> Average Solution Time
       </h3>

@@ -5,8 +5,8 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 // components
 import AddProblem from "@/components/AddProblem";
-import AverageDurationServer from "@/components/stat/AverageDuration.server";
-import AverageDurationSkeleton from "@/components/stat/AverageDurationSkeleton";
+import StatServer from "../../components/stat/Stat.server";
+import StatSkeloton from "../../components/stat/StatSkeloton";
 import ProblemListServer from "@/components/problems/ProblemList.server";
 import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
 
@@ -21,10 +21,10 @@ export default async function Page() {
 
   return (
     <div className="w-full flex flex-col lg:flex-row-reverse px-4 gap-3">
-      <div className="flex-1 mt-5 md:mt-10">
+      <div className="flex-1 mt-5 md:mt-10 space-y-5 flex flex-col lg:items-end">
         <AddProblem />
-        <Suspense fallback={<AverageDurationSkeleton />}>
-          <AverageDurationServer userId={userId} />
+        <Suspense fallback={<StatSkeloton />}>
+          <StatServer userId={userId} />
         </Suspense>
       </div>
       <div className="w-full lg:w-5/8 mt-5">

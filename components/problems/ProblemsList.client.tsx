@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import ProblemSolving from "../ProblemSolving";
 import type { UserProblemFullClient } from "../../types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "../../lib/timer";
-import { DIFFICULTY_COLORS } from "../stat/AverageDuration.client";
+import { DIFFICULTY_COLORS } from "../stat/AverageDuration";
 
 export default function ProblemListClient({
   receivedProblems,
