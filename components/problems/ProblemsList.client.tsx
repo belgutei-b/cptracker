@@ -138,14 +138,20 @@ export default function ProblemListClient({
             </div>
 
             <div className="flex gap-2 flex-wrap my-3">
-              {problem.problem.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
-                >
-                  {tag}
+              {problem.status === "SOLVED" ? (
+                problem.problem.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
+                  >
+                    {tag}
+                  </span>
+                ))
+              ) : (
+                <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
+                  topics hidden
                 </span>
-              ))}
+              )}
             </div>
 
             <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">

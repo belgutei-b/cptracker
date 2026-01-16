@@ -37,11 +37,13 @@ export default function ProblemSolving({
 
   const [note, setNote] = useState("");
   const [isFinishing, setIsFinishing] = useState(false);
+  const [showUnsolvedTopics, setShowUnsolvedTopics] = useState(false);
 
   // Initialize note when opening / switching problems
   useEffect(() => {
     if (!open || !problem) return;
     setNote(problem.note ?? "");
+    setShowUnsolvedTopics(false);
   }, [open, problem?.problemId]);
 
   // Track last note successfully sent
@@ -154,16 +156,28 @@ export default function ProblemSolving({
               </Link>
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-2">
-              {problem.problem.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+            {problem.status !== "SOLVED" && (
+              <button
+                type="button"
+                onClick={() => setShowUnsolvedTopics((prev) => !prev)}
+                className="mt-2 text-[10px] rounded-full border border-[#3e3e3e] px-2 py-0.5 text-gray-300 hover:text-white hover:border-[#5a5a5a] transition-colors"
+              >
+                {showUnsolvedTopics ? "Hide" : "Show"} topics
+              </button>
+            )}
+
+            {(problem.status === "SOLVED" || showUnsolvedTopics) && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {problem.problem.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col justify-end items-end text-gray-400">
