@@ -4,7 +4,6 @@ import { serializeDates } from "../types/client";
 import { unstable_noStore as noStore } from "next/cache";
 import { getProblemData } from "./leetcode";
 import prisma from "./prisma";
-import { Status } from "@/app/generated/prisma/enums";
 
 export async function serverPostProblem({
   problemLink,
@@ -28,12 +27,12 @@ export async function serverPostProblem({
     },
   });
 
+  // 1.1 If problem doesn't exist, call leetcode graphql
+  // 1.2 add problem to the db
   if (!problem) {
-    // 1.1 if doesn't exist, call leetcode graphql
     const problemData = await getProblemData(titleSlug);
     if (!problemData) throw new Error("Error calling leetcode graphql");
 
-    // 1.2 add problem to the db
     problem = await prisma.problem.create({
       data: {
         questionId: problemData.questionId,
@@ -79,61 +78,13 @@ export async function serverPostProblem({
   }
 
   return true;
-  // 4. invalidate /dashboard
 }
 
+/**
+ * retrieve problems for the user
+ */
 export async function getProblems({ userId }: { userId: string }) {
   noStore();
-  const now = new Date();
-  const staleThreshold = new Date(now.getTime() - 10 * 60 * 1000);
-
-  const staleInProgress = await prisma.userProblem.findMany({
-    where: {
-      userId,
-      status: Status.IN_PROGRESS,
-      lastBeatAt: {
-        lt: staleThreshold,
-      },
-    },
-    select: {
-      problemId: true,
-      duration: true,
-      lastStartedAt: true,
-      lastBeatAt: true,
-    },
-  });
-
-  if (staleInProgress.length > 0) {
-    await prisma.$transaction(
-      staleInProgress.map((p) => {
-        let addSeconds = 0;
-        if (p.lastStartedAt && p.lastBeatAt) {
-          addSeconds = Math.max(
-            0,
-            Math.floor(
-              (p.lastBeatAt.getTime() - p.lastStartedAt.getTime()) / 1000
-            )
-          );
-        }
-
-        const newDuration = (p.duration ?? 0) + addSeconds;
-
-        return prisma.userProblem.updateMany({
-          where: {
-            userId,
-            problemId: p.problemId,
-          },
-          data: {
-            status: Status.TRIED,
-            duration: newDuration,
-            lastStartedAt: null,
-            lastBeatAt: null,
-          },
-        });
-      })
-    );
-  }
-
   const problems = await prisma.userProblem.findMany({
     where: {
       userId,

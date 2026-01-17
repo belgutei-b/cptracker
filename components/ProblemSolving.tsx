@@ -2,7 +2,7 @@
 
 import type { UserProblemFullClient } from "../types/client";
 import { getDisplayedSeconds, formatMMSS } from "../lib/timer";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 
@@ -46,51 +46,6 @@ export default function ProblemSolving({
     setShowUnsolvedTopics(false);
   }, [open, problem?.problemId]);
 
-  // Track last note successfully sent
-  const lastSentNoteRef = useRef<string>("");
-
-  // Reset lastSent when problem changes
-  useEffect(() => {
-    if (!problem) return;
-    lastSentNoteRef.current = problem.note ?? "";
-  }, [problem?.problemId]);
-
-  // Heartbeat every 30s ONLY when running
-  useEffect(() => {
-    if (!open || !problem) return;
-    if (!(problem.status === "IN_PROGRESS" && problem.lastStartedAt)) return;
-
-    let cancelled = false;
-
-    async function sendBeat() {
-      if (cancelled) return;
-
-      const noteChanged = note !== lastSentNoteRef.current;
-      const payload = noteChanged ? { note } : {};
-
-      try {
-        await fetch(`/api/problems/${problem!.problemId}/beat`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (noteChanged) lastSentNoteRef.current = note;
-      } catch {
-        // optionally handle errors
-      }
-    }
-
-    // Optional: beat immediately on open
-    sendBeat();
-
-    const id = window.setInterval(sendBeat, 30_000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [open, problem?.problemId, problem?.status, problem?.lastStartedAt, note]);
-
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
     console.log(isSolved);
     const payload: {
@@ -107,7 +62,11 @@ export default function ProblemSolving({
       });
       if (res.status === 200) {
         const data = (await res.json()) as { duration?: number | null };
-        onFinishLocalAction(problem!.problemId, payload.newStatus, data.duration);
+        onFinishLocalAction(
+          problem!.problemId,
+          payload.newStatus,
+          data.duration
+        );
       }
       // TODO: toast message
       console.log(res);
