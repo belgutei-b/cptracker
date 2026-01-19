@@ -1,7 +1,14 @@
 "use client";
 
 import { SolvedDurationStats } from "../../lib/userStat";
-import { Pie, Cell, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Pie,
+  Cell,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  Label,
+} from "recharts";
 import { LayoutDashboard } from "lucide-react";
 import { DIFFICULTY_COLORS } from "./AverageDuration";
 
