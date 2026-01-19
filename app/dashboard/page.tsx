@@ -28,7 +28,11 @@ export default async function Page() {
         </Suspense>
       </div>
       <div className="w-full lg:w-5/8 mt-5">
-        <div className="text-lg text-white font-bold mb-5">My Dashboard</div>
+        <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
+        <div className="text-gray-400 mb-5">
+          Keep track of your leetcode progress and efficiency.
+        </div>
+
         <div>
           <Suspense fallback={<ProblemListSkeleton />}>
             <ProblemListServer userId={userId} />

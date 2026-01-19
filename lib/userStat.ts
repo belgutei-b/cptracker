@@ -4,7 +4,7 @@ import prisma from "./prisma";
 import type { Difficulty } from "../app/generated/prisma/enums";
 
 export type SolvedDurationStats = {
-  difficulty: Difficulty;
+  difficulty: Difficulty | "Total";
   count: number;
   totalDuration: number;
   averageMin: number;
@@ -49,6 +49,12 @@ export async function getUserStats({
       totalDuration: 0,
       averageMin: 0,
     },
+    {
+      difficulty: "Total",
+      count: 0,
+      totalDuration: 0,
+      averageMin: 0,
+    },
   ];
 
   for (const entry of solved) {
@@ -62,6 +68,16 @@ export async function getUserStats({
       stat.totalDuration += entry.duration ?? 0;
     }
   }
+
+  const totalStat = stats.find((stat) => stat.difficulty === "Total");
+  if (totalStat) {
+    for (const stat of stats) {
+      if (stat.difficulty === "Total") continue;
+      totalStat.count += stat.count;
+      totalStat.totalDuration += stat.totalDuration;
+    }
+  }
+
   for (const stat of stats) {
     if (stat.count > 0) {
       stat.averageMin = Math.floor(stat.totalDuration / 60 / stat.count);
@@ -69,19 +85,6 @@ export async function getUserStats({
       stat.totalDuration = Math.floor(stat.totalDuration / 60);
     }
   }
-
-  // const stats: SolvedDurationStats = {
-  //   Easy: { count: 0, totalDuration: 0 },
-  //   Medium: { count: 0, totalDuration: 0 },
-  //   Hard: { count: 0, totalDuration: 0 },
-  // };
-
-  // for (const entry of solved) {
-  //   const difficulty = entry.problem.difficulty;
-  //   const bucket = stats[difficulty];
-  //   bucket.count += 1;
-  //   bucket.totalDuration += entry.duration ?? 0;
-  // }
 
   return stats;
 }

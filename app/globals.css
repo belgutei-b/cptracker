@@ -38,3 +38,15 @@ body {
   @apply transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   @apply bg-amber-500 hover:bg-amber-600;
 }
+
+.dashboard-stat-box {
+  @apply bg-[#282828] p-3 rounded-xl border border-[#3e3e3e];
+}
+
+.dashboard-stat-title {
+  @apply text-xs font-bold text-gray-400 uppercase;
+}
+
+.dashboard-stat-text {
+  @apply font-bold mt-1 text-white;
+}
