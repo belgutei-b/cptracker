@@ -1,8 +1,6 @@
 export default function StatSkeloton() {
   return (
     <div className="space-y-6">
-      <div className="w-56 h-6 bg-[#3e3e3e] mb-4 animate-pulse rounded" />
-
       <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-5 w-80">
         {Array.from({ length: 4 }).map((_, index) => (
           <div

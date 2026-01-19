@@ -20,14 +20,14 @@ export default async function Page() {
   const userId = session.user.id;
 
   return (
-    <div className="w-full flex flex-col lg:flex-row-reverse px-4 gap-3">
-      <div className="flex-1 mt-5 md:mt-10 space-y-5 flex flex-col lg:items-end">
+    <div className="w-full flex flex-col md:flex-row-reverse px-4">
+      <div className="w-90 mt-5 md:mt-10 space-y-5 flex flex-col md:items-end">
         <AddProblem />
         <Suspense fallback={<StatSkeloton />}>
           <StatServer userId={userId} />
         </Suspense>
       </div>
-      <div className="w-full lg:w-5/8 mt-5">
+      <div className="flex-1 mt-5">
         <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
         <div className="text-gray-400 mb-5">
           Keep track of your leetcode progress and efficiency.

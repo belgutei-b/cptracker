@@ -1,10 +1,10 @@
 export default function ProblemListSkeleton() {
   return (
-    <div className="flex flex-wrap gap-4">
-      {Array.from({ length: 5 }).map((_, index) => (
+    <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
+      {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}
-          className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-90 animate-pulse"
+          className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full animate-pulse"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="w-60 space-y-2">

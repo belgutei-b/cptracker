@@ -88,11 +88,11 @@ export default function ProblemListClient({
 
   return (
     <>
-      <div className="flex flex-wrap gap-4">
+      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {problems.map((problem) => (
           <div
             key={problem.problemId}
-            className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-90"
+            className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full"
           >
             <div className="flex justify-between items-start mb-2">
               <div className="w-60">
