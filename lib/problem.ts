@@ -92,6 +92,9 @@ export async function getProblems({ userId }: { userId: string }) {
     include: {
       problem: true,
     },
+    orderBy: {
+      updatedAt: "desc",
+    },
   });
 
   return serializeDates(problems);

@@ -5,6 +5,7 @@ import { getDisplayedSeconds, formatMMSS } from "../lib/timer";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function ProblemSolving({
   open,
@@ -22,7 +23,7 @@ export default function ProblemSolving({
   onFinishLocalAction: (
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
-    duration?: number | null
+    duration?: number | null,
   ) => void;
 }) {
   // Close on Escape
@@ -50,8 +51,10 @@ export default function ProblemSolving({
     console.log(isSolved);
     const payload: {
       newStatus: "SOLVED" | "TRIED";
+      note: string;
     } = {
       newStatus: isSolved ? "SOLVED" : "TRIED",
+      note: note,
     };
     try {
       setIsFinishing(true);
@@ -65,8 +68,11 @@ export default function ProblemSolving({
         onFinishLocalAction(
           problem!.problemId,
           payload.newStatus,
-          data.duration
+          data.duration,
         );
+        toast.success("Successfully updated");
+      } else {
+        toast.error("Error updating problem");
       }
       // TODO: toast message
       console.log(res);

@@ -1,14 +1,9 @@
 "use server";
 
+import { Status } from "@/app/generated/prisma/enums";
 import prisma from "./prisma";
-import type { Difficulty } from "../app/generated/prisma/enums";
-
-export type SolvedDurationStats = {
-  difficulty: Difficulty | "Total";
-  count: number;
-  totalDuration: number;
-  averageMin: number;
-}[];
+import type { SolvedDurationStats } from "@/types/stat";
+import type { BarChartData } from "@/types/stat";
 
 export async function getUserStats({
   userId,
@@ -87,4 +82,84 @@ export async function getUserStats({
   }
 
   return stats;
+}
+
+export async function getBarChartData({
+  numberOfDays,
+  isSolvedOnly,
+  userId,
+}: {
+  numberOfDays: number;
+  isSolvedOnly: boolean;
+  userId: string;
+}): Promise<BarChartData[]> {
+  console.log(numberOfDays, isSolvedOnly, userId);
+  const now = new Date();
+  const endDate = new Date(now);
+  endDate.setHours(23, 59, 59, 999);
+
+  const startDate = new Date(now);
+  startDate.setHours(0, 0, 0, 0);
+  startDate.setDate(startDate.getDate() - (numberOfDays - 1));
+
+  const statuses: Status[] = isSolvedOnly
+    ? ["SOLVED"]
+    : ["TRIED", "SOLVED", "IN_PROGRESS"];
+
+  const rows = await prisma.userProblem.findMany({
+    where: {
+      userId,
+      status: {
+        in: statuses,
+      },
+      lastBeatAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    select: {
+      duration: true,
+      lastBeatAt: true,
+      problem: {
+        select: {
+          difficulty: true,
+        },
+      },
+    },
+  });
+
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const toKey = (date: Date) =>
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const toLabel = (date: Date) =>
+    `${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+
+  const dayMap = new Map<string, BarChartData>();
+  for (let i = 0; i < numberOfDays; i += 1) {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    const key = toKey(date);
+    dayMap.set(key, {
+      date: toLabel(date),
+      easy: 0,
+      medium: 0,
+      hard: 0,
+      problemCount: 0,
+    });
+  }
+
+  for (const row of rows) {
+    if (!row.lastBeatAt) continue;
+    const key = toKey(row.lastBeatAt);
+    const entry = dayMap.get(key);
+    if (!entry) continue;
+
+    const duration = row.duration ?? 0;
+    if (row.problem.difficulty === "Easy") entry.easy += duration;
+    if (row.problem.difficulty === "Medium") entry.medium += duration;
+    if (row.problem.difficulty === "Hard") entry.hard += duration;
+    entry.problemCount += 1;
+  }
+
+  return Array.from(dayMap.values());
 }

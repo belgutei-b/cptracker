@@ -10,7 +10,7 @@ function isStatus(value: unknown): value is Status {
 export async function POST(
   request: NextRequest,
 
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const problemId = (await params).id;
@@ -50,7 +50,7 @@ export async function POST(
       if (existing.lastStartedAt) {
         addSeconds = Math.max(
           0,
-          Math.floor((now.getTime() - existing.lastStartedAt.getTime()) / 1000)
+          Math.floor((now.getTime() - existing.lastStartedAt.getTime()) / 1000),
         );
       }
 
@@ -66,7 +66,8 @@ export async function POST(
           status: body.newStatus,
           duration: newDuration,
           lastStartedAt: null,
-          lastBeatAt: null,
+          lastBeatAt: now,
+          solvedAt: now,
           ...(typeof body.note === "string" ? { note: body.note } : {}),
         },
       });
@@ -79,7 +80,7 @@ export async function POST(
       { error: "Unexpected error occurred" },
       {
         status: 500,
-      }
+      },
     );
   }
 }

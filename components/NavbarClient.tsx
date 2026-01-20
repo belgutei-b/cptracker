@@ -25,18 +25,32 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
           </Link>
           <div className="flex items-center gap-1">
             {signedIn && (
-              <Link
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+              <div className="space-x-3">
+                <Link
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
                 ${
                   pathname === "/dashboard"
                     ? "bg-[#333] text-white"
                     : "text-gray-400 hover:text-white"
                 }
               `}
-                href="/dashboard"
-              >
-                Dashboard
-              </Link>
+                  href="/dashboard"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                ${
+                  pathname === "/analytics"
+                    ? "bg-[#333] text-white"
+                    : "text-gray-400 hover:text-white"
+                }
+              `}
+                  href="/analytics"
+                >
+                  Analytics
+                </Link>
+              </div>
             )}
           </div>
         </div>

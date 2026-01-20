@@ -1,7 +1,6 @@
 import { getUser } from "../../lib/user";
 import { auth } from "../../lib/auth";
 import { headers } from "next/headers";
-import WeeklyActivityChart from "../../components/profile/WeeklyActivityChart";
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -17,7 +16,6 @@ export default async function Page() {
   return (
     <div className="px-4 py-6 space-y-6">
       <div className="text-xl text-white font-bold">Profile & Analytics</div>
-      <WeeklyActivityChart />
     </div>
   );
 }
