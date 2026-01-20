@@ -12,10 +12,9 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import * as Switch from "@radix-ui/react-switch";
 import { useEffect, useState } from "react";
-import "./swichStyles.css";
 import { DIFFICULTY_COLORS as COLORS } from "@/components/stat/AverageDuration";
+import { Filter } from "lucide-react";
 
 type ChartData = {
   date: string;
@@ -45,19 +44,21 @@ export default function ActivityChart() {
         }
         const payload = await response.json();
         const data = Array.isArray(payload?.data) ? payload.data : [];
-        const mapped = data.map((entry: {
-          date: string;
-          easy: number;
-          medium: number;
-          hard: number;
-          problemCount: number;
-        }) => ({
-          date: entry.date,
-          Easy: entry.easy ?? 0,
-          Medium: entry.medium ?? 0,
-          Hard: entry.hard ?? 0,
-          Solved: entry.problemCount ?? 0,
-        }));
+        const mapped = data.map(
+          (entry: {
+            date: string;
+            easy: number;
+            medium: number;
+            hard: number;
+            problemCount: number;
+          }) => ({
+            date: entry.date,
+            Easy: entry.easy ?? 0,
+            Medium: entry.medium ?? 0,
+            Hard: entry.hard ?? 0,
+            Solved: entry.problemCount ?? 0,
+          }),
+        );
         setChartData(mapped);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
@@ -110,33 +111,40 @@ export default function ActivityChart() {
             </div>
           </div>
           {/* switch and duration selector */}
-          <div className="mt-2 flex space-x-5">
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                className="Label text-sm"
-                htmlFor="solved-only"
-                style={{ paddingRight: 15 }}
-              >
-                Solved Only
-              </label>
-              <Switch.Root
-                className="SwitchRoot"
-                id="solved-only"
-                checked={isSolvedOnly}
-                onCheckedChange={setIsSolvedOnly}
-              >
-                <Switch.Thumb className="SwitchThumb" />
-              </Switch.Root>
+          <div className="mt-2 flex space-x-3">
+            <div className="flex items-center bg-[#1a1a1a] rounded-lg p-1 border border-[#3e3e3e]">
+              {([7, 14, 28] as const).map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setNumberOfDays(range)}
+                  className={`px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
+                    numberOfDays === range
+                      ? "bg-[#ffa116] text-black shadow-lg shadow-[#ffa11633]"
+                      : "text-gray-500 hover:text-white"
+                  }`}
+                >
+                  {range === 7
+                    ? "7 Days"
+                    : range === 14
+                      ? "2 Weeks"
+                      : "1 Month"}
+                </button>
+              ))}
             </div>
-            <select
-              className="bg-stone-700 border-stone-500 border rounded-md py-1 pl-2 text-sm text-white"
-              value={numberOfDays}
-              onChange={(event) => setNumberOfDays(Number(event.target.value))}
+
+            {/* Solved Only Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsSolvedOnly(!isSolvedOnly)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-bold uppercase w-31 ${
+                isSolvedOnly
+                  ? "bg-[#00af9b20] border-[#00af9b40] text-[#00af9b]"
+                  : "bg-[#1a1a1a] border-[#3e3e3e] text-gray-500 hover:text-white"
+              }`}
             >
-              <option value={7}>Last 7 days</option>
-              <option value={14}>Last 2 weeks</option>
-              <option value={28}>Last month</option>
-            </select>
+              <Filter size={12} />
+              {isSolvedOnly ? "Solved Only" : "All Attempts"}
+            </button>
           </div>
         </div>
       </div>
