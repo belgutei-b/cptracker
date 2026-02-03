@@ -2,7 +2,7 @@
 import { Brain, UserIcon, Search, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "../lib/auth-client";
+import { signOut } from "@/lib/auth-client";
 
 export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#1a1a1a]/80 backdrop-blur-md border-b border-neutral-700 px-6 py-4">
+    <nav className="bg-[#1a1a1a]/80 border-b border-neutral-700 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <Link
