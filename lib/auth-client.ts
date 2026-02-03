@@ -1,8 +1,14 @@
 import { createAuthClient } from "better-auth/react";
 
+const isDev = process.env.NODE_ENV !== "production";
+const devBaseUrl =
+  process.env.NEXT_PUBLIC_BETTER_AUTH_URL_DEV ?? "http://localhost:3000";
+const prodBaseUrl =
+  process.env.NEXT_PUBLIC_BETTER_AUTH_URL_PROD ?? "https://www.cptracker.org";
+
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3000",
+  baseURL: isDev ? devBaseUrl : prodBaseUrl,
 });
 
 export const googleSignIn = async () => {

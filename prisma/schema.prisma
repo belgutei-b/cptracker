@@ -6,13 +6,11 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../prisma/generated"
-  engineType = "client"
+  output   = "./generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Difficulty {
