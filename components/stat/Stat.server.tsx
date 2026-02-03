@@ -1,5 +1,5 @@
-import { getUserStats } from "../../lib/userStat";
-import AverageDuration from "./AverageDuration";
+import { getUserStats } from "@/lib/userStat";
+import AverageDuration from "@/components/stat/AverageDuration";
 import BoxStats from "./BoxStats";
 import DifficultyRatio from "./DifficultyRatio";
 

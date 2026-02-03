@@ -1,6 +1,6 @@
 "use client";
 import { Brain } from "lucide-react";
-import { githubSignIn, googleSignIn } from "../lib/auth-client";
+import { githubSignIn, googleSignIn } from "@/lib/auth-client";
 
 export default function Auth() {
   return (

@@ -5,8 +5,8 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 // components
 import AddProblem from "@/components/AddProblem";
-import StatServer from "../../components/stat/Stat.server";
-import StatSkeloton from "../../components/stat/StatSkeloton";
+import StatServer from "@/components/stat/Stat.server";
+import StatSkeloton from "@/components/stat/StatSkeloton";
 import DashboardMain from "@/components/DashboardMain";
 import { getProblems } from "@/lib/problem";
 

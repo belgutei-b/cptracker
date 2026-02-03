@@ -4,10 +4,10 @@ import Link from "next/link";
 import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import ProblemSolving from "../ProblemSolving";
-import type { UserProblemFullClient } from "../../types/client";
-import { useNowTick, getDisplayedSeconds, formatMMSS } from "../../lib/timer";
-import { DIFFICULTY_COLORS } from "../stat/AverageDuration";
+import ProblemSolving from "@/components/ProblemSolving";
+import type { UserProblemFullClient } from "@/types/client";
+import { useNowTick, getDisplayedSeconds, formatMMSS } from "@/lib/timer";
+import { DIFFICULTY_COLORS } from "@/components/stat/AverageDuration";
 
 export default function ProblemListClient({
   receivedProblems,
@@ -29,7 +29,7 @@ export default function ProblemListClient({
 
   const activeProblem = useMemo(
     () => problems.find((p) => p.problemId === activeProblemId) ?? null,
-    [problems, activeProblemId]
+    [problems, activeProblemId],
   );
   const difficultyFilter = filters.difficulty ?? "all";
   const statusFilter = filters.status ?? "all";
@@ -46,7 +46,7 @@ export default function ProblemListClient({
   }, [problems, difficultyFilter, statusFilter]);
 
   const anyRunning = problems.some(
-    (p) => p.status === "IN_PROGRESS" && p.lastStartedAt
+    (p) => p.status === "IN_PROGRESS" && p.lastStartedAt,
   );
   const nowMs = useNowTick(isClient && anyRunning);
   const displayNowMs = isClient ? nowMs : 0;
@@ -70,14 +70,14 @@ export default function ProblemListClient({
 
   function onNoteLocalChange(problemId: string, note: string) {
     setProblems((prev) =>
-      prev.map((p) => (p.problemId === problemId ? { ...p, note } : p))
+      prev.map((p) => (p.problemId === problemId ? { ...p, note } : p)),
     );
   }
 
   function onFinishLocalAction(
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
-    duration?: number | null
+    duration?: number | null,
   ) {
     setProblems((prev) =>
       prev.map((p) =>
@@ -88,8 +88,8 @@ export default function ProblemListClient({
               lastStartedAt: null,
               ...(typeof duration === "number" ? { duration } : {}),
             }
-          : p
-      )
+          : p,
+      ),
     );
   }
 
@@ -110,8 +110,8 @@ export default function ProblemListClient({
       prev.map((p) =>
         p.problemId === problemId
           ? { ...p, status: "IN_PROGRESS", lastStartedAt: startedAtIso }
-          : p
-      )
+          : p,
+      ),
     );
 
     // Call the start endpoint (recommended)

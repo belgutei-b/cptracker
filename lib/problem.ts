@@ -1,6 +1,6 @@
 "use server";
 
-import { serializeDates } from "../types/client";
+import { serializeDates } from "@/types/client";
 import { unstable_noStore as noStore } from "next/cache";
 import { getLeetcodeDailyProblem, getProblemData } from "./leetcode";
 import prisma from "./prisma";
@@ -91,11 +91,7 @@ export async function serverPostProblem({
   return true;
 }
 
-export async function serverAddDailyProblem({
-  userId,
-}: {
-  userId: string;
-}) {
+export async function serverAddDailyProblem({ userId }: { userId: string }) {
   const dailyLink = await getLeetcodeDailyProblem();
   if (!dailyLink) throw new Error("Error fetching daily problem");
 

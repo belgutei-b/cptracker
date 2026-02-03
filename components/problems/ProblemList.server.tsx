@@ -1,5 +1,5 @@
-import { getProblems } from "../../lib/problem";
-import ProblemListClient from "./ProblemsList.client";
+import { getProblems } from "@/lib/problem";
+import ProblemListClient from "@/components/problems/ProblemsList.client";
 
 export default async function ProblemListServer({
   userId,

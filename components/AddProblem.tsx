@@ -2,7 +2,7 @@
 import { Plus, LinkIcon } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { actionPostProblem } from "../app/dashboard/actions";
+import { actionPostProblem } from "@/app/dashboard/actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 

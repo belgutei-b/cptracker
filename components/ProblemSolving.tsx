@@ -1,7 +1,7 @@
 "use client";
 
-import type { UserProblemFullClient } from "../types/client";
-import { getDisplayedSeconds, formatMMSS } from "../lib/timer";
+import type { UserProblemFullClient } from "@/types/client";
+import { getDisplayedSeconds, formatMMSS } from "@/lib/timer";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";

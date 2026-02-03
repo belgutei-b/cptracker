@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { UserProblemFullClient } from "../types/client";
+import type { UserProblemFullClient } from "@/types/client";
 import ProblemListClient from "./problems/ProblemsList.client";
 
 export default function DashboardMain({

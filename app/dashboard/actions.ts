@@ -1,8 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
-import { auth } from "../../lib/auth";
-import { serverAddDailyProblem, serverPostProblem } from "../../lib/problem";
+import { auth } from "@/lib/auth";
+import { serverAddDailyProblem, serverPostProblem } from "@/lib/problem";
 import { revalidatePath } from "next/cache";
 
 export async function actionPostProblem(link: string) {
