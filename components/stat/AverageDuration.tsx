@@ -1,4 +1,4 @@
-import type { SolvedDurationStats } from "../../lib/userStat";
+import type { SolvedDurationStats } from "@/types/stat";
 import { BarChart2 } from "lucide-react";
 
 export const DIFFICULTY_COLORS = {

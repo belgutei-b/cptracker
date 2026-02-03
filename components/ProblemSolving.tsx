@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 import toast from "react-hot-toast";
+import { DIFFICULTY_COLORS } from "@/components/stat/AverageDuration";
 
 export default function ProblemSolving({
   open,
@@ -101,10 +102,20 @@ export default function ProblemSolving({
         <div className="flex items-start justify-between gap-4 border-b border-[#3e3e3e] p-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-emerald-500 text-xs font-bold tracking-wider uppercase">
+              <span
+                className="text-xs font-bold tracking-wider uppercase"
+                style={{
+                  color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                }}
+              >
                 {problem.problem.difficulty}
               </span>
-              <CheckCircle size={16} className="text-[#00af9b]" />
+              <CheckCircle
+                size={16}
+                style={{
+                  color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                }}
+              />
             </div>
 
             <div className="mt-1 flex items-center gap-2 text-xl font-semibold text-white">
