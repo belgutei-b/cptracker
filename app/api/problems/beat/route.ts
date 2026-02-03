@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/user";
-import { Status } from "@/app/generated/prisma/enums";
+import { Status } from "@/prisma/generated/enums";
 
 export async function POST() {
   const userId = await getCurrentUserId();

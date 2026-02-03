@@ -1,4 +1,4 @@
-import type { Difficulty } from "@/app/generated/prisma/enums";
+import type { Difficulty } from "@/prisma/generated/enums";
 
 export type BarChartData = {
   // month/day

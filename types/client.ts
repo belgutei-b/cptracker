@@ -1,4 +1,4 @@
-import type { UserProblem, Problem } from "@/app/generated/prisma/client";
+import type { UserProblem, Problem } from "@/prisma/generated/client";
 
 type DateToString<T> = T extends Date
   ? string

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/user";
-import { Status } from "@/app/generated/prisma/enums";
+import { Status } from "@/prisma/generated/enums";
 
 function isStatus(value: unknown): value is Status {
   return value === "TRIED" || value === "SOLVED";
