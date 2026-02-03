@@ -24,7 +24,7 @@ type ChartData = {
   Solved: number;
 };
 
-export default function ActivityChart() {
+export default function TotalSolveDuration() {
   const [isSolvedOnly, setIsSolvedOnly] = useState(false);
   const [numberOfDays, setNumberOfDays] = useState(7);
   const [chartData, setChartData] = useState<ChartData[]>([]);
@@ -74,7 +74,7 @@ export default function ActivityChart() {
   }, [isSolvedOnly, numberOfDays]);
 
   return (
-    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-90 w-180">
+    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-90 w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-lg text-white font-bold">Total Time</p>

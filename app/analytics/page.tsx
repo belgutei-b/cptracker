@@ -1,4 +1,5 @@
-import ActivityChart from "@/components/analytics/AnalyticsDurationCnt";
+import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
+import AverageSolveDuration from "@/components/analytics/AverageSolveDuration";
 import { Timer, Trophy } from "lucide-react";
 
 export default async function Page() {
@@ -45,7 +46,11 @@ export default async function Page() {
         </div>
       </div>
 
-      <ActivityChart />
+      <div className="w-180 space-y-10">
+        <TotalSolveDuration />
+
+        <AverageSolveDuration />
+      </div>
     </div>
   );
 }
