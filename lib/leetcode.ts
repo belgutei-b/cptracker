@@ -28,7 +28,6 @@ query questionTitle($titleSlug: String!) {
 // https://github.com/akarsh1995/leetcode-graphql-queries/blob/main/problem_solve_page/problem_solve_page.graphql
 
 export async function getProblemData(slug: string) {
-  // TODO: check if exists in the database
   const query = `
     query singleQuestionTopicTags($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
@@ -59,4 +58,32 @@ export async function getProblemData(slug: string) {
   const data = await res.json();
 
   return data.data.question;
+}
+
+export async function getLeetcodeDailyProblem() {
+  const query = `
+    query questionOfToday {
+      activeDailyCodingChallengeQuestion {
+        link
+      }
+    }
+  `;
+  const res = await fetch("https://leetcode.com/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: {},
+      operationName: "questionOfToday",
+    }),
+  });
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const data = await res.json();
+  return data?.data?.activeDailyCodingChallengeQuestion?.link ?? null;
 }

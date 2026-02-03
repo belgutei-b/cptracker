@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProblemSolving from "../ProblemSolving";
 import type { UserProblemFullClient } from "../../types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "../../lib/timer";
@@ -17,6 +18,9 @@ export default function ProblemListClient({
     useState<UserProblemFullClient[]>(receivedProblems);
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const openProblemId = searchParams.get("openProblemId");
 
   const activeProblem = useMemo(
     () => problems.find((p) => p.problemId === activeProblemId) ?? null,
@@ -35,6 +39,16 @@ export default function ProblemListClient({
   useEffect(() => {
     setIsClient(true);
   }, []);
+  useEffect(() => {
+    if (!openProblemId) return;
+    const exists = problems.some((p) => p.problemId === openProblemId);
+    if (!exists) return;
+    setActiveProblemId(openProblemId);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("openProblemId");
+    const next = params.toString();
+    router.replace(next ? `/dashboard?${next}` : "/dashboard");
+  }, [openProblemId, problems, router, searchParams]);
 
   function onNoteLocalChange(problemId: string, note: string) {
     setProblems((prev) =>

@@ -21,7 +21,8 @@ export default function HeartbeatManager() {
     }
 
     sendBeat();
-    const id = window.setInterval(sendBeat, 10_000);
+    // heartbeat in every 60 seconds
+    const id = window.setInterval(sendBeat, 60_000);
     return () => {
       cancelled = true;
       window.clearInterval(id);

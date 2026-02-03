@@ -9,6 +9,7 @@ import StatServer from "../../components/stat/Stat.server";
 import StatSkeloton from "../../components/stat/StatSkeloton";
 import ProblemListServer from "@/components/problems/ProblemList.server";
 import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
+import DailyQuestionButton from "@/components/DailyQuestionButton";
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -28,11 +29,19 @@ export default async function Page() {
         </Suspense>
       </div>
       <div className="flex-1 mt-5">
-        <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
-        <div className="text-gray-400 mb-5">
-          Keep track of your leetcode progress and efficiency.
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="text-xl text-white font-bold mb-1">
+              My Dashboard
+            </div>
+            <div className="text-gray-400 mb-5">
+              Keep track of your leetcode progress and efficiency.
+            </div>
+          </div>
+          <div>
+            <DailyQuestionButton />
+          </div>
         </div>
-
         <div>
           <Suspense fallback={<ProblemListSkeleton />}>
             <ProblemListServer userId={userId} />
