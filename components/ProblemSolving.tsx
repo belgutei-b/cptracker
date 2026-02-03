@@ -71,12 +71,9 @@ export default function ProblemSolving({
           data.duration,
         );
         toast.success("Successfully updated");
-      } else {
-        toast.error("Error updating problem");
       }
-      // TODO: toast message
-      console.log(res);
     } catch (err) {
+      toast.error("Unexpected Error Occurred");
       console.log(err);
     } finally {
       setIsFinishing(false);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Swords } from "lucide-react";
 import toast from "react-hot-toast";
-import { actionDailyProblem } from "../app/dashboard/actions";
+import { actionDailyProblem } from "@/app/dashboard/actions";
 
 export default function DailyQuestionButton() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,13 +15,16 @@ export default function DailyQuestionButton() {
     setIsSubmitting(true);
     try {
       const res = await actionDailyProblem();
-      toast(res.message);
       if (res.success && res.problemId) {
         router.push(`/dashboard?openProblemId=${res.problemId}`);
         if (!res.alreadyAdded) {
           router.refresh();
         }
+      } else {
+        throw new Error("err");
       }
+    } catch (err) {
+      toast.error("Unexpected Error Occurred");
     } finally {
       setIsSubmitting(false);
     }

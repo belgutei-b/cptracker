@@ -14,19 +14,22 @@ export default function AddProblem() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!link) {
-      toast("Leetcode problem link required");
+      toast.error("Leetcode problem link required");
       return;
     }
     setIsSubmitting(true);
     try {
       const res = await actionPostProblem(link);
-      console.log(res);
 
-      toast(res.message);
       if (res.success) {
+        toast.success(res.message);
         setLink("");
         router.refresh();
+      } else {
+        toast.error(res.message);
       }
+    } catch (err) {
+      toast.error("Unexpected Error Occurred");
     } finally {
       setIsSubmitting(false);
     }
