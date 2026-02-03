@@ -1,6 +1,6 @@
 "use client";
 
-import { SolvedDurationStats } from "../../lib/userStat";
+import type { SolvedDurationStats } from "@/types/stat";
 import {
   Pie,
   Cell,

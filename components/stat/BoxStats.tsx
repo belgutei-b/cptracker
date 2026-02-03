@@ -1,6 +1,6 @@
 "use client";
 
-import { SolvedDurationStats } from "@/lib/userStat";
+import { SolvedDurationStats } from "@/types/stat";
 import { formatMMSS } from "@/lib/timer";
 
 export default function BoxStats({ stats }: { stats: SolvedDurationStats }) {
