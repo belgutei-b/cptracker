@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/user";
-import { Status } from "@/prisma/generated/enums";
+import { Status } from "@/prisma/generated/prisma/enums";
 
 export async function POST() {
   const userId = await getCurrentUserId();
@@ -39,8 +39,8 @@ export async function POST() {
           addSeconds = Math.max(
             0,
             Math.floor(
-              (p.lastBeatAt.getTime() - p.lastStartedAt.getTime()) / 1000
-            )
+              (p.lastBeatAt.getTime() - p.lastStartedAt.getTime()) / 1000,
+            ),
           );
         }
 
@@ -58,7 +58,7 @@ export async function POST() {
             lastBeatAt: null,
           },
         });
-      })
+      }),
     );
   }
 

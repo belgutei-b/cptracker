@@ -1,6 +1,6 @@
 "use server";
 
-import { Status } from "@/prisma/generated/enums";
+import { Status } from "@/prisma/generated/prisma/enums";
 import prisma from "./prisma";
 import type { SolvedDurationStats } from "@/types/stat";
 import type { BarChartData } from "@/types/stat";
