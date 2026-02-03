@@ -1,8 +1,9 @@
 "use client";
-import { Brain, UserIcon, Search, LogOut } from "lucide-react";
+import { Brain, UserIcon, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
+import DailyQuestionButton from "./DailyQuestionButton";
 
 export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
@@ -56,13 +57,8 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
         </div>
         {signedIn && (
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center bg-[#282828] rounded-full px-4 py-2 border border-neutral-700">
-              <Search size={16} className="text-gray-500 mr-2" />
-              <input
-                type="text"
-                placeholder="Search problems..."
-                className="bg-transparent border-none outline-none text-sm w-48 text-white placeholder-gray-600"
-              />
+            <div className="hidden sm:flex items-center">
+              <DailyQuestionButton />
             </div>
             <div className="flex items-center gap-2">
               <Link

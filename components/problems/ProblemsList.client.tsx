@@ -11,8 +11,13 @@ import { DIFFICULTY_COLORS } from "../stat/AverageDuration";
 
 export default function ProblemListClient({
   receivedProblems,
+  filters = { difficulty: "all", status: "all" },
 }: {
   receivedProblems: UserProblemFullClient[];
+  filters?: {
+    difficulty: string;
+    status: string;
+  };
 }) {
   const [problems, setProblems] =
     useState<UserProblemFullClient[]>(receivedProblems);
@@ -26,6 +31,19 @@ export default function ProblemListClient({
     () => problems.find((p) => p.problemId === activeProblemId) ?? null,
     [problems, activeProblemId]
   );
+  const difficultyFilter = filters.difficulty ?? "all";
+  const statusFilter = filters.status ?? "all";
+  const filteredProblems = useMemo(() => {
+    return problems.filter((p) => {
+      const matchesDifficulty =
+        difficultyFilter === "all" ||
+        p.problem.difficulty.toLowerCase() === difficultyFilter;
+      const normalizedStatus = p.status.toLowerCase().replace("_", "-");
+      const matchesStatus =
+        statusFilter === "all" || normalizedStatus === statusFilter;
+      return matchesDifficulty && matchesStatus;
+    });
+  }, [problems, difficultyFilter, statusFilter]);
 
   const anyRunning = problems.some(
     (p) => p.status === "IN_PROGRESS" && p.lastStartedAt
@@ -103,7 +121,7 @@ export default function ProblemListClient({
   return (
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
-        {problems.map((problem) => (
+        {filteredProblems.map((problem) => (
           <div
             key={problem.problemId}
             className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full"
