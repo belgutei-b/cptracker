@@ -6,7 +6,8 @@ export default async function Home() {
 
   try {
     userCount = await getUserCount();
-  } catch {
+  } catch (err) {
+    console.log(err);
     userCountFailed = true;
   }
 
