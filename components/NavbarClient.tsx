@@ -1,5 +1,6 @@
 "use client";
-import { Brain, UserIcon, LogOut } from "lucide-react";
+import { Brain } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
@@ -8,10 +9,17 @@ import DailyQuestionButton from "./DailyQuestionButton";
 export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleBetterLogout = async () => {
-    await signOut();
-    router.refresh();
+    if (logoutLoading) return;
+    setLogoutLoading(true);
+    try {
+      await signOut();
+      router.refresh();
+    } finally {
+      setLogoutLoading(false);
+    }
   };
 
   return (
@@ -51,6 +59,18 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
                 >
                   Analytics
                 </Link>
+                <Link
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                ${
+                  pathname === "/profile"
+                    ? "bg-[#333] text-white"
+                    : "text-gray-400 hover:text-white"
+                }
+              `}
+                  href="/profile"
+                >
+                  Profile
+                </Link>
               </div>
             )}
           </div>
@@ -61,17 +81,12 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
               <DailyQuestionButton />
             </div>
             <div className="flex items-center gap-2">
-              <Link
-                href="/profile"
-                className="w-9 h-9 rounded-full bg-[#3e3e3e] flex items-center justify-center text-gray-300 hover:bg-[#4e4e4e] transition-colors"
-              >
-                <UserIcon size={18} />
-              </Link>
               <button
                 onClick={handleBetterLogout}
-                className="w-9 h-9 rounded-full bg-[#3e3e3e] flex items-center justify-center text-red-400 hover:bg-red-900/30 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-red-400 hover:text-red-500 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-red-400"
+                disabled={logoutLoading}
               >
-                <LogOut size={18} />
+                Sign out
               </button>
             </div>
           </div>
@@ -79,13 +94,8 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
         {!signedIn && (
           <div className="flex items-center gap-4">
             <Link
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                ${
-                  pathname === "/auth"
-                    ? "bg-[#333] text-white"
-                    : "text-gray-400 hover:text-white"
-                }
-              `}
+              className="px-4 py-2 rounded-lg text-sm font-semibold border transition-colors
+                bg-amber-500 text-neutral-900"
               href="/auth"
             >
               Sign in
