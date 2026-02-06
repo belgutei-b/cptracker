@@ -2,6 +2,10 @@ import { PrismaClient } from "../prisma/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const currEnv = process.env.NODE_ENV;
+
+// WARNING: running migration in prod
+// const url = process.env.DB_URL_PROD;
+
 const url =
   currEnv === "production" ? process.env.DB_URL_PROD : process.env.DB_URL_TEST;
 

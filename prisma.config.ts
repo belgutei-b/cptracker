@@ -9,6 +9,10 @@ import { defineConfig } from "prisma/config";
 
 const currEnv = process.env.NODE_ENV;
 console.log(currEnv);
+
+// WARNING: running migration in prod
+// const url = process.env.DB_URL_PROD;
+
 const url =
   currEnv === "production" ? process.env.DB_URL_PROD : process.env.DB_URL_TEST;
 
