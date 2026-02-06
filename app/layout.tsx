@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar.server";
 import ToastProvider from "@/components/ToastProvider";
 import HeartbeatManager from "@/components/HeartbeatManager";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,6 +52,7 @@ export default function RootLayout({
         <HeartbeatManager />
         <Navbar />
         {children}
+        <Analytics />
       </body>
     </html>
   );
