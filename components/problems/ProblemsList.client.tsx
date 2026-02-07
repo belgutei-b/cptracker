@@ -9,6 +9,46 @@ import type { UserProblemFullClient } from "@/types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "@/lib/timer";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 
+const SHORT_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+function formatDateForCard(dateValue?: string | null) {
+  if (!dateValue) return "-";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return `${date.getDate()} ${SHORT_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+}
+
+function getDisplayDate(problem: UserProblemFullClient) {
+  if (problem.status === "SOLVED") {
+    return problem.solvedAt ?? problem.updatedAt ?? problem.createdAt;
+  }
+
+  if (problem.status === "IN_PROGRESS" || problem.status === "TRIED") {
+    return (
+      problem.lastStartedAt ??
+      problem.lastBeatAt ??
+      problem.updatedAt ??
+      problem.createdAt
+    );
+  }
+
+  return problem.createdAt;
+}
+
 export default function ProblemListClient({
   receivedProblems,
   filters = { difficulty: "all", status: "all" },
@@ -118,92 +158,99 @@ export default function ProblemListClient({
     await fetch(`/api/problems/${problemId}/start`, { method: "POST" });
   }
 
-  console.log(problems[0]);
-
   return (
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
-        {filteredProblems.map((problem) => (
-          <div
-            key={problem.problemId}
-            className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full flex flex-col justify-between"
-          >
-            {/* UPPER PART  */}
-            <div>
-              {/* Difficulty | Duration */}
-              <div className="flex justify-between mb-2">
-                {/* Difficulty | left side */}
-                <div className="flex items-center gap-2">
-                  <p
-                    className="text-xs font-bold tracking-wider uppercase"
-                    style={{
-                      color: DIFFICULTY_COLORS[problem.problem.difficulty],
-                    }}
-                  >
-                    {problem.problem.difficulty}
-                  </p>
-                  <CheckCircle
-                    size={16}
-                    style={{
-                      color: DIFFICULTY_COLORS[problem.problem.difficulty],
-                    }}
-                  />
-                </div>
-                {/* Duration | right side */}
-                <div className="flex items-center text-xs font-mono text-gray-400">
-                  <Clock size={12} className="mr-1.5" />
-                  <p className="tracking-tighter">
-                    {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
-                  </p>
-                </div>
-              </div>
+        {filteredProblems.map((problem) => {
+          const displayDate = formatDateForCard(getDisplayDate(problem));
 
-              {/* Title & Problem link */}
-              <div className="text-lg font-semibold flex gap-2 text-white">
-                <p>{problem.problem.title}</p>
-                <Link
-                  href={problem.problem.link}
-                  target="_blank"
-                  className="text-gray-500 hover:text-white transition-colors mt-1"
-                >
-                  <ExternalLink size={16} />
-                </Link>
-              </div>
-
-              {/* Topics */}
-              <div className="flex gap-2 flex-wrap my-3">
-                {problem.status === "SOLVED" ? (
-                  problem.problem.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
+          return (
+            <div
+              key={problem.problemId}
+              className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full flex flex-col justify-between"
+            >
+              {/* UPPER PART  */}
+              <div>
+                {/* Difficulty | Duration */}
+                <div className="flex justify-between mb-2">
+                  {/* Difficulty | left side */}
+                  <div className="flex items-center gap-1.5">
+                    <p
+                      className="text-xs font-bold tracking-wider uppercase"
+                      style={{
+                        color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                      }}
                     >
-                      {tag}
+                      {problem.problem.difficulty}
+                    </p>
+                    <CheckCircle
+                      size={16}
+                      style={{
+                        color: DIFFICULTY_COLORS[problem.problem.difficulty],
+                      }}
+                    />
+                  </div>
+                  {/* Duration | right side */}
+                  <div className="flex items-center text-xs font-mono text-gray-400">
+                    <Clock size={12} className="mr-1.5" />
+                    <p className="tracking-tighter">
+                      {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Title & Problem link */}
+                <div className="text-base font-semibold flex gap-2 text-white">
+                  <p>
+                    {problem.problem.questionId}. {problem.problem.title}
+                  </p>
+                  <Link
+                    href={problem.problem.link}
+                    target="_blank"
+                    className="text-gray-500 hover:text-white transition-colors mt-1"
+                  >
+                    <ExternalLink size={16} />
+                  </Link>
+                </div>
+
+                {/* Topics */}
+                <div className="flex gap-2 flex-wrap my-3">
+                  {problem.status === "SOLVED" ? (
+                    problem.problem.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
+                      >
+                        {tag}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
+                      topics hidden
                     </span>
-                  ))
-                ) : (
-                  <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
-                    topics hidden
-                  </span>
-                )}
+                  )}
+                </div>
+              </div>
+
+              {/* BOTTOM PART */}
+              <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
+                <button
+                  onClick={() => startProblem(problem.problemId)}
+                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
+                >
+                  <Play size={18} />
+                </button>
+
+                <div className="flex flex-col items-end">
+                  <div className="text-xs text-white font-semibold uppercase">
+                    {problem.status}
+                  </div>
+                  <div className="text-[11px] text-gray-400">{displayDate}</div>
+                </div>
               </div>
             </div>
-
-            {/* BOTTOM PART */}
-            <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
-              <button
-                onClick={() => startProblem(problem.problemId)}
-                className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
-              >
-                <Play size={18} />
-              </button>
-
-              <div className="text-sm text-white font-semibold">
-                {problem.status}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <ProblemSolving
