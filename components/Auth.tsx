@@ -24,7 +24,7 @@ export default function Auth() {
         CP <span className="text-amber-500">Pulse</span>
       </h1>
       <div className="bg-neutral-800 p-8 rounded-2xl border border-neutral-600 w-full max-w-md shadow-2xl">
-        <h2 className="text-xl font-semibold mb-6 text-white">
+        <h2 className="text-lg font-semibold mb-6 text-white">
           Start Tracking Your Progress
         </h2>
         <div className={`${styles.authButtons} flex flex-col gap-3`}>

@@ -19,6 +19,44 @@ export async function getUser({ userId }: { userId: string }) {
   return user;
 }
 
+export async function getProfileOverview({ userId }: { userId: string }) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      createdAt: true,
+      accounts: {
+        select: {
+          providerId: true,
+          accountId: true,
+        },
+      },
+    },
+  });
+
+  if (!user) return null;
+
+  const providers = Array.from(new Set(user.accounts.map((a) => a.providerId)));
+  const githubAccountId =
+    user.accounts.find((a) => a.providerId === "github")?.accountId ?? null;
+
+  const identity =
+    user.username?.trim() ||
+    (githubAccountId ? `@${githubAccountId}` : null) ||
+    user.email ||
+    "Unknown User";
+
+  return {
+    identity,
+    providers,
+    createdAt: user.createdAt,
+  };
+}
+
 export async function getCurrentUserId() {
   const session = await auth.api.getSession({
     headers: await headers(),

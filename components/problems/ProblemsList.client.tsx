@@ -7,30 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProblemSolving from "@/components/ProblemSolving";
 import type { UserProblemFullClient } from "@/types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "@/lib/timer";
+import { formatDayMonthYear } from "@/lib/date";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
-
-const SHORT_MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-] as const;
-
-function formatDateForCard(dateValue?: string | null) {
-  if (!dateValue) return "-";
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "-";
-
-  return `${date.getDate()} ${SHORT_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
-}
 
 function getDisplayDate(problem: UserProblemFullClient) {
   if (problem.status === "SOLVED") {
@@ -162,7 +140,7 @@ export default function ProblemListClient({
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {filteredProblems.map((problem) => {
-          const displayDate = formatDateForCard(getDisplayDate(problem));
+          const displayDate = formatDayMonthYear(getDisplayDate(problem));
 
           return (
             <div
