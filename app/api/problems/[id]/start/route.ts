@@ -4,7 +4,7 @@ import { getCurrentUserId } from "@/lib/user";
 
 /* Start */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const problemId = (await params).id;
@@ -20,9 +20,8 @@ export async function POST(
     },
     data: {
       status: "IN_PROGRESS",
-      lastBeatAt: now,
       lastStartedAt: now,
     },
   });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, lastStartedAt: now.toISOString() });
 }

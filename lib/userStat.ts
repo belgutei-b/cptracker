@@ -140,12 +140,6 @@ export async function getBarChartData({
           },
         },
         {
-          lastBeatAt: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-        {
           updatedAt: {
             gte: startDate,
             lte: endDate,
@@ -158,7 +152,6 @@ export async function getBarChartData({
       duration: true,
       solvedAt: true,
       lastStartedAt: true,
-      lastBeatAt: true,
       updatedAt: true,
       problem: {
         select: {
@@ -192,7 +185,7 @@ export async function getBarChartData({
     const durationDate =
       row.status === "SOLVED"
         ? row.solvedAt
-        : (row.lastStartedAt ?? row.lastBeatAt ?? row.updatedAt);
+        : (row.lastStartedAt ?? row.updatedAt);
 
     if (!durationDate) continue;
 

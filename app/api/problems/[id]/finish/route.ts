@@ -18,7 +18,12 @@ export async function POST(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    let body: { newStatus?: Status; note?: string } = {};
+    let body: {
+      newStatus?: Status;
+      note?: string;
+      timeComplexity?: string;
+      spaceComplexity?: string;
+    } = {};
     try {
       body = await request.json();
       // newStatus is either TRIED or SOLVED
@@ -66,9 +71,14 @@ export async function POST(
           status: body.newStatus,
           duration: newDuration,
           lastStartedAt: null,
-          lastBeatAt: now,
           solvedAt: now,
           ...(typeof body.note === "string" ? { note: body.note } : {}),
+          ...(typeof body.timeComplexity === "string"
+            ? { timeComplexity: body.timeComplexity }
+            : {}),
+          ...(typeof body.spaceComplexity === "string"
+            ? { spaceComplexity: body.spaceComplexity }
+            : {}),
         },
       });
     });

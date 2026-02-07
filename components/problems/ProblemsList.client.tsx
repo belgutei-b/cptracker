@@ -16,12 +16,7 @@ function getDisplayDate(problem: UserProblemFullClient) {
   }
 
   if (problem.status === "IN_PROGRESS" || problem.status === "TRIED") {
-    return (
-      problem.lastStartedAt ??
-      problem.lastBeatAt ??
-      problem.updatedAt ??
-      problem.createdAt
-    );
+    return problem.lastStartedAt ?? problem.updatedAt ?? problem.createdAt;
   }
 
   return problem.createdAt;
@@ -86,17 +81,21 @@ export default function ProblemListClient({
     router.replace(next ? `/dashboard?${next}` : "/dashboard");
   }, [openProblemId, problems, router, searchParams]);
 
-  function onNoteLocalChange(problemId: string, note: string) {
-    setProblems((prev) =>
-      prev.map((p) => (p.problemId === problemId ? { ...p, note } : p)),
-    );
-  }
-
   function onFinishLocalAction(
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
-    duration?: number | null,
+    updates?: {
+      duration?: number | null;
+      note?: string;
+      timeComplexity?: string;
+      spaceComplexity?: string;
+    },
   ) {
+    const nextDuration = updates?.duration;
+    const nextNote = updates?.note;
+    const nextTimeComplexity = updates?.timeComplexity;
+    const nextSpaceComplexity = updates?.spaceComplexity;
+
     setProblems((prev) =>
       prev.map((p) =>
         p.problemId === problemId
@@ -104,7 +103,16 @@ export default function ProblemListClient({
               ...p,
               status: newStatus,
               lastStartedAt: null,
-              ...(typeof duration === "number" ? { duration } : {}),
+              ...(typeof nextDuration === "number"
+                ? { duration: nextDuration }
+                : {}),
+              ...(typeof nextNote === "string" ? { note: nextNote } : {}),
+              ...(typeof nextTimeComplexity === "string"
+                ? { timeComplexity: nextTimeComplexity }
+                : {}),
+              ...(typeof nextSpaceComplexity === "string"
+                ? { spaceComplexity: nextSpaceComplexity }
+                : {}),
             }
           : p,
       ),
@@ -122,6 +130,8 @@ export default function ProblemListClient({
     if (existing?.status === "SOLVED") return;
 
     const startedAtIso = new Date().toISOString();
+    const previousStatus = existing?.status;
+    const previousLastStartedAt = existing?.lastStartedAt ?? null;
 
     // optimistic update
     setProblems((prev) =>
@@ -132,8 +142,43 @@ export default function ProblemListClient({
       ),
     );
 
-    // Call the start endpoint (recommended)
-    await fetch(`/api/problems/${problemId}/start`, { method: "POST" });
+    try {
+      const res = await fetch(`/api/problems/${problemId}/start`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to start problem");
+      }
+
+      const data = (await res.json()) as { lastStartedAt?: string };
+      const backendStartedAt = data.lastStartedAt;
+      if (typeof backendStartedAt === "string") {
+        setProblems((prev) =>
+          prev.map((p) =>
+            p.problemId === problemId
+              ? {
+                  ...p,
+                  status: "IN_PROGRESS",
+                  lastStartedAt: backendStartedAt,
+                }
+              : p,
+          ),
+        );
+      }
+    } catch {
+      if (!existing) return;
+      setProblems((prev) =>
+        prev.map((p) =>
+          p.problemId === problemId
+            ? {
+                ...p,
+                status: previousStatus ?? p.status,
+                lastStartedAt: previousLastStartedAt,
+              }
+            : p,
+        ),
+      );
+    }
   }
 
   return (
@@ -236,7 +281,6 @@ export default function ProblemListClient({
         onCloseAction={() => setActiveProblemId(null)}
         problem={activeProblem}
         nowMs={nowMs}
-        onNoteLocalChangeAction={onNoteLocalChange}
         onFinishLocalAction={onFinishLocalAction}
       />
     </>

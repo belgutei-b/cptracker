@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar.server";
 import ToastProvider from "@/components/ToastProvider";
-import HeartbeatManager from "@/components/HeartbeatManager";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -49,7 +48,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastProvider />
-        <HeartbeatManager />
         <Navbar />
         {children}
         <Analytics />

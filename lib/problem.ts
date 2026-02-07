@@ -130,7 +130,6 @@ export async function serverAddDailyProblem({ userId }: { userId: string }) {
       userId,
       problemId: problem.id,
       status: "IN_PROGRESS",
-      lastBeatAt: now,
       lastStartedAt: now,
     },
   });

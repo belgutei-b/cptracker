@@ -57,10 +57,12 @@ model Problem {
 }
 
 model UserProblem {
-  userId    String
-  problemId String
-  status    Status @default(TODO)
-  note      String @default("")
+  userId          String
+  problemId       String
+  status          Status @default(TODO)
+  note            String @default("")
+  timeComplexity  String @default("")
+  spaceComplexity String @default("")
 
   user    User    @relation(fields: [userId], references: [id])
   problem Problem @relation(fields: [problemId], references: [id])

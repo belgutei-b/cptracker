@@ -13,18 +13,21 @@ export default function ProblemSolving({
   onCloseAction,
   problem,
   nowMs,
-  onNoteLocalChangeAction,
   onFinishLocalAction,
 }: {
   open: boolean;
   onCloseAction: () => void;
   problem: UserProblemFullClient | null;
   nowMs: number;
-  onNoteLocalChangeAction: (problemId: string, note: string) => void;
   onFinishLocalAction: (
     problemId: string,
     newStatus: "TRIED" | "SOLVED",
-    duration?: number | null,
+    updates?: {
+      duration?: number | null;
+      note?: string;
+      timeComplexity?: string;
+      spaceComplexity?: string;
+    },
   ) => void;
 }) {
   // Close on Escape
@@ -38,24 +41,31 @@ export default function ProblemSolving({
   }, [open, onCloseAction]);
 
   const [note, setNote] = useState("");
+  const [timeComplexity, setTimeComplexity] = useState("");
+  const [spaceComplexity, setSpaceComplexity] = useState("");
   const [isFinishing, setIsFinishing] = useState(false);
   const [showUnsolvedTopics, setShowUnsolvedTopics] = useState(false);
 
-  // Initialize note when opening / switching problems
+  // Initialize local fields when opening / switching problems
   useEffect(() => {
     if (!open || !problem) return;
     setNote(problem.note ?? "");
+    setTimeComplexity(problem.timeComplexity ?? "");
+    setSpaceComplexity(problem.spaceComplexity ?? "");
     setShowUnsolvedTopics(false);
   }, [open, problem?.problemId]);
 
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
-    console.log(isSolved);
     const payload: {
       newStatus: "SOLVED" | "TRIED";
       note: string;
+      timeComplexity: string;
+      spaceComplexity: string;
     } = {
       newStatus: isSolved ? "SOLVED" : "TRIED",
       note: note,
+      timeComplexity: timeComplexity,
+      spaceComplexity: spaceComplexity,
     };
     try {
       setIsFinishing(true);
@@ -69,7 +79,12 @@ export default function ProblemSolving({
         onFinishLocalAction(
           problem!.problemId,
           payload.newStatus,
-          data.duration,
+          {
+            duration: data.duration,
+            note: payload.note,
+            timeComplexity: payload.timeComplexity,
+            spaceComplexity: payload.spaceComplexity,
+          },
         );
         toast.success("Successfully updated");
       }
@@ -178,13 +193,36 @@ export default function ProblemSolving({
             </div>
           </div>
 
+          <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Time Complexity
+              </label>
+              <input
+                type="text"
+                value={timeComplexity}
+                onChange={(e) => setTimeComplexity(e.target.value)}
+                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-gray-200"
+                placeholder="O(n log n)"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Space Complexity
+              </label>
+              <input
+                type="text"
+                value={spaceComplexity}
+                onChange={(e) => setSpaceComplexity(e.target.value)}
+                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-gray-200"
+                placeholder="O(1)"
+              />
+            </div>
+          </div>
+
           <textarea
             value={note}
-            onChange={(e) => {
-              const next = e.target.value;
-              setNote(next);
-              onNoteLocalChangeAction(problem.problemId, next);
-            }}
+            onChange={(e) => setNote(e.target.value)}
             className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-4 text-gray-200 w-full h-40"
           />
         </div>
