@@ -118,25 +118,30 @@ export default function ProblemListClient({
     await fetch(`/api/problems/${problemId}/start`, { method: "POST" });
   }
 
+  console.log(problems[0]);
+
   return (
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {filteredProblems.map((problem) => (
           <div
             key={problem.problemId}
-            className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full"
+            className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full flex flex-col justify-between"
           >
-            <div className="flex justify-between items-start mb-2">
-              <div className="w-60">
-                <div className="flex items-center gap-2 mb-1">
-                  <span
-                    className="text-emerald-500 text-xs font-bold tracking-wider uppercase"
+            {/* UPPER PART  */}
+            <div>
+              {/* Difficulty | Duration */}
+              <div className="flex justify-between mb-2">
+                {/* Difficulty | left side */}
+                <div className="flex items-center gap-2">
+                  <p
+                    className="text-xs font-bold tracking-wider uppercase"
                     style={{
                       color: DIFFICULTY_COLORS[problem.problem.difficulty],
                     }}
                   >
                     {problem.problem.difficulty}
-                  </span>
+                  </p>
                   <CheckCircle
                     size={16}
                     style={{
@@ -144,62 +149,54 @@ export default function ProblemListClient({
                     }}
                   />
                 </div>
-
-                <div className="text-lg font-semibold flex items-center gap-2 text-white">
-                  {problem.problem.title}
-                  <Link
-                    href={problem.problem.link}
-                    target="_blank"
-                    className="text-gray-500 hover:text-white transition-colors"
-                  >
-                    <ExternalLink size={14} />
-                  </Link>
+                {/* Duration | right side */}
+                <div className="flex items-center text-xs font-mono text-gray-400">
+                  <Clock size={12} className="mr-1.5" />
+                  <p className="tracking-tighter">
+                    {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
+                  </p>
                 </div>
               </div>
 
-              <div className="w-30 flex flex-col items-end">
-                <div className="text-xs text-gray-400 flex items-center gap-1">
-                  <Clock size={12} />
-                  Total Spent
-                </div>
-
-                <div className="text-sm font-mono text-amber-500">
-                  {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 flex-wrap my-3">
-              {problem.status === "SOLVED" ? (
-                problem.problem.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
-                  >
-                    {tag}
-                  </span>
-                ))
-              ) : (
-                <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
-                  topics hidden
-                </span>
-              )}
-            </div>
-
-            <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
-              <div className="relative group">
-                <button
-                  onClick={() => startProblem(problem.problemId)}
-                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
+              {/* Title & Problem link */}
+              <div className="text-lg font-semibold flex gap-2 text-white">
+                <p>{problem.problem.title}</p>
+                <Link
+                  href={problem.problem.link}
+                  target="_blank"
+                  className="text-gray-500 hover:text-white transition-colors mt-1"
                 >
-                  <Play size={18} />
-                </button>
-                {problem.status === "TODO" && (
-                  <div className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded bg-black/80 px-2 py-1 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100">
-                    Start solving
-                  </div>
+                  <ExternalLink size={16} />
+                </Link>
+              </div>
+
+              {/* Topics */}
+              <div className="flex gap-2 flex-wrap my-3">
+                {problem.status === "SOLVED" ? (
+                  problem.problem.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
+                    topics hidden
+                  </span>
                 )}
               </div>
+            </div>
+
+            {/* BOTTOM PART */}
+            <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
+              <button
+                onClick={() => startProblem(problem.problemId)}
+                className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
+              >
+                <Play size={18} />
+              </button>
 
               <div className="text-sm text-white font-semibold">
                 {problem.status}

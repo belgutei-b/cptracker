@@ -16,7 +16,7 @@ export default function AverageDuration({
   return (
     <div className="bg-[#282828] p-6 rounded-xl border border-[#3e3e3e] w-80">
       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">
-        <BarChart2 size={14} /> Average Solution Time
+        <BarChart2 size={14} /> Average Solve Time
       </h3>
       <div className="space-y-5">
         {difficultyStats.map((stat) => (
