@@ -12,14 +12,9 @@ export async function GET(request: NextRequest) {
 
     // retrieving query parameters from the url
     const searchParams = request.nextUrl.searchParams;
-    const rawIsSolvedOnly = searchParams.get("isSolvedOnly");
     const rawNumberOfDays = searchParams.get("numberOfDays");
 
     // validate that isSolvedOnly is boolean and numberOfDays is one of 7, 14, 28
-    let isSolvedOnly: boolean = false;
-    if (rawIsSolvedOnly && rawIsSolvedOnly === "true") {
-      isSolvedOnly = true;
-    }
 
     let numberOfDays: number = 7;
     if (rawNumberOfDays) {
@@ -31,7 +26,6 @@ export async function GET(request: NextRequest) {
     // call library function
     const ret = await getBarChartData({
       numberOfDays,
-      isSolvedOnly,
       userId,
     });
 

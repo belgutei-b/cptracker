@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 import { DIFFICULTY_COLORS as COLORS } from "@/components/stat/AverageDuration";
-import { Filter } from "lucide-react";
 
 type ChartData = {
   date: string;
@@ -25,7 +24,6 @@ type ChartData = {
 };
 
 export default function TotalSolveDuration() {
-  const [isSolvedOnly, setIsSolvedOnly] = useState(false);
   const [numberOfDays, setNumberOfDays] = useState(7);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +34,7 @@ export default function TotalSolveDuration() {
       setIsLoading(true);
       try {
         const response = await fetch(
-          `/api/analytics/bar-chart?isSolvedOnly=${isSolvedOnly}&numberOfDays=${numberOfDays}`,
+          `/api/analytics/bar-chart?numberOfDays=${numberOfDays}`,
           { signal: controller.signal },
         );
         if (!response.ok) {
@@ -71,7 +69,7 @@ export default function TotalSolveDuration() {
 
     loadData();
     return () => controller.abort();
-  }, [isSolvedOnly, numberOfDays]);
+  }, [numberOfDays]);
 
   return (
     <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-90 w-full">
@@ -131,20 +129,6 @@ export default function TotalSolveDuration() {
                 </button>
               ))}
             </div>
-
-            {/* Solved Only Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsSolvedOnly(!isSolvedOnly)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-bold uppercase w-31 ${
-                isSolvedOnly
-                  ? "bg-[#00af9b20] border-[#00af9b40] text-[#00af9b]"
-                  : "bg-[#1a1a1a] border-[#3e3e3e] text-gray-500 hover:text-white"
-              }`}
-            >
-              <Filter size={12} />
-              {isSolvedOnly ? "Solved Only" : "All Attempts"}
-            </button>
           </div>
         </div>
       </div>

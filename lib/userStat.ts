@@ -86,14 +86,12 @@ export async function getUserStats({
 
 export async function getBarChartData({
   numberOfDays,
-  isSolvedOnly,
   userId,
 }: {
   numberOfDays: number;
-  isSolvedOnly: boolean;
   userId: string;
 }): Promise<BarChartData[]> {
-  console.log(numberOfDays, isSolvedOnly, userId);
+  console.log(numberOfDays, userId);
   const now = new Date();
   const endDate = new Date(now);
   endDate.setHours(23, 59, 59, 999);
@@ -102,9 +100,7 @@ export async function getBarChartData({
   startDate.setHours(0, 0, 0, 0);
   startDate.setDate(startDate.getDate() - (numberOfDays - 1));
 
-  const statuses: Status[] = isSolvedOnly
-    ? ["SOLVED"]
-    : ["TRIED", "SOLVED", "IN_PROGRESS"];
+  const statuses: Status[] = ["TRIED", "SOLVED", "IN_PROGRESS"];
 
   const rows = await prisma.userProblem.findMany({
     where: {
