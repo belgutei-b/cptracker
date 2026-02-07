@@ -7,7 +7,7 @@ export type BarChartData = {
   easy: number;
   medium: number;
   hard: number;
-  // number of tried | (tried+solved) problems
+  // number of solved problems
   problemCount: number;
 };
 
@@ -16,3 +16,8 @@ export type SolvedDurationStats = {
   count: number;
   totalDuration: number;
 }[];
+
+export type UserStats = {
+  stats: SolvedDurationStats;
+  streakDays: number;
+};

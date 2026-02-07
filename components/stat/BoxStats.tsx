@@ -3,7 +3,16 @@
 import { SolvedDurationStats } from "@/types/stat";
 import { formatMMSS } from "@/lib/timer";
 
-export default function BoxStats({ stats }: { stats: SolvedDurationStats }) {
+export default function BoxStats({
+  stats,
+  streakDays,
+}: {
+  stats: SolvedDurationStats;
+  streakDays: number;
+}) {
+  const averageSeconds =
+    stats[3].count > 0 ? Math.floor(stats[3].totalDuration / stats[3].count) : 0;
+
   return (
     <div>
       <div className="text-lg text-white font-bold mb-4">
@@ -22,13 +31,13 @@ export default function BoxStats({ stats }: { stats: SolvedDurationStats }) {
         </div>
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Avg Time</p>
-          <p className="dashboard-stat-text">
-            {formatMMSS(stats[3].totalDuration)}
-          </p>
+          <p className="dashboard-stat-text">{formatMMSS(averageSeconds)}</p>
         </div>
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Current Streak</p>
-          <p className="dashboard-stat-text">12 Days</p>
+          <p className="dashboard-stat-text">
+            {streakDays} Day{streakDays === 1 ? "" : "s"}
+          </p>
         </div>
       </div>
     </div>

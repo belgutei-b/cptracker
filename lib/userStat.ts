@@ -4,12 +4,34 @@ import { Status } from "@/prisma/generated/prisma/enums";
 import prisma from "./prisma";
 import type { SolvedDurationStats } from "@/types/stat";
 import type { BarChartData } from "@/types/stat";
+import type { UserStats } from "@/types/stat";
+
+function toLocalDateKey(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getSolvedStreakDays(solvedDates: Date[]) {
+  const solvedDaySet = new Set(solvedDates.map((date) => toLocalDateKey(date)));
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+
+  let streak = 0;
+  while (solvedDaySet.has(toLocalDateKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+}
 
 export async function getUserStats({
   userId,
 }: {
   userId: string;
-}): Promise<SolvedDurationStats> {
+}): Promise<UserStats> {
   const solved = await prisma.userProblem.findMany({
     where: {
       userId,
@@ -17,6 +39,7 @@ export async function getUserStats({
     },
     select: {
       duration: true,
+      solvedAt: true,
       problem: {
         select: {
           difficulty: true,
@@ -69,7 +92,15 @@ export async function getUserStats({
     }
   }
 
-  return stats;
+  const solvedDates = solved
+    .map((entry) => entry.solvedAt)
+    .filter((value): value is Date => value instanceof Date);
+  const streakDays = getSolvedStreakDays(solvedDates);
+
+  return {
+    stats,
+    streakDays,
+  };
 }
 
 export async function getBarChartData({
@@ -79,7 +110,6 @@ export async function getBarChartData({
   numberOfDays: number;
   userId: string;
 }): Promise<BarChartData[]> {
-  console.log(numberOfDays, userId);
   const now = new Date();
   const endDate = new Date(now);
   endDate.setHours(23, 59, 59, 999);
@@ -96,14 +126,40 @@ export async function getBarChartData({
       status: {
         in: statuses,
       },
-      lastBeatAt: {
-        gte: startDate,
-        lte: endDate,
-      },
+      OR: [
+        {
+          solvedAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        {
+          lastStartedAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        {
+          lastBeatAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        {
+          updatedAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      ],
     },
     select: {
+      status: true,
       duration: true,
+      solvedAt: true,
+      lastStartedAt: true,
       lastBeatAt: true,
+      updatedAt: true,
       problem: {
         select: {
           difficulty: true,
@@ -133,16 +189,32 @@ export async function getBarChartData({
   }
 
   for (const row of rows) {
-    if (!row.lastBeatAt) continue;
-    const key = toKey(row.lastBeatAt);
+    const durationDate =
+      row.status === "SOLVED"
+        ? row.solvedAt
+        : (row.lastStartedAt ?? row.lastBeatAt ?? row.updatedAt);
+
+    if (!durationDate) continue;
+
+    const key = toKey(durationDate);
     const entry = dayMap.get(key);
     if (!entry) continue;
 
-    const duration = row.duration ?? 0;
+    let duration = row.duration ?? 0;
+    if (row.status === "IN_PROGRESS" && row.lastStartedAt) {
+      duration += Math.max(
+        0,
+        Math.floor((now.getTime() - row.lastStartedAt.getTime()) / 1000),
+      );
+    }
+
     if (row.problem.difficulty === "Easy") entry.easy += duration;
     if (row.problem.difficulty === "Medium") entry.medium += duration;
     if (row.problem.difficulty === "Hard") entry.hard += duration;
-    entry.problemCount += 1;
+
+    if (row.status === "SOLVED" && row.solvedAt) {
+      entry.problemCount += 1;
+    }
   }
 
   return Array.from(dayMap.values());

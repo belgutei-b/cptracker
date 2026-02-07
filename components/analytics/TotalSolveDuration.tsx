@@ -29,7 +29,7 @@ export default function TotalSolveDuration({
   chartData,
   isLoading,
 }: Props) {
-  const barSize = numberOfDays === 7 ? 18 : numberOfDays === 14 ? 14 : 10;
+  const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 14 : 10;
 
   return (
     <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-[360px] w-full">
@@ -114,21 +114,48 @@ export default function TotalSolveDuration({
             />
             <Tooltip
               cursor={{ fill: "#ffffff05" }}
-              contentStyle={{
-                backgroundColor: "#1a1a1a",
-                border: "1px solid #3e3e3e",
-                borderRadius: "12px",
-                boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)",
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null;
+
+                const itemByName = new Map(
+                  payload.map((item) => [String(item.name), item]),
+                );
+
+                const orderedRows = [
+                  { name: "Easy", color: COLORS.Easy, isMinutes: true },
+                  { name: "Medium", color: COLORS.Medium, isMinutes: true },
+                  { name: "Hard", color: COLORS.Hard, isMinutes: true },
+                  {
+                    name: "Total Solved",
+                    color: "#ffa116",
+                    isMinutes: false,
+                  },
+                ];
+
+                return (
+                  <div
+                    className="rounded-xl border border-[#3e3e3e] bg-[#1a1a1a] px-3 py-2 shadow-lg"
+                    style={{ fontSize: "12px", fontWeight: "bold" }}
+                  >
+                    <p className="mb-1 text-white">{`Date: ${String(label)}`}</p>
+                    {orderedRows.map((row) => {
+                      const item = itemByName.get(row.name);
+                      if (!item) return null;
+
+                      const rawValue = Number(item.value ?? 0);
+                      const displayValue = row.isMinutes
+                        ? `${(rawValue / 60).toFixed(1)}m`
+                        : String(rawValue);
+
+                      return (
+                        <p key={row.name} style={{ color: row.color }}>
+                          {`${row.name}: ${displayValue}`}
+                        </p>
+                      );
+                    })}
+                  </div>
+                );
               }}
-              labelStyle={{ color: "#ffffff", fontWeight: "bold" }}
-              formatter={(value, name) => {
-                if (name === "Solved") {
-                  return [String(value), "Solved"];
-                }
-                return [`${(Number(value) / 60).toFixed(1)}m`, String(name)];
-              }}
-              labelFormatter={(label) => `Date: ${label}`}
-              itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
             />
 
             <Bar
@@ -163,7 +190,7 @@ export default function TotalSolveDuration({
               yAxisId="right"
               type="monotone"
               dataKey="problemCount"
-              name="Solved"
+              name="Total Solved"
               stroke={"#ffa116"}
               strokeWidth={3}
               dot={{
