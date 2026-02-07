@@ -7,10 +7,9 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
-  Label,
 } from "recharts";
 import { LayoutDashboard } from "lucide-react";
-import { DIFFICULTY_COLORS } from "./AverageDuration";
+import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 
 export default function DifficultyRatio({
   stats,

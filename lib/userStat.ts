@@ -30,25 +30,21 @@ export async function getUserStats({
       difficulty: "Easy",
       count: 0,
       totalDuration: 0,
-      averageMin: 0,
     },
     {
       difficulty: "Medium",
       count: 0,
       totalDuration: 0,
-      averageMin: 0,
     },
     {
       difficulty: "Hard",
       count: 0,
       totalDuration: 0,
-      averageMin: 0,
     },
     {
       difficulty: "Total",
       count: 0,
       totalDuration: 0,
-      averageMin: 0,
     },
   ];
 
@@ -70,14 +66,6 @@ export async function getUserStats({
       if (stat.difficulty === "Total") continue;
       totalStat.count += stat.count;
       totalStat.totalDuration += stat.totalDuration;
-    }
-  }
-
-  for (const stat of stats) {
-    if (stat.count > 0) {
-      stat.averageMin = Math.floor(stat.totalDuration / 60 / stat.count);
-      // second -> min
-      stat.totalDuration = Math.floor(stat.totalDuration / 60);
     }
   }
 

@@ -15,5 +15,4 @@ export type SolvedDurationStats = {
   difficulty: Difficulty | "Total";
   count: number;
   totalDuration: number;
-  averageMin: number;
 }[];

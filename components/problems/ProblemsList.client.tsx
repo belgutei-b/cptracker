@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProblemSolving from "@/components/ProblemSolving";
 import type { UserProblemFullClient } from "@/types/client";
 import { useNowTick, getDisplayedSeconds, formatMMSS } from "@/lib/timer";
-import { DIFFICULTY_COLORS } from "@/components/stat/AverageDuration";
+import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 
 export default function ProblemListClient({
   receivedProblems,

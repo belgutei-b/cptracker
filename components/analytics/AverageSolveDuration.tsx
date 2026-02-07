@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -11,91 +11,24 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { DIFFICULTY_COLORS as COLORS } from "@/components/stat/AverageDuration";
+import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
+import type { AnalyticsRangeDays } from "@/constants/analytics";
+import { LEETCODE_TAGS } from "@/constants/tags";
 import { Search, ChevronDown, Clock, Tag, X } from "lucide-react";
 
-const TAGS = [
-  "Array",
-  "String",
-  "Hash Table",
-  "Math",
-  "Dynamic Programming",
-  "Sorting",
-  "Greedy",
-  "Depth-First Search",
-  "Binary Search",
-  "Database",
-  "Matrix",
-  "Bit Manipulation",
-  "Tree",
-  "Breadth-First Search",
-  "Two Pointers",
-  "Prefix Sum",
-  "Heap (Priority Queue)",
-  "Simulation",
-  "Counting",
-  "Graph Theory",
-  "Binary Tree",
-  "Stack",
-  "Sliding Window",
-  "Enumeration",
-  "Design",
-  "Backtracking",
-  "Union-Find",
-  "Number Theory",
-  "Linked List",
-  "Ordered Set",
-  "Segment Tree",
-  "Monotonic Stack",
-  "Trie",
-  "Divide and Conquer",
-  "Combinatorics",
-  "Bitmask DP",
-  "Recursion",
-  "Queue",
-  "Geometry",
-  "Binary Indexed Tree",
-  "Memoization",
-  "Hash Function",
-  "Binary Search Tree",
-  "Shortest Path",
-  "String Matching",
-  "Topological Sort",
-  "Rolling Hash",
-  "Game Theory",
-  "Interactive",
-  "Data Stream",
-  "Monotonic Queue",
-  "Brainteaser",
-  "Doubly-Linked List",
-  "Merge Sort",
-  "Randomized",
-  "Counting Sort",
-  "Iterator",
-  "Concurrency",
-  "Quickselect",
-  "Suffix Array",
-  "Sweep Line",
-  "Probability and Statistics",
-  "Minimum Spanning Tree",
-  "Bucket Sort",
-  "Shell",
-  "Reservoir Sampling",
-  "Strongly Connected Component",
-  "Eulerian Circuit",
-  "Radix Sort",
-  "Rejection Sampling",
-  "Biconnected Component",
-];
-
 // Generate mock data for different topics
+type TopicDayData = {
+  date: string;
+  avgTime: number;
+};
+
 const generateMockTopicData = () => {
-  const dataMap: Record<string, any[]> = {};
+  const dataMap: Record<string, TopicDayData[]> = {};
   const now = new Date();
 
-  TAGS.forEach((tag) => {
+  LEETCODE_TAGS.forEach((tag) => {
     const topicBaseTime = 15 + Math.random() * 45; // Different base time per topic
-    const days = [];
+    const days: TopicDayData[] = [];
     for (let i = 30; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
@@ -113,7 +46,7 @@ const generateMockTopicData = () => {
   });
 
   // Default "All Topics"
-  const allDays = [];
+  const allDays: TopicDayData[] = [];
   for (let i = 30; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
@@ -130,8 +63,11 @@ const generateMockTopicData = () => {
 
 const allTopicMockData = generateMockTopicData();
 
-export default function AverageSolveDuration() {
-  const [timeRange, setTimeRange] = useState<"7d" | "14d" | "30d">("7d");
+type Props = {
+  numberOfDays: AnalyticsRangeDays;
+};
+
+export default function AverageSolveDuration({ numberOfDays }: Props) {
   const [selectedTag, setSelectedTag] = useState("All Topics");
   const [isPopOverOpen, setIsPopOverOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
@@ -152,15 +88,15 @@ export default function AverageSolveDuration() {
 
   const filteredTags = useMemo(() => {
     const search = tagSearch.toLowerCase();
-    return ["All Topics", ...TAGS].filter((t) =>
+    return ["All Topics", ...LEETCODE_TAGS].filter((t) =>
       t.toLowerCase().includes(search),
     );
   }, [tagSearch]);
 
   const chartData = useMemo(() => {
-    const sliceCount = timeRange === "7d" ? 7 : timeRange === "14d" ? 14 : 31;
+    const sliceCount = numberOfDays;
     return allTopicMockData[selectedTag].slice(-sliceCount);
-  }, [timeRange, selectedTag]);
+  }, [numberOfDays, selectedTag]);
 
   return (
     <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl w-full flex flex-col gap-6">
@@ -173,23 +109,6 @@ export default function AverageSolveDuration() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Time Range Selector */}
-          <div className="flex items-center bg-[#1a1a1a] rounded-lg p-1 border border-[#3e3e3e]">
-            {(["7d", "14d", "30d"] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
-                  timeRange === range
-                    ? "bg-[#ffa116] text-black shadow-lg shadow-[#ffa11633]"
-                    : "text-gray-500 hover:text-white"
-                }`}
-              >
-                {range === "7d" ? "7D" : range === "14d" ? "14D" : "30D"}
-              </button>
-            ))}
-          </div>
-
           {/* Topic Selector */}
           <div className="relative" ref={popoverRef}>
             <button
@@ -277,7 +196,7 @@ export default function AverageSolveDuration() {
               tickLine={false}
               tick={{ fill: "#666", fontSize: 10, fontWeight: "bold" }}
               dy={10}
-              interval={timeRange === "30d" ? 4 : 0}
+              interval={numberOfDays >= 28 ? 4 : 0}
             />
             <YAxis
               axisLine={false}
@@ -309,7 +228,7 @@ export default function AverageSolveDuration() {
               dataKey="avgTime"
               fill="#ffa11633"
               radius={[4, 4, 0, 0]}
-              barSize={timeRange === "30d" ? 12 : timeRange === "14d" ? 24 : 40}
+              barSize={numberOfDays >= 28 ? 12 : numberOfDays === 14 ? 24 : 40}
             >
               {chartData.map((entry, index) => (
                 <Cell

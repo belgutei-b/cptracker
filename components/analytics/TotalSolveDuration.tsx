@@ -8,132 +8,68 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
-import { useEffect, useState } from "react";
-import { DIFFICULTY_COLORS as COLORS } from "@/components/stat/AverageDuration";
+import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
+import type { AnalyticsRangeDays } from "@/constants/analytics";
+import type { BarChartData } from "@/types/stat";
 
-type ChartData = {
-  date: string;
-  Easy: number;
-  Medium: number;
-  Hard: number;
-  Solved: number;
+type Props = {
+  numberOfDays: AnalyticsRangeDays;
+  chartData: BarChartData[];
+  isLoading: boolean;
 };
 
-export default function TotalSolveDuration() {
-  const [numberOfDays, setNumberOfDays] = useState(7);
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+function formatMinutes(value: number) {
+  return `${(value / 60).toFixed(1)}`;
+}
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/analytics/bar-chart?numberOfDays=${numberOfDays}`,
-          { signal: controller.signal },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch bar chart data");
-        }
-        const payload = await response.json();
-        const data = Array.isArray(payload?.data) ? payload.data : [];
-        const mapped = data.map(
-          (entry: {
-            date: string;
-            easy: number;
-            medium: number;
-            hard: number;
-            problemCount: number;
-          }) => ({
-            date: entry.date,
-            Easy: entry.easy ?? 0,
-            Medium: entry.medium ?? 0,
-            Hard: entry.hard ?? 0,
-            Solved: entry.problemCount ?? 0,
-          }),
-        );
-        setChartData(mapped);
-      } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-          setChartData([]);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-    return () => controller.abort();
-  }, [numberOfDays]);
+export default function TotalSolveDuration({
+  numberOfDays,
+  chartData,
+  isLoading,
+}: Props) {
+  const barSize = numberOfDays === 7 ? 18 : numberOfDays === 14 ? 14 : 10;
 
   return (
-    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-90 w-full">
+    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-[360px] w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-lg text-white font-bold">Total Time</p>
         </div>
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-tighter">
-            <div className="flex items-center gap-1">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: COLORS.Easy }}
-              ></div>
-              <span className="text-gray-400">Easy</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: COLORS.Medium }}
-              ></div>
-              <span className="text-gray-400">Medium</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: COLORS.Hard }}
-              ></div>
-              <span className="text-gray-400">Hard</span>
-            </div>
-            <div className="flex items-center gap-1 ml-2">
-              <div
-                className="w-4 h-0.5"
-                style={{ backgroundColor: "#ffa116" }}
-              ></div>
-              <span className="text-gray-400">Solved Count</span>
-            </div>
+        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-tighter">
+          <div className="flex items-center gap-1">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: COLORS.Easy }}
+            ></div>
+            <span className="text-gray-400">Easy</span>
           </div>
-          {/* switch and duration selector */}
-          <div className="mt-2 flex space-x-3">
-            <div className="flex items-center bg-[#1a1a1a] rounded-lg p-1 border border-[#3e3e3e]">
-              {([7, 14, 28] as const).map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setNumberOfDays(range)}
-                  className={`px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
-                    numberOfDays === range
-                      ? "bg-[#ffa116] text-black shadow-lg shadow-[#ffa11633]"
-                      : "text-gray-500 hover:text-white"
-                  }`}
-                >
-                  {range === 7
-                    ? "7 Days"
-                    : range === 14
-                      ? "2 Weeks"
-                      : "1 Month"}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-1">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: COLORS.Medium }}
+            ></div>
+            <span className="text-gray-400">Medium</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: COLORS.Hard }}
+            ></div>
+            <span className="text-gray-400">Hard</span>
+          </div>
+          <div className="flex items-center gap-1 ml-2">
+            <div
+              className="w-4 h-0.5"
+              style={{ backgroundColor: "#ffa116" }}
+            ></div>
+            <span className="text-gray-400">Solved Count</span>
           </div>
         </div>
       </div>
 
-      <div className="relative h-full">
+      <div className="relative h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             responsive
@@ -152,6 +88,7 @@ export default function TotalSolveDuration() {
             />
             <YAxis
               yAxisId="left"
+              tickFormatter={formatMinutes}
               tick={{ fill: "#666", fontSize: 11 }}
               label={{
                 value: "Minutes",
@@ -183,38 +120,50 @@ export default function TotalSolveDuration() {
                 borderRadius: "12px",
                 boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)",
               }}
+              labelStyle={{ color: "#ffffff", fontWeight: "bold" }}
+              formatter={(value, name) => {
+                if (name === "Solved") {
+                  return [String(value), "Solved"];
+                }
+                return [`${(Number(value) / 60).toFixed(1)}m`, String(name)];
+              }}
+              labelFormatter={(label) => `Date: ${label}`}
               itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
             />
 
             <Bar
               yAxisId="left"
-              dataKey="Easy"
+              dataKey="easy"
+              name="Easy"
               stackId="a"
               fill={COLORS.Easy}
               radius={[0, 0, 0, 0]}
-              barSize={10} // 32 for last 7 days
+              barSize={barSize}
             />
             <Bar
               yAxisId="left"
-              dataKey="Medium"
+              dataKey="medium"
+              name="Medium"
               stackId="a"
               fill={COLORS.Medium}
               radius={[0, 0, 0, 0]}
-              barSize={10}
+              barSize={barSize}
             />
             <Bar
               yAxisId="left"
-              dataKey="Hard"
+              dataKey="hard"
+              name="Hard"
               stackId="a"
               fill={COLORS.Hard}
               radius={[4, 4, 0, 0]}
-              barSize={10}
+              barSize={barSize}
             />
 
             <Line
               yAxisId="right"
               type="monotone"
-              dataKey="Solved"
+              dataKey="problemCount"
+              name="Solved"
               stroke={"#ffa116"}
               strokeWidth={3}
               dot={{

@@ -23,7 +23,7 @@ export default function BoxStats({ stats }: { stats: SolvedDurationStats }) {
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Avg Time</p>
           <p className="dashboard-stat-text">
-            {formatMMSS(stats[3].averageMin)}
+            {formatMMSS(stats[3].totalDuration)}
           </p>
         </div>
         <div className="dashboard-stat-box">

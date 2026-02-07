@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 import toast from "react-hot-toast";
-import { DIFFICULTY_COLORS } from "@/components/stat/AverageDuration";
+import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 
 export default function ProblemSolving({
   open,
