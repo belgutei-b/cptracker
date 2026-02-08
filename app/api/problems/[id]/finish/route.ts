@@ -71,7 +71,7 @@ export async function POST(
           status: body.newStatus,
           duration: newDuration,
           lastStartedAt: null,
-          solvedAt: now,
+          solvedAt: body.newStatus === "SOLVED" ? now : null,
           ...(typeof body.note === "string" ? { note: body.note } : {}),
           ...(typeof body.timeComplexity === "string"
             ? { timeComplexity: body.timeComplexity }

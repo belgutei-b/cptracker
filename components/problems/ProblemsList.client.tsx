@@ -119,6 +119,34 @@ export default function ProblemListClient({
     );
   }
 
+  function onSaveLocalAction(
+    problemId: string,
+    updates: {
+      note?: string;
+      timeComplexity?: string;
+      spaceComplexity?: string;
+    },
+  ) {
+    setProblems((prev) =>
+      prev.map((p) =>
+        p.problemId === problemId
+          ? {
+              ...p,
+              ...(typeof updates.note === "string"
+                ? { note: updates.note }
+                : {}),
+              ...(typeof updates.timeComplexity === "string"
+                ? { timeComplexity: updates.timeComplexity }
+                : {}),
+              ...(typeof updates.spaceComplexity === "string"
+                ? { spaceComplexity: updates.spaceComplexity }
+                : {}),
+            }
+          : p,
+      ),
+    );
+  }
+
   async function startProblem(problemId: string) {
     const existing = problems.find((p) => p.problemId === problemId);
 
@@ -282,6 +310,7 @@ export default function ProblemListClient({
         problem={activeProblem}
         nowMs={nowMs}
         onFinishLocalAction={onFinishLocalAction}
+        onSaveLocalAction={onSaveLocalAction}
       />
     </>
   );

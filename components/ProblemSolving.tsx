@@ -14,6 +14,7 @@ export default function ProblemSolving({
   problem,
   nowMs,
   onFinishLocalAction,
+  onSaveLocalAction,
 }: {
   open: boolean;
   onCloseAction: () => void;
@@ -24,6 +25,14 @@ export default function ProblemSolving({
     newStatus: "TRIED" | "SOLVED",
     updates?: {
       duration?: number | null;
+      note?: string;
+      timeComplexity?: string;
+      spaceComplexity?: string;
+    },
+  ) => void;
+  onSaveLocalAction: (
+    problemId: string,
+    updates: {
       note?: string;
       timeComplexity?: string;
       spaceComplexity?: string;
@@ -44,6 +53,7 @@ export default function ProblemSolving({
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
   const [isFinishing, setIsFinishing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showUnsolvedTopics, setShowUnsolvedTopics] = useState(false);
 
   // Initialize local fields when opening / switching problems
@@ -76,16 +86,12 @@ export default function ProblemSolving({
       });
       if (res.status === 200) {
         const data = (await res.json()) as { duration?: number | null };
-        onFinishLocalAction(
-          problem!.problemId,
-          payload.newStatus,
-          {
-            duration: data.duration,
-            note: payload.note,
-            timeComplexity: payload.timeComplexity,
-            spaceComplexity: payload.spaceComplexity,
-          },
-        );
+        onFinishLocalAction(problem!.problemId, payload.newStatus, {
+          duration: data.duration,
+          note: payload.note,
+          timeComplexity: payload.timeComplexity,
+          spaceComplexity: payload.spaceComplexity,
+        });
         toast.success("Successfully updated");
       }
     } catch (err) {
@@ -96,9 +102,56 @@ export default function ProblemSolving({
     }
   }
 
+  async function handleSave() {
+    if (!problem) return;
+
+    const payload = {
+      note,
+      timeComplexity,
+      spaceComplexity,
+    };
+
+    try {
+      setIsSaving(true);
+      const res = await fetch(`/api/problems/${problem.problemId}/save`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.status === 200) {
+        const data = (await res.json()) as {
+          note?: string;
+          timeComplexity?: string;
+          spaceComplexity?: string;
+        };
+
+        onSaveLocalAction(problem.problemId, {
+          note: data.note,
+          timeComplexity: data.timeComplexity,
+          spaceComplexity: data.spaceComplexity,
+        });
+
+        toast.success("Saved");
+      } else {
+        toast.error("Save failed");
+      }
+    } catch (err) {
+      toast.error("Unexpected Error Occurred");
+      console.log(err);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   if (!open || !problem) return null;
 
   const displayedSeconds = getDisplayedSeconds(problem, nowMs);
+  const canSave = problem.status === "SOLVED";
+  const isDirty =
+    note !== (problem.note ?? "") ||
+    timeComplexity !== (problem.timeComplexity ?? "") ||
+    spaceComplexity !== (problem.spaceComplexity ?? "");
 
   return (
     <div
@@ -227,22 +280,35 @@ export default function ProblemSolving({
           />
         </div>
 
-        {problem.status !== "SOLVED" && (
+        {(problem.status !== "SOLVED" || canSave) && (
           <div className="border-t border-[#3e3e3e] flex items-center justify-end gap-2 p-4">
-            <button
-              onClick={() => handleFinish({ isSolved: false })}
-              disabled={isFinishing}
-              className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Tried
-            </button>
-            <button
-              onClick={() => handleFinish({ isSolved: true })}
-              disabled={isFinishing}
-              className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-emerald-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Solved
-            </button>
+            {problem.status !== "SOLVED" && (
+              <>
+                <button
+                  onClick={() => handleFinish({ isSolved: false })}
+                  disabled={isFinishing || isSaving}
+                  className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Tried
+                </button>
+                <button
+                  onClick={() => handleFinish({ isSolved: true })}
+                  disabled={isFinishing || isSaving}
+                  className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-emerald-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Solved
+                </button>
+              </>
+            )}
+            {canSave && (
+              <button
+                onClick={handleSave}
+                disabled={!isDirty || isSaving || isFinishing}
+                className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-sky-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? "Updating..." : "Update notes"}
+              </button>
+            )}
           </div>
         )}
       </div>
