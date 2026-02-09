@@ -1,7 +1,8 @@
 "use client";
 
 import type { UserProblemFullClient } from "@/types/client";
-import { getDisplayedSeconds, formatMMSS } from "@/lib/timer";
+import { getDisplayedSeconds } from "@/lib/timer";
+import { formatDuration } from "@/lib/date";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
@@ -225,7 +226,7 @@ export default function ProblemSolving({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 bg-[#ffa116] text-black px-4 py-1.5 rounded-full font-mono text-sm font-bold shadow-lg shadow-[#ffa11633]">
                 <Timer size={14} className="animate-pulse" />
-                {formatMMSS(displayedSeconds)}
+                {formatDuration(displayedSeconds)}
               </div>
 
               <button
@@ -240,7 +241,7 @@ export default function ProblemSolving({
 
         <div className="p-4">
           <div className="mb-3 flex items-center justify-between">
-            <div className="text-sm text-gray-300">
+            <div className="text-sm text-stone-300">
               Status:{" "}
               <span className="text-white font-semibold">{problem.status}</span>
             </div>
@@ -248,26 +249,26 @@ export default function ProblemSolving({
 
           <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-stone-300">
                 Time Complexity
               </label>
               <input
                 type="text"
                 value={timeComplexity}
                 onChange={(e) => setTimeComplexity(e.target.value)}
-                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-gray-200"
+                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-gray-200 placeholder:text-stone-600"
                 placeholder="O(n log n)"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-stone-300">
                 Space Complexity
               </label>
               <input
                 type="text"
                 value={spaceComplexity}
                 onChange={(e) => setSpaceComplexity(e.target.value)}
-                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-gray-200"
+                className="w-full rounded-lg border border-[#3e3e3e] bg-[#1f1f1f] px-3 py-2 text-sm text-stone-200 placeholder:text-stone-600"
                 placeholder="O(1)"
               />
             </div>
@@ -276,7 +277,7 @@ export default function ProblemSolving({
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-4 text-gray-200 w-full h-40"
+            className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-2 text-gray-200 w-full h-40"
           />
         </div>
 
@@ -304,7 +305,7 @@ export default function ProblemSolving({
               <button
                 onClick={handleSave}
                 disabled={!isDirty || isSaving || isFinishing}
-                className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-sky-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? "Updating..." : "Update notes"}
               </button>

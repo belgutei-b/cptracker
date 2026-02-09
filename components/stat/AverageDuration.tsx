@@ -1,6 +1,7 @@
 import type { SolvedDurationStats } from "@/types/stat";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import { BarChart2 } from "lucide-react";
+import { formatDuration } from "@/lib/date";
 
 export default function AverageDuration({
   stats,
@@ -24,7 +25,7 @@ export default function AverageDuration({
             <div className="flex justify-between text-[10px] mb-2 font-bold tracking-tighter">
               <span className="text-gray-400 uppercase">{stat.difficulty}</span>
               <span style={{ color: DIFFICULTY_COLORS[stat.difficulty] }}>
-                {(stat.totalDuration / 60).toFixed(1)}m
+                {formatDuration(stat.totalDuration)}
               </span>
             </div>
             <div className="w-full bg-[#1a1a1a] h-1.5 rounded-full overflow-hidden">

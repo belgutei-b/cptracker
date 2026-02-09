@@ -6,7 +6,8 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProblemSolving from "@/components/ProblemSolving";
 import type { UserProblemFullClient } from "@/types/client";
-import { useNowTick, getDisplayedSeconds, formatMMSS } from "@/lib/timer";
+import { useNowTick, getDisplayedSeconds } from "@/lib/timer";
+import { formatDuration } from "@/lib/date";
 import { formatDayMonthYear } from "@/lib/date";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 
@@ -245,7 +246,9 @@ export default function ProblemListClient({
                   <div className="flex items-center text-xs font-mono text-gray-400">
                     <Clock size={12} className="mr-1.5" />
                     <p className="tracking-tighter">
-                      {formatMMSS(getDisplayedSeconds(problem, displayNowMs))}
+                      {formatDuration(
+                        getDisplayedSeconds(problem, displayNowMs),
+                      )}
                     </p>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { SolvedDurationStats } from "@/types/stat";
-import { formatMMSS } from "@/lib/timer";
+import { formatDuration } from "@/lib/date";
 
 export default function BoxStats({
   stats,
@@ -11,7 +11,9 @@ export default function BoxStats({
   streakDays: number;
 }) {
   const averageSeconds =
-    stats[3].count > 0 ? Math.floor(stats[3].totalDuration / stats[3].count) : 0;
+    stats[3].count > 0
+      ? Math.floor(stats[3].totalDuration / stats[3].count)
+      : 0;
 
   return (
     <div>
@@ -26,12 +28,14 @@ export default function BoxStats({
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Total Time</p>
           <p className="dashboard-stat-text">
-            {formatMMSS(stats[3].totalDuration)}
+            {formatDuration(stats[3].totalDuration)}
           </p>
         </div>
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Avg Time</p>
-          <p className="dashboard-stat-text">{formatMMSS(averageSeconds)}</p>
+          <p className="dashboard-stat-text">
+            {formatDuration(averageSeconds)}
+          </p>
         </div>
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Current Streak</p>

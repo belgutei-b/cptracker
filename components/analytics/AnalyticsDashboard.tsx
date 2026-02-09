@@ -1,24 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import AverageSolveDuration from "@/components/analytics/AverageSolveDuration";
+// import AverageSolveDuration from "@/components/analytics/AverageSolveDuration";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import {
   ANALYTICS_RANGE_OPTIONS,
   type AnalyticsRangeDays,
 } from "@/constants/analytics";
+import { formatDuration } from "@/lib/date";
 import type { BarChartData } from "@/types/stat";
-
-function formatDuration(totalSeconds: number) {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
-}
 
 function getRangeLabel(numberOfDays: AnalyticsRangeDays) {
   if (numberOfDays === 7) return "Last 7 Days";
@@ -92,7 +83,9 @@ export default function AnalyticsDashboard() {
   return (
     <div className="mt-5 mx-5 space-y-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="text-xl text-white font-bold">Performance Analytics</div>
+        <div className="text-xl text-white font-bold">
+          Performance Analytics
+        </div>
 
         <div className="flex items-center bg-[#1a1a1a] rounded-lg p-1 border border-[#3e3e3e] w-max">
           {ANALYTICS_RANGE_OPTIONS.map((range) => (
@@ -118,7 +111,7 @@ export default function AnalyticsDashboard() {
             chartData={chartData}
             isLoading={isLoading}
           />
-          <AverageSolveDuration numberOfDays={numberOfDays} />
+          {/* <AverageSolveDuration numberOfDays={numberOfDays} /> */}
         </div>
 
         <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl text-white">
@@ -132,7 +125,7 @@ export default function AnalyticsDashboard() {
               {isLoading ? "Loading..." : formatDuration(totalSeconds)}
             </p>
             <p className="text-xs text-gray-500 mt-2">
-              {isLoading ? "" : `${totalSolved} problems touched`}
+              {isLoading ? "" : `${totalSolved} problems solved`}
             </p>
           </div>
 
