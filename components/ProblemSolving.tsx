@@ -2,12 +2,28 @@
 
 import type { UserProblemFullClient } from "@/types/client";
 import { getDisplayedSeconds } from "@/lib/timer";
-import { formatDuration } from "@/lib/date";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
 import toast from "react-hot-toast";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+
+function formatProblemTimer(totalSeconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(seconds).padStart(2, "0");
+
+  if (hours > 0) {
+    const hh = String(hours).padStart(2, "0");
+    return `${hh}:${mm}:${ss}`;
+  }
+
+  return `${mm}:${ss}`;
+}
 
 export default function ProblemSolving({
   open,
@@ -224,9 +240,11 @@ export default function ProblemSolving({
 
           <div className="flex flex-col justify-end items-end text-gray-400">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-[#ffa116] text-black px-4 py-1.5 rounded-full font-mono text-sm font-bold shadow-lg shadow-[#ffa11633]">
+              <div className="flex items-center gap-2 bg-[#ffa116] text-black px-4 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-[#ffa11633]">
                 <Timer size={14} className="animate-pulse" />
-                {formatDuration(displayedSeconds)}
+                <span className="font-timer">
+                  {formatProblemTimer(displayedSeconds)}
+                </span>
               </div>
 
               <button
