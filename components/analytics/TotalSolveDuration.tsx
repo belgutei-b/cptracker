@@ -32,7 +32,7 @@ export default function TotalSolveDuration({
   const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 14 : 10;
 
   return (
-    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-[360px] w-full">
+    <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl h-90 w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-lg text-white font-bold">Total Time</p>
@@ -69,7 +69,7 @@ export default function TotalSolveDuration({
         </div>
       </div>
 
-      <div className="relative h-[280px]">
+      <div className="relative h-70">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             responsive

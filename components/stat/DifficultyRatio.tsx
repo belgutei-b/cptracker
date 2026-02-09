@@ -7,9 +7,32 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
+  Label,
 } from "recharts";
 import { LayoutDashboard } from "lucide-react";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+
+function DifficultyTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ name?: string; value?: number; color?: string }>;
+}) {
+  if (!active || !payload?.length) return null;
+
+  const item = payload[0];
+  const difficulty = item.name ?? "Unknown";
+  const count = item.value ?? 0;
+
+  return (
+    <div className="rounded-md border border-[#3e3e3e] bg-[#1a1a1a] px-3 py-2 text-base shadow-lg">
+      <div className="text-gray-300">
+        {difficulty}: <span className="font-bold text-white">{count}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function DifficultyRatio({
   stats,
@@ -33,6 +56,8 @@ export default function DifficultyRatio({
       color: DIFFICULTY_COLORS["Hard"],
     },
   ];
+  const totalCount = stats.filter((stat) => stat.difficulty === "Total")[0]
+    .count;
   return (
     <div className="bg-[#282828] p-6 rounded-xl border border-[#3e3e3e] w-80">
       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">
@@ -52,13 +77,10 @@ export default function DifficultyRatio({
                 <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                background: "#333",
-                border: "none",
-                borderRadius: "4px",
-              }}
-            />
+            <Label position="center" className="text-white" fill="#fff">
+              {totalCount}
+            </Label>
+            <Tooltip content={<DifficultyTooltip />} />
           </PieChart>
         </ResponsiveContainer>
       </div>

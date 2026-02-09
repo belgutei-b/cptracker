@@ -1,10 +1,12 @@
 "use client";
-import { Plus, LinkIcon } from "lucide-react";
+
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { actionPostProblem } from "@/app/dashboard/actions";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
+import { Plus, LinkIcon } from "lucide-react";
+import toast from "react-hot-toast";
+import { actionPostProblem } from "@/app/dashboard/actions";
 
 export default function AddProblem() {
   const [link, setLink] = useState("");
@@ -45,7 +47,7 @@ export default function AddProblem() {
           type="text"
           value={link}
           onChange={(e) => setLink(e.target.value)}
-          placeholder="Paste LeetCode link to add problem..."
+          placeholder="Paste leetCode problem link..."
           className="flex-1 bg-transparent border-none outline-none text-sm text-white py-2 placeholder-gray-600"
         />
         <button
