@@ -44,7 +44,7 @@ body {
 }
 
 .dashboard-stat-title {
-  @apply text-xs font-bold text-gray-400 uppercase;
+  @apply text-xs font-semibold text-gray-400 uppercase;
 }
 
 .dashboard-stat-text {

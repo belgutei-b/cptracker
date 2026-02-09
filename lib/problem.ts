@@ -83,7 +83,6 @@ export async function serverPostProblem({
       problemId: problem.id,
     },
   });
-  console.log(newUserProblem);
   if (!newUserProblem) {
     throw new Error("Error adding problem");
   }

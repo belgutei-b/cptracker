@@ -22,8 +22,8 @@ export default function AverageDuration({
       <div className="space-y-5">
         {difficultyStats.map((stat) => (
           <div key={stat.difficulty}>
-            <div className="flex justify-between text-[10px] mb-2 font-bold tracking-tighter">
-              <span className="text-gray-400 uppercase">{stat.difficulty}</span>
+            <div className="flex justify-between text-xs mb-2 font-bold tracking-tighter">
+              <span className="text-gray-400">{stat.difficulty}</span>
               <span style={{ color: DIFFICULTY_COLORS[stat.difficulty] }}>
                 {formatDuration(stat.totalDuration)}
               </span>
