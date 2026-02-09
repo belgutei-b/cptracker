@@ -64,9 +64,9 @@ export default function Auth() {
                 </svg>
               </div>
               <span className={styles.gsiMaterialButtonContents}>
-                Sign in with Google
+                Continue with Google
               </span>
-              <span style={{ display: "none" }}>Sign in with Google</span>
+              <span style={{ display: "none" }}>Continue with Google</span>
             </div>
           </button>
           <button
@@ -86,9 +86,9 @@ export default function Auth() {
                 />
               </div>
               <span className={styles.gsiMaterialButtonContents}>
-                Sign in with GitHub
+                Continue with GitHub
               </span>
-              <span style={{ display: "none" }}>Sign in with GitHub</span>
+              <span style={{ display: "none" }}>Continue with GitHub</span>
             </div>
           </button>
         </div>
