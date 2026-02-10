@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 
+type TimerDisplayInput = {
+  duration: number;
+  status: "TODO" | "IN_PROGRESS" | "TRIED" | "SOLVED";
+  lastStartedAt?: string | Date | null;
+};
+
 export function useNowTick(enabled: boolean, intervalMs = 1000) {
   const [now, setNow] = useState(() => Date.now());
 
@@ -12,14 +18,21 @@ export function useNowTick(enabled: boolean, intervalMs = 1000) {
   return now;
 }
 
-export function getDisplayedSeconds(
-  p: {
-    duration: number;
-    status: "TODO" | "IN_PROGRESS" | "TRIED" | "SOLVED";
-    lastStartedAt?: string | Date | null;
-  },
-  nowMs: number,
-) {
+export function getDisplayedMilliseconds(p: TimerDisplayInput, nowMs: number) {
+  const baseMs = Math.max(0, (p.duration ?? 0) * 1000);
+
+  if (p.status !== "IN_PROGRESS" || !p.lastStartedAt) return baseMs;
+
+  const startedMs =
+    typeof p.lastStartedAt === "string"
+      ? new Date(p.lastStartedAt).getTime()
+      : p.lastStartedAt.getTime();
+
+  const deltaMs = Math.max(0, nowMs - startedMs);
+  return baseMs + deltaMs;
+}
+
+export function getDisplayedSeconds(p: TimerDisplayInput, nowMs: number) {
   const base = p.duration ?? 0;
 
   if (p.status !== "IN_PROGRESS" || !p.lastStartedAt) return base;

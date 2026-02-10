@@ -1,28 +1,39 @@
 "use client";
 
-import type { UserProblemFullClient } from "@/types/client";
-import { getDisplayedSeconds } from "@/lib/timer";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ExternalLink, CheckCircle, X, Timer } from "lucide-react";
+import localFont from "next/font/local";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+import { ExternalLink, CheckCircle, X } from "lucide-react";
 
-function formatProblemTimer(totalSeconds: number) {
-  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
+import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+import type { UserProblemFullClient } from "@/types/client";
+
+const timerFont = localFont({
+  src: [
+    {
+      path: "../public/timerfont/font-timer.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+});
+
+function formatProblemTimer(totalMs: number) {
+  const safeMs = Math.max(0, Math.floor(totalMs));
+  const safeSeconds = Math.floor(safeMs / 1000);
   const hours = Math.floor(safeSeconds / 3600);
   const minutes = Math.floor((safeSeconds % 3600) / 60);
   const seconds = safeSeconds % 60;
+  const centiseconds = Math.floor((safeMs % 1000) / 10);
 
+  const hh = String(hours).padStart(2, "0");
   const mm = String(minutes).padStart(2, "0");
   const ss = String(seconds).padStart(2, "0");
+  const xx = String(centiseconds).padStart(2, "0");
 
-  if (hours > 0) {
-    const hh = String(hours).padStart(2, "0");
-    return `${hh}:${mm}:${ss}`;
-  }
-
-  return `${mm}:${ss}`;
+  return { main: `${hh}:${mm}:${ss}`, centiseconds: xx };
 }
 
 export default function ProblemSolving({
@@ -71,7 +82,6 @@ export default function ProblemSolving({
   const [spaceComplexity, setSpaceComplexity] = useState("");
   const [isFinishing, setIsFinishing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [showUnsolvedTopics, setShowUnsolvedTopics] = useState(false);
 
   // Initialize local fields when opening / switching problems
   useEffect(() => {
@@ -79,7 +89,6 @@ export default function ProblemSolving({
     setNote(problem.note ?? "");
     setTimeComplexity(problem.timeComplexity ?? "");
     setSpaceComplexity(problem.spaceComplexity ?? "");
-    setShowUnsolvedTopics(false);
   }, [open, problem?.problemId]);
 
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
@@ -161,9 +170,17 @@ export default function ProblemSolving({
     }
   }
 
+  const isTimerRunning =
+    open && problem?.status === "IN_PROGRESS" && !!problem?.lastStartedAt;
+  const liveNowMs = useNowTick(isTimerRunning, 10);
+
   if (!open || !problem) return null;
 
-  const displayedSeconds = getDisplayedSeconds(problem, nowMs);
+  const displayedMilliseconds = getDisplayedMilliseconds(
+    problem,
+    isTimerRunning ? liveNowMs : nowMs,
+  );
+  const formattedTimer = formatProblemTimer(displayedMilliseconds);
   const canSave = problem.status === "SOLVED";
   const isDirty =
     note !== (problem.note ?? "") ||
@@ -184,7 +201,7 @@ export default function ProblemSolving({
       />
 
       <div className="relative z-10 w-full max-w-3xl rounded-2xl border border-[#3e3e3e] bg-[#282828] shadow-xl">
-        <div className="flex items-start justify-between gap-4 border-b border-[#3e3e3e] p-4">
+        <div className="flex items-start justify-between gap-4 px-4 pt-4">
           <div>
             <div className="flex items-center gap-2">
               <span
@@ -214,17 +231,7 @@ export default function ProblemSolving({
               </Link>
             </div>
 
-            {problem.status !== "SOLVED" && (
-              <button
-                type="button"
-                onClick={() => setShowUnsolvedTopics((prev) => !prev)}
-                className="mt-2 text-[10px] rounded-full border border-[#3e3e3e] px-2 py-0.5 text-gray-300 hover:text-white hover:border-[#5a5a5a] transition-colors"
-              >
-                {showUnsolvedTopics ? "Hide" : "Show"} topics
-              </button>
-            )}
-
-            {(problem.status === "SOLVED" || showUnsolvedTopics) && (
+            {problem.status === "SOLVED" && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {problem.problem.tags.map((tag) => (
                   <span
@@ -238,22 +245,20 @@ export default function ProblemSolving({
             )}
           </div>
 
-          <div className="flex flex-col justify-end items-end text-gray-400">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-[#ffa116] text-black px-4 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-[#ffa11633]">
-                <Timer size={14} className="animate-pulse" />
-                <span className="font-timer">
-                  {formatProblemTimer(displayedSeconds)}
-                </span>
-              </div>
-
-              <button
-                onClick={onCloseAction}
-                className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
-              >
-                <X size={24} />
-              </button>
-            </div>
+          <button
+            onClick={onCloseAction}
+            className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        {/* Timer | horizontal line */}
+        <div className="border-b border-[#3e3e3e] w-full flex justify-center text-6xl  text-[#ffa116] py-3">
+          <div>
+            <span className={timerFont.className}>
+              {formattedTimer.main}
+              <span className="text-2xl">.{formattedTimer.centiseconds}</span>
+            </span>
           </div>
         </div>
 
