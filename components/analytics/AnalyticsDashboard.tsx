@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-// import AverageSolveDuration from "@/components/analytics/AverageSolveDuration";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import {
@@ -104,17 +103,14 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
-        <div className="space-y-10">
-          <TotalSolveDuration
-            numberOfDays={numberOfDays}
-            chartData={chartData}
-            isLoading={isLoading}
-          />
-          {/* <AverageSolveDuration numberOfDays={numberOfDays} /> */}
-        </div>
+      <div className="flex flex-col lg:flex-row items-start space-y-5 md:space-x-5">
+        <TotalSolveDuration
+          numberOfDays={numberOfDays}
+          chartData={chartData}
+          isLoading={isLoading}
+        />
 
-        <div className="bg-[#282828] p-6 rounded-2xl border border-[#3e3e3e] shadow-xl text-white">
+        <div className="bg-[#282828] w-100 p-6 rounded-2xl border border-[#3e3e3e] shadow-xl text-white">
           <p className="text-lg font-bold">Total Time</p>
           <p className="text-xs uppercase tracking-widest text-gray-500 mt-1">
             {getRangeLabel(numberOfDays)}
