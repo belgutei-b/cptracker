@@ -15,7 +15,7 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
             href="/"
             className="text-xl font-bold text-amber-500 flex items-center mr-8 gap-2 cursor-pointer"
           >
-            <Brain size={24} /> Pulse
+            <Brain size={24} /> CPTracker
           </Link>
           <div className="flex items-center gap-1">
             {signedIn && (

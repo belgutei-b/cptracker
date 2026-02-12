@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pulse",
+  title: "CPTracker - Dashboard for leetcode",
   description: "Track your leetcode progress",
   icons: {
     icon: [
