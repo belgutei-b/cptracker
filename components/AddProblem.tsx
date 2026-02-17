@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
-import { useRouter } from "next/navigation";
-
+import { useState, type FormEvent } from "react";
 import { Plus, LinkIcon } from "lucide-react";
 import toast from "react-hot-toast";
-import { actionPostProblem } from "@/app/dashboard/actions";
+import { useAddProblemMutation } from "@/hooks/problems/useAddProblemMutation";
 
 export default function AddProblem() {
   const [link, setLink] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const addMutation = useAddProblemMutation();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,21 +15,12 @@ export default function AddProblem() {
       toast.error("Leetcode problem link required");
       return;
     }
-    setIsSubmitting(true);
     try {
-      const res = await actionPostProblem(link);
-
-      if (res.success) {
-        toast.success(res.message);
-        setLink("");
-        router.refresh();
-      } else {
-        toast.error(res.message);
-      }
+      await addMutation.mutateAsync({
+        problemLink: link,
+      });
     } catch (err) {
       toast.error("Unexpected Error Occurred");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -52,7 +39,7 @@ export default function AddProblem() {
         />
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={addMutation.isPending}
           className="px-4 py-2 rounded-xl flex items-center gap-2 border bg-amber-500 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus size={16} /> Add

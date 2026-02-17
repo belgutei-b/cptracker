@@ -1,6 +1,6 @@
 "use server";
 
-import { serializeDates } from "@/types/client";
+import { serializeDates, type UserProblemFullClient } from "@/types/client";
 import { unstable_noStore as noStore } from "next/cache";
 import { getLeetcodeDailyProblem, getProblemData } from "./leetcode";
 import prisma from "./prisma";
@@ -54,7 +54,7 @@ export async function serverPostProblem({
 }: {
   problemLink: string;
   userId: string;
-}) {
+}): Promise<UserProblemFullClient> {
   const titleSlug = problemLink.split("/")[4];
   const baseLink = "https://leetcode.com/problems/" + titleSlug;
 
@@ -82,12 +82,15 @@ export async function serverPostProblem({
       userId,
       problemId: problem.id,
     },
+    include: {
+      problem: true,
+    },
   });
   if (!newUserProblem) {
     throw new Error("Error adding problem");
   }
 
-  return true;
+  return serializeDates(newUserProblem) as UserProblemFullClient;
 }
 
 export async function serverAddDailyProblem({ userId }: { userId: string }) {
