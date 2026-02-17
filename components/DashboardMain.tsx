@@ -1,14 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { UserProblemFullClient } from "@/types/client";
-import ProblemListClient from "./problems/ProblemsList.client";
+import ProblemsList from "./problems/ProblemsList";
 
-export default function DashboardMain({
-  problems,
-}: {
-  problems: UserProblemFullClient[];
-}) {
+export default function DashboardMain() {
   const [difficulty, setDifficulty] = useState("all");
   const [status, setStatus] = useState("all");
 
@@ -50,10 +45,7 @@ export default function DashboardMain({
         </div>
       </div>
 
-      <ProblemListClient
-        receivedProblems={problems}
-        filters={{ difficulty, status }}
-      />
+      <ProblemsList filters={{ difficulty, status }} />
     </>
   );
 }

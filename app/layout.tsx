@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar.server";
 import ToastProvider from "@/components/ToastProvider";
+import QueryProvider from "@/components/QueryProvider";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -49,7 +50,7 @@ export default function RootLayout({
       >
         <ToastProvider />
         <Navbar />
-        {children}
+        <QueryProvider>{children}</QueryProvider>
         <Analytics />
       </body>
     </html>

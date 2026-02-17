@@ -8,7 +8,6 @@ import AddProblem from "@/components/AddProblem";
 import StatServer from "@/components/stat/Stat.server";
 import StatSkeloton from "@/components/stat/StatSkeloton";
 import DashboardMain from "@/components/DashboardMain";
-import { getProblems } from "@/lib/problem";
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -18,7 +17,6 @@ export default async function Page() {
     redirect("/auth");
   }
   const userId = session.user.id;
-  const problems = await getProblems({ userId });
 
   return (
     <div className="w-full flex flex-col md:flex-row-reverse px-4">
@@ -29,7 +27,7 @@ export default async function Page() {
         </Suspense>
       </div>
       <div className="flex-1 mt-5">
-        <DashboardMain problems={problems} />
+        <DashboardMain />
       </div>
     </div>
   );

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import ProblemSolving from "@/components/ProblemSolving";
+import { useMemo, useState } from "react";
+
+import ProblemSolving from "@/components/problems/ProblemSolving";
+import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
 import type { UserProblemFullClient } from "@/types/client";
 import { useNowTick, getDisplayedSeconds } from "@/lib/timer";
 import { formatDuration } from "@/lib/date";
 import { formatDayMonthYear } from "@/lib/date";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
+import { useStartProblemMutation } from "@/hooks/problems/useStartProblemMutation";
 
 function getDisplayDate(problem: UserProblemFullClient) {
   if (problem.status === "SOLVED") {
@@ -23,30 +26,26 @@ function getDisplayDate(problem: UserProblemFullClient) {
   return problem.createdAt;
 }
 
-export default function ProblemListClient({
-  receivedProblems,
+export default function ProblemList({
   filters = { difficulty: "all", status: "all" },
 }: {
-  receivedProblems: UserProblemFullClient[];
   filters?: {
     difficulty: string;
     status: string;
   };
 }) {
-  const [problems, setProblems] =
-    useState<UserProblemFullClient[]>(receivedProblems);
+  const { data: problems = [], isLoading, isError } = useProblemsQuery();
+  const startMutation = useStartProblemMutation();
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const openProblemId = searchParams.get("openProblemId");
 
   const activeProblem = useMemo(
     () => problems.find((p) => p.problemId === activeProblemId) ?? null,
     [problems, activeProblemId],
   );
+
   const difficultyFilter = filters.difficulty ?? "all";
   const statusFilter = filters.status ?? "all";
+
   const filteredProblems = useMemo(() => {
     return problems.filter((p) => {
       const matchesDifficulty =
@@ -62,93 +61,9 @@ export default function ProblemListClient({
   const anyRunning = problems.some(
     (p) => p.status === "IN_PROGRESS" && p.lastStartedAt,
   );
-  const nowMs = useNowTick(isClient && anyRunning);
-  const displayNowMs = isClient ? nowMs : 0;
+  const nowMs = useNowTick(anyRunning);
 
-  useEffect(() => {
-    setProblems(receivedProblems);
-  }, [receivedProblems]);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  useEffect(() => {
-    if (!openProblemId) return;
-    const exists = problems.some((p) => p.problemId === openProblemId);
-    if (!exists) return;
-    setActiveProblemId(openProblemId);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("openProblemId");
-    const next = params.toString();
-    router.replace(next ? `/dashboard?${next}` : "/dashboard");
-  }, [openProblemId, problems, router, searchParams]);
-
-  function onFinishLocalAction(
-    problemId: string,
-    newStatus: "TRIED" | "SOLVED",
-    updates?: {
-      duration?: number | null;
-      note?: string;
-      timeComplexity?: string;
-      spaceComplexity?: string;
-    },
-  ) {
-    const nextDuration = updates?.duration;
-    const nextNote = updates?.note;
-    const nextTimeComplexity = updates?.timeComplexity;
-    const nextSpaceComplexity = updates?.spaceComplexity;
-
-    setProblems((prev) =>
-      prev.map((p) =>
-        p.problemId === problemId
-          ? {
-              ...p,
-              status: newStatus,
-              lastStartedAt: null,
-              ...(typeof nextDuration === "number"
-                ? { duration: nextDuration }
-                : {}),
-              ...(typeof nextNote === "string" ? { note: nextNote } : {}),
-              ...(typeof nextTimeComplexity === "string"
-                ? { timeComplexity: nextTimeComplexity }
-                : {}),
-              ...(typeof nextSpaceComplexity === "string"
-                ? { spaceComplexity: nextSpaceComplexity }
-                : {}),
-            }
-          : p,
-      ),
-    );
-  }
-
-  function onSaveLocalAction(
-    problemId: string,
-    updates: {
-      note?: string;
-      timeComplexity?: string;
-      spaceComplexity?: string;
-    },
-  ) {
-    setProblems((prev) =>
-      prev.map((p) =>
-        p.problemId === problemId
-          ? {
-              ...p,
-              ...(typeof updates.note === "string"
-                ? { note: updates.note }
-                : {}),
-              ...(typeof updates.timeComplexity === "string"
-                ? { timeComplexity: updates.timeComplexity }
-                : {}),
-              ...(typeof updates.spaceComplexity === "string"
-                ? { spaceComplexity: updates.spaceComplexity }
-                : {}),
-            }
-          : p,
-      ),
-    );
-  }
-
-  async function startProblem(problemId: string) {
+  function startProblem(problemId: string) {
     const existing = problems.find((p) => p.problemId === problemId);
 
     // Always open the modal
@@ -158,56 +73,19 @@ export default function ProblemListClient({
     if (existing?.status === "IN_PROGRESS" && existing.lastStartedAt) return;
     if (existing?.status === "SOLVED") return;
 
-    const startedAtIso = new Date().toISOString();
-    const previousStatus = existing?.status;
-    const previousLastStartedAt = existing?.lastStartedAt ?? null;
+    startMutation.mutate(problemId);
+  }
 
-    // optimistic update
-    setProblems((prev) =>
-      prev.map((p) =>
-        p.problemId === problemId
-          ? { ...p, status: "IN_PROGRESS", lastStartedAt: startedAtIso }
-          : p,
-      ),
+  if (isLoading) {
+    return <ProblemListSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-xl border border-[#3e3e3e] bg-[#282828] p-6 text-sm text-red-300">
+        Failed to load problems.
+      </div>
     );
-
-    try {
-      const res = await fetch(`/api/problems/${problemId}/start`, {
-        method: "POST",
-      });
-      if (!res.ok) {
-        throw new Error("Failed to start problem");
-      }
-
-      const data = (await res.json()) as { lastStartedAt?: string };
-      const backendStartedAt = data.lastStartedAt;
-      if (typeof backendStartedAt === "string") {
-        setProblems((prev) =>
-          prev.map((p) =>
-            p.problemId === problemId
-              ? {
-                  ...p,
-                  status: "IN_PROGRESS",
-                  lastStartedAt: backendStartedAt,
-                }
-              : p,
-          ),
-        );
-      }
-    } catch {
-      if (!existing) return;
-      setProblems((prev) =>
-        prev.map((p) =>
-          p.problemId === problemId
-            ? {
-                ...p,
-                status: previousStatus ?? p.status,
-                lastStartedAt: previousLastStartedAt,
-              }
-            : p,
-        ),
-      );
-    }
   }
 
   return (
@@ -215,6 +93,9 @@ export default function ProblemListClient({
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {filteredProblems.map((problem) => {
           const displayDate = formatDayMonthYear(getDisplayDate(problem));
+          const isStarting =
+            startMutation.isPending &&
+            startMutation.variables === problem.problemId;
 
           return (
             <div
@@ -246,9 +127,7 @@ export default function ProblemListClient({
                   <div className="flex items-center text-xs font-mono text-gray-400">
                     <Clock size={12} className="mr-1.5" />
                     <p className="tracking-tighter">
-                      {formatDuration(
-                        getDisplayedSeconds(problem, displayNowMs),
-                      )}
+                      {formatDuration(getDisplayedSeconds(problem, nowMs))}
                     </p>
                   </div>
                 </div>
@@ -290,7 +169,8 @@ export default function ProblemListClient({
               <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
                 <button
                   onClick={() => startProblem(problem.problemId)}
-                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e]"
+                  disabled={isStarting}
+                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Play size={18} />
                 </button>
@@ -312,8 +192,6 @@ export default function ProblemListClient({
         onCloseAction={() => setActiveProblemId(null)}
         problem={activeProblem}
         nowMs={nowMs}
-        onFinishLocalAction={onFinishLocalAction}
-        onSaveLocalAction={onSaveLocalAction}
       />
     </>
   );

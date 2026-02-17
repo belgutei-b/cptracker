@@ -9,11 +9,13 @@ import { ExternalLink, CheckCircle, X } from "lucide-react";
 import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import type { UserProblemFullClient } from "@/types/client";
+import { useFinishProblemMutation } from "@/hooks/problems/useFinishProblemMutation";
+import { useSaveProblemMutation } from "@/hooks/problems/useSaveProblemMutation";
 
 const timerFont = localFont({
   src: [
     {
-      path: "../public/timerfont/font-timer.woff2",
+      path: "../../public/timerfont/font-timer.woff2",
       weight: "400",
       style: "normal",
     },
@@ -41,33 +43,12 @@ export default function ProblemSolving({
   onCloseAction,
   problem,
   nowMs,
-  onFinishLocalAction,
-  onSaveLocalAction,
 }: {
   open: boolean;
   onCloseAction: () => void;
   problem: UserProblemFullClient | null;
   nowMs: number;
-  onFinishLocalAction: (
-    problemId: string,
-    newStatus: "TRIED" | "SOLVED",
-    updates?: {
-      duration?: number | null;
-      note?: string;
-      timeComplexity?: string;
-      spaceComplexity?: string;
-    },
-  ) => void;
-  onSaveLocalAction: (
-    problemId: string,
-    updates: {
-      note?: string;
-      timeComplexity?: string;
-      spaceComplexity?: string;
-    },
-  ) => void;
 }) {
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -77,105 +58,71 @@ export default function ProblemSolving({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onCloseAction]);
 
-  const [note, setNote] = useState("");
-  const [timeComplexity, setTimeComplexity] = useState("");
-  const [spaceComplexity, setSpaceComplexity] = useState("");
-  const [isFinishing, setIsFinishing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  if (!open || !problem) return null;
 
-  // Initialize local fields when opening / switching problems
-  useEffect(() => {
-    if (!open || !problem) return;
-    setNote(problem.note ?? "");
-    setTimeComplexity(problem.timeComplexity ?? "");
-    setSpaceComplexity(problem.spaceComplexity ?? "");
-  }, [open, problem?.problemId]);
+  return (
+    <ProblemSolvingContent
+      key={problem.problemId}
+      problem={problem}
+      nowMs={nowMs}
+      onCloseAction={onCloseAction}
+    />
+  );
+}
+
+function ProblemSolvingContent({
+  problem,
+  nowMs,
+  onCloseAction,
+}: {
+  problem: UserProblemFullClient;
+  nowMs: number;
+  onCloseAction: () => void;
+}) {
+  const [note, setNote] = useState(problem.note ?? "");
+  const [timeComplexity, setTimeComplexity] = useState(
+    problem.timeComplexity ?? "",
+  );
+  const [spaceComplexity, setSpaceComplexity] = useState(
+    problem.spaceComplexity ?? "",
+  );
+  const finishMutation = useFinishProblemMutation();
+  const saveMutation = useSaveProblemMutation();
 
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
-    const payload: {
-      newStatus: "SOLVED" | "TRIED";
-      note: string;
-      timeComplexity: string;
-      spaceComplexity: string;
-    } = {
-      newStatus: isSolved ? "SOLVED" : "TRIED",
-      note: note,
-      timeComplexity: timeComplexity,
-      spaceComplexity: spaceComplexity,
-    };
     try {
-      setIsFinishing(true);
-      const res = await fetch(`/api/problems/${problem!.problemId}/finish`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      await finishMutation.mutateAsync({
+        problemId: problem.problemId,
+        newStatus: isSolved ? "SOLVED" : "TRIED",
+        note,
+        timeComplexity,
+        spaceComplexity,
       });
-      if (res.status === 200) {
-        const data = (await res.json()) as { duration?: number | null };
-        onFinishLocalAction(problem!.problemId, payload.newStatus, {
-          duration: data.duration,
-          note: payload.note,
-          timeComplexity: payload.timeComplexity,
-          spaceComplexity: payload.spaceComplexity,
-        });
-        toast.success("Successfully updated");
-      }
+      toast.success("Successfully updated");
     } catch (err) {
       toast.error("Unexpected Error Occurred");
       console.log(err);
-    } finally {
-      setIsFinishing(false);
     }
   }
 
   async function handleSave() {
-    if (!problem) return;
-
-    const payload = {
-      note,
-      timeComplexity,
-      spaceComplexity,
-    };
-
     try {
-      setIsSaving(true);
-      const res = await fetch(`/api/problems/${problem.problemId}/save`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      await saveMutation.mutateAsync({
+        problemId: problem.problemId,
+        note,
+        timeComplexity,
+        spaceComplexity,
       });
-
-      if (res.status === 200) {
-        const data = (await res.json()) as {
-          note?: string;
-          timeComplexity?: string;
-          spaceComplexity?: string;
-        };
-
-        onSaveLocalAction(problem.problemId, {
-          note: data.note,
-          timeComplexity: data.timeComplexity,
-          spaceComplexity: data.spaceComplexity,
-        });
-
-        toast.success("Saved");
-      } else {
-        toast.error("Save failed");
-      }
+      toast.success("Saved");
     } catch (err) {
       toast.error("Unexpected Error Occurred");
       console.log(err);
-    } finally {
-      setIsSaving(false);
     }
   }
 
   const isTimerRunning =
-    open && problem?.status === "IN_PROGRESS" && !!problem?.lastStartedAt;
+    problem.status === "IN_PROGRESS" && !!problem.lastStartedAt;
   const liveNowMs = useNowTick(isTimerRunning, 10);
-
-  if (!open || !problem) return null;
-
   const displayedMilliseconds = getDisplayedMilliseconds(
     problem,
     isTimerRunning ? liveNowMs : nowMs,
@@ -186,6 +133,8 @@ export default function ProblemSolving({
     note !== (problem.note ?? "") ||
     timeComplexity !== (problem.timeComplexity ?? "") ||
     spaceComplexity !== (problem.spaceComplexity ?? "");
+  const isFinishing = finishMutation.isPending;
+  const isSaving = saveMutation.isPending;
 
   return (
     <div
