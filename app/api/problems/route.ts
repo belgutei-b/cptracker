@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getProblems, serverPostProblem } from "@/lib/problem";
 import { getCurrentUserId } from "@/lib/user";
 
+/**
+ * user add problem
+ * @param request
+ * @returns created problem object
+ */
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as {
     problemLink?: string;
@@ -35,14 +40,20 @@ export async function POST(request: NextRequest) {
   );
 }
 
+/**
+ * user get all problems
+ * @returns array of problem object
+ */
 export async function GET() {
   const userId = await getCurrentUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   const problems = await getProblems({
     userId,
   });
+
   return NextResponse.json(
     {
       problems,

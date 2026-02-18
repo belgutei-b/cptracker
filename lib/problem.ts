@@ -16,11 +16,6 @@ async function getOrCreateProblem({
     where: {
       titleSlug,
     },
-    select: {
-      id: true,
-      title: true,
-      questionId: true,
-    },
   });
 
   if (!problem) {
@@ -35,11 +30,6 @@ async function getOrCreateProblem({
         titleSlug: problemData.titleSlug,
         difficulty: problemData.difficulty,
         tags: problemData.topicTags.map((tag: { name: string }) => tag.name),
-      },
-      select: {
-        id: true,
-        title: true,
-        questionId: true,
       },
     });
   }
@@ -127,16 +117,21 @@ export async function serverAddDailyProblem({ userId }: { userId: string }) {
   }
 
   const now = new Date();
-  await prisma.userProblem.create({
+  const createdUserProblem = await prisma.userProblem.create({
     data: {
       userId,
       problemId: problem.id,
       status: "IN_PROGRESS",
       lastStartedAt: now,
     },
+    include: {
+      problem: true,
+    },
   });
 
+  const serializedUserProblem = serializeDates(createdUserProblem);
   return {
+    problem: serializedUserProblem,
     problemId: problem.id,
     alreadyAdded: false,
   };
