@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   BarChart3,
   BookText,
   Gauge,
@@ -33,12 +32,6 @@ const coreFeatures = [
       "Compare your average solve speed for Easy, Medium, and Hard questions.",
     icon: Gauge,
   },
-];
-
-const snapshotStats = [
-  { label: "Last 7 Days", value: "Focused trend view" },
-  { label: "2 Weeks", value: "Consistency insights" },
-  { label: "1 Month", value: "Long-term progress" },
 ];
 
 export default function Page() {
