@@ -15,13 +15,9 @@ export default function AddProblem() {
       toast.error("Leetcode problem link required");
       return;
     }
-    try {
-      await addMutation.mutateAsync({
-        problemLink: link,
-      });
-    } catch (err) {
-      toast.error("Unexpected Error Occurred");
-    }
+    await addMutation.mutateAsync({
+      problemLink: link,
+    });
   }
 
   return (

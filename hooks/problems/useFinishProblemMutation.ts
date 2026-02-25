@@ -38,6 +38,7 @@ async function finishProblemApi({
 
   if (!res.ok) {
     toast.error("Failed to finish problem");
+    throw new Error("error");
   }
 
   return (await res.json()) as FinishResponse;

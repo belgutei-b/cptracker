@@ -32,6 +32,7 @@ async function saveProblemApi({
 
   if (!res.ok) {
     toast.error("Failed to save problem notes");
+    throw new Error("error");
   }
 
   return (await res.json()) as SaveResponse;

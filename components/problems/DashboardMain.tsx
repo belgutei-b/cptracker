@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import ProblemList from "@/components/problems/ProblemList";
+import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
+import { UserProblemFullClient } from "@/types/client";
 
-export default function DashboardMain() {
+export default function DashboardMain({
+  problems,
+  className,
+  isLoading,
+}: {
+  problems: UserProblemFullClient[];
+  className?: string;
+  isLoading: boolean;
+}) {
   const [difficulty, setDifficulty] = useState("all");
   const [status, setStatus] = useState("all");
-
   return (
-    <>
+    <div className={["flex flex-col", className].filter(Boolean).join(" ")}>
       <div className="flex justify-between items-center">
         <div>
           <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
@@ -44,8 +53,11 @@ export default function DashboardMain() {
           </div>
         </div>
       </div>
-
-      <ProblemList filters={{ difficulty, status }} />
-    </>
+      {isLoading ? (
+        <ProblemListSkeleton />
+      ) : (
+        <ProblemList problems={problems} filters={{ difficulty, status }} />
+      )}
+    </div>
   );
 }

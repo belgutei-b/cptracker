@@ -1,34 +1,28 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+"use client";
 
-import { auth } from "@/lib/auth";
-// components
+import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
 import AddProblem from "@/components/problems/AddProblem";
-import StatServer from "@/components/stat/Stat.server";
-import StatSkeloton from "@/components/stat/StatSkeloton";
-import DashboardMain from "@/components/DashboardMain";
+import DashboardMain from "@/components/problems/DashboardMain";
+import Stat from "@/components/stat/Stat";
 
-export default async function Page() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) {
-    redirect("/auth");
+export default function Page() {
+  const { data: problems = [], isLoading, isError } = useProblemsQuery();
+
+  if (isError) {
+    return <div>Error fetching problems</div>;
   }
-  const userId = session.user.id;
 
   return (
-    <div className="w-full flex flex-col md:flex-row-reverse px-4">
-      <div className="w-90 mt-5 md:mt-10 space-y-5 flex flex-col md:items-end">
+    <div className="flex flex-col md:flex-row-reverse md:justify-between w-full px-4">
+      <div className="w-90 mt-5 md:mt-10 flex flex-col md:items-end space-y-5">
         <AddProblem />
-        <Suspense fallback={<StatSkeloton />}>
-          <StatServer userId={userId} />
-        </Suspense>
+        <Stat problems={problems} isLoading={isLoading} className="" />
       </div>
-      <div className="flex-1 mt-5">
-        <DashboardMain />
-      </div>
+      <DashboardMain
+        problems={problems}
+        isLoading={isLoading}
+        className="mt-5 flex-1"
+      />
     </div>
   );
 }

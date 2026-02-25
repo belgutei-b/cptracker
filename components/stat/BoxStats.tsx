@@ -1,14 +1,14 @@
 "use client";
 
 import { SolvedDurationStats } from "@/types/stat";
-import { formatDuration } from "@/lib/date";
+import { formatDayMonthYear, formatDuration } from "@/lib/date";
 
 export default function BoxStats({
   stats,
-  streakDays,
+  lastSolvedAt,
 }: {
   stats: SolvedDurationStats;
-  streakDays: number;
+  lastSolvedAt: string | null;
 }) {
   const averageSeconds =
     stats[3].count > 0
@@ -38,9 +38,9 @@ export default function BoxStats({
           </p>
         </div>
         <div className="dashboard-stat-box">
-          <p className="dashboard-stat-title">Current Streak</p>
+          <p className="dashboard-stat-title">Last Solved</p>
           <p className="dashboard-stat-text">
-            {streakDays} Day{streakDays === 1 ? "" : "s"}
+            {formatDayMonthYear(lastSolvedAt, "-")}
           </p>
         </div>
       </div>

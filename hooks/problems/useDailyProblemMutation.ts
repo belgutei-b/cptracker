@@ -35,12 +35,14 @@ async function addDailyProblemApi() {
       // Non-JSON error response: use default fallback message.
     }
     toast.error(errorMessage);
+    throw new Error("Error");
   }
 
   const data = (await res.json()) as AddDailyProblemResponse;
 
   if (data.alreadyAdded) {
     toast.error("Daily problem already added");
+    throw new Error("Error");
   }
 
   return data.problem;

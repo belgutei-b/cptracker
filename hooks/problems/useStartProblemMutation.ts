@@ -9,7 +9,10 @@ async function startProblemApi(problemId: string) {
   const res = await fetch(`/api/problems/${problemId}/start`, {
     method: "POST",
   });
-  if (!res.ok) toast.error("Failed to start problem");
+  if (!res.ok) {
+    toast.error("Failed to start problem");
+    throw new Error("error");
+  }
   return (await res.json()) as { ok: true; lastStartedAt: string };
 }
 

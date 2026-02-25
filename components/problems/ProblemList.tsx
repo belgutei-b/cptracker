@@ -5,13 +5,11 @@ import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import ProblemSolving from "@/components/problems/ProblemSolving";
-import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
 import type { UserProblemFullClient } from "@/types/client";
 import { useNowTick, getDisplayedSeconds } from "@/lib/timer";
 import { formatDuration } from "@/lib/date";
 import { formatDayMonthYear } from "@/lib/date";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
-import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
 import { useStartProblemMutation } from "@/hooks/problems/useStartProblemMutation";
 
 function getDisplayDate(problem: UserProblemFullClient) {
@@ -28,13 +26,15 @@ function getDisplayDate(problem: UserProblemFullClient) {
 
 export default function ProblemList({
   filters = { difficulty: "all", status: "all" },
+  problems,
 }: {
   filters?: {
     difficulty: string;
     status: string;
   };
+  problems: UserProblemFullClient[];
 }) {
-  const { data: problems = [], isLoading, isError } = useProblemsQuery();
+  // const { data: problems = [], isLoading, isError } = useProblemsQuery();
   const startMutation = useStartProblemMutation();
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
 
@@ -75,19 +75,6 @@ export default function ProblemList({
 
     startMutation.mutate(problemId);
   }
-
-  if (isLoading) {
-    return <ProblemListSkeleton />;
-  }
-
-  if (isError) {
-    return (
-      <div className="rounded-xl border border-[#3e3e3e] bg-[#282828] p-6 text-sm text-red-300">
-        Failed to load problems.
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">

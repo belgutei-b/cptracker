@@ -13,7 +13,10 @@ async function addProblemApi({ problemLink }: { problemLink: string }) {
       problemLink,
     }),
   });
-  if (!res.ok) toast.error("Failed to add problem");
+  if (!res.ok) {
+    toast.error("Failed to add problem");
+    throw new Error("Error");
+  }
   const data = (await res.json()) as { problem: UserProblemFullClient };
   return data.problem;
 }
