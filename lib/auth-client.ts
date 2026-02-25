@@ -14,12 +14,14 @@ export const authClient = createAuthClient({
 export const googleSignIn = async () => {
   await authClient.signIn.social({
     provider: "google",
+    callbackURL: "/dashboard",
   });
 };
 
 export const githubSignIn = async () => {
   const data = await authClient.signIn.social({
     provider: "github",
+    callbackURL: "/dashboard",
   });
 };
 

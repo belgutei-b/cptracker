@@ -1,13 +1,19 @@
 "use client";
 
 import { Swords } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useDailyProblemMutation } from "@/hooks/problems/useDailyProblemMutation";
 
 export default function DailyQuestionButton() {
   const dailyProblemMutation = useDailyProblemMutation();
+  const pathname = usePathname();
+  const router = useRouter();
 
   function handleClick() {
     dailyProblemMutation.mutate();
+    if (pathname !== "/dashboard") {
+      router.push("/dashboard");
+    }
   }
 
   return (
