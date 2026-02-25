@@ -3,12 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UserProblemFullClient } from "@/types/client";
 import { queryKeys } from "@/lib/queryKeys";
+import toast from "react-hot-toast";
 
 type SaveResponse = {
   ok: boolean;
-  note?: string;
-  timeComplexity?: string;
-  spaceComplexity?: string;
 };
 
 async function saveProblemApi({
@@ -33,7 +31,7 @@ async function saveProblemApi({
   });
 
   if (!res.ok) {
-    throw new Error("Failed to save problem notes");
+    toast.error("Failed to save problem notes");
   }
 
   return (await res.json()) as SaveResponse;
@@ -44,7 +42,7 @@ export function useSaveProblemMutation() {
 
   return useMutation({
     mutationFn: saveProblemApi,
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       const nowIso = new Date().toISOString();
       queryClient.setQueryData<UserProblemFullClient[]>(
         queryKeys.problems,
@@ -54,15 +52,14 @@ export function useSaveProblemMutation() {
               ? {
                   ...p,
                   updatedAt: nowIso,
-                  note: data.note ?? variables.note,
-                  timeComplexity:
-                    data.timeComplexity ?? variables.timeComplexity,
-                  spaceComplexity:
-                    data.spaceComplexity ?? variables.spaceComplexity,
+                  note: variables.note,
+                  timeComplexity: variables.timeComplexity,
+                  spaceComplexity: variables.spaceComplexity,
                 }
               : p,
           ),
       );
+      toast.success("Notes saved");
     },
   });
 }

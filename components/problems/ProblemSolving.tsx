@@ -3,7 +3,6 @@
 import Link from "next/link";
 import localFont from "next/font/local";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { ExternalLink, CheckCircle, X } from "lucide-react";
 
 import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
@@ -90,34 +89,22 @@ function ProblemSolvingContent({
   const saveMutation = useSaveProblemMutation();
 
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
-    try {
-      await finishMutation.mutateAsync({
-        problemId: problem.problemId,
-        newStatus: isSolved ? "SOLVED" : "TRIED",
-        note,
-        timeComplexity,
-        spaceComplexity,
-      });
-      toast.success("Successfully updated");
-    } catch (err) {
-      toast.error("Unexpected Error Occurred");
-      console.log(err);
-    }
+    await finishMutation.mutateAsync({
+      problemId: problem.problemId,
+      newStatus: isSolved ? "SOLVED" : "TRIED",
+      note,
+      timeComplexity,
+      spaceComplexity,
+    });
   }
 
   async function handleSave() {
-    try {
-      await saveMutation.mutateAsync({
-        problemId: problem.problemId,
-        note,
-        timeComplexity,
-        spaceComplexity,
-      });
-      toast.success("Saved");
-    } catch (err) {
-      toast.error("Unexpected Error Occurred");
-      console.log(err);
-    }
+    await saveMutation.mutateAsync({
+      problemId: problem.problemId,
+      note,
+      timeComplexity,
+      spaceComplexity,
+    });
   }
 
   const isTimerRunning =

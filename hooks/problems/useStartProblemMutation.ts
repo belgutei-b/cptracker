@@ -3,12 +3,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UserProblemFullClient } from "@/types/client";
 import { queryKeys } from "@/lib/queryKeys";
+import toast from "react-hot-toast";
 
 async function startProblemApi(problemId: string) {
   const res = await fetch(`/api/problems/${problemId}/start`, {
     method: "POST",
   });
-  if (!res.ok) throw new Error("Failed to start problem");
+  if (!res.ok) toast.error("Failed to start problem");
   return (await res.json()) as { ok: true; lastStartedAt: string };
 }
 

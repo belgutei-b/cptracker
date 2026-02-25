@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type UserProblemFullClient } from "@/types/client";
 import { queryKeys } from "@/lib/queryKeys";
+import toast from "react-hot-toast";
 
 async function addProblemApi({ problemLink }: { problemLink: string }) {
   const res = await fetch("/api/problems", {
@@ -12,7 +13,7 @@ async function addProblemApi({ problemLink }: { problemLink: string }) {
       problemLink,
     }),
   });
-  if (!res.ok) throw new Error("Failed to add problem");
+  if (!res.ok) toast.error("Failed to add problem");
   const data = (await res.json()) as { problem: UserProblemFullClient };
   return data.problem;
 }
@@ -32,6 +33,7 @@ export function useAddProblemMutation() {
           return [data, ...withoutDuplicate];
         },
       );
+      toast.success(`${data.problem.title} added`);
     },
   });
 }

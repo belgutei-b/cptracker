@@ -16,15 +16,6 @@ type ApiErrorResponse = {
   message?: string;
 };
 
-const DEFAULT_DAILY_PROBLEM_ERROR = "Failed to add daily problem";
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  return "Unexpected error occurred";
-}
-
 async function addDailyProblemApi() {
   const res = await fetch("/api/problems/daily", {
     method: "POST",
@@ -32,7 +23,7 @@ async function addDailyProblemApi() {
   });
 
   if (!res.ok) {
-    let errorMessage = DEFAULT_DAILY_PROBLEM_ERROR;
+    let errorMessage = "Failed to add daily problem";
     try {
       const errorData = (await res.json()) as ApiErrorResponse;
       if (errorData.error) {
@@ -43,13 +34,13 @@ async function addDailyProblemApi() {
     } catch {
       // Non-JSON error response: use default fallback message.
     }
-    throw new Error(errorMessage);
+    toast.error(errorMessage);
   }
 
   const data = (await res.json()) as AddDailyProblemResponse;
 
   if (data.alreadyAdded) {
-    throw new Error("Daily problem already added");
+    toast.error("Daily problem already added");
   }
 
   return data.problem;
@@ -60,9 +51,6 @@ export function useDailyProblemMutation() {
 
   return useMutation({
     mutationFn: addDailyProblemApi,
-    onError: (error) => {
-      toast.error(getErrorMessage(error));
-    },
     onSuccess: (data) => {
       queryClient.setQueryData<UserProblemFullClient[]>(
         queryKeys.problems,

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UserProblemFullClient } from "@/types/client";
 import { queryKeys } from "@/lib/queryKeys";
+import toast from "react-hot-toast";
 
 type FinishStatus = "TRIED" | "SOLVED";
 
@@ -36,7 +37,7 @@ async function finishProblemApi({
   });
 
   if (!res.ok) {
-    throw new Error("Failed to finish problem");
+    toast.error("Failed to finish problem");
   }
 
   return (await res.json()) as FinishResponse;
@@ -71,6 +72,7 @@ export function useFinishProblemMutation() {
               : p,
           ),
       );
+      toast.success("Successfully finished");
     },
   });
 }
