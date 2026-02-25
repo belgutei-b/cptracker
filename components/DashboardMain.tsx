@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ProblemsList from "./problems/ProblemsList";
+import ProblemList from "@/components/problems/ProblemList";
 
 export default function DashboardMain() {
   const [difficulty, setDifficulty] = useState("all");
@@ -45,7 +45,7 @@ export default function DashboardMain() {
         </div>
       </div>
 
-      <ProblemsList filters={{ difficulty, status }} />
+      <ProblemList filters={{ difficulty, status }} />
     </>
   );
 }
