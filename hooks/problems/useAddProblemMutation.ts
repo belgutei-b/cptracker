@@ -29,8 +29,8 @@ export function useAddProblemMutation() {
 
   return useMutation({
     mutationFn: addProblemApi,
-    onError(error) {
-      console.log(error);
+    onError: (error) => {
+      // console.log(error);
       toast.error(error.message);
     },
     onSuccess: (data) => {

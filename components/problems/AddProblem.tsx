@@ -9,13 +9,13 @@ export default function AddProblem() {
   const [link, setLink] = useState("");
   const addMutation = useAddProblemMutation();
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!link) {
       toast.error("Leetcode problem link required");
       return;
     }
-    await addMutation.mutateAsync({
+    addMutation.mutate({
       problemLink: link,
     });
   }

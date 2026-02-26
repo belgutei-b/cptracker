@@ -5,17 +5,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import toast from "react-hot-toast";
 
-type AddDailyProblemResponse = {
-  problemId: string;
-  problem: UserProblemFullClient;
-  alreadyAdded: boolean;
-};
-
-type ApiErrorResponse = {
-  error?: string;
-  message?: string;
-};
-
 async function addDailyProblemApi() {
   const res = await fetch("/api/problems/daily", {
     method: "POST",
@@ -23,29 +12,16 @@ async function addDailyProblemApi() {
   });
 
   if (!res.ok) {
-    let errorMessage = "Failed to add daily problem";
-    try {
-      const errorData = (await res.json()) as ApiErrorResponse;
-      if (errorData.error) {
-        errorMessage = errorData.error;
-      } else if (errorData.message) {
-        errorMessage = errorData.message;
-      }
-    } catch {
-      // Non-JSON error response: use default fallback message.
-    }
-    toast.error(errorMessage);
-    throw new Error("Error");
+    throw new Error("Unexpected error occurred");
   }
 
-  const data = (await res.json()) as AddDailyProblemResponse;
+  const data = await res.json();
 
   if (data.alreadyAdded) {
-    toast.error("Daily problem already added");
-    throw new Error("Error");
+    throw new Error("Daily problem already added");
   }
 
-  return data.problem;
+  return data.problem as UserProblemFullClient;
 }
 
 export function useDailyProblemMutation() {
@@ -53,6 +29,9 @@ export function useDailyProblemMutation() {
 
   return useMutation({
     mutationFn: addDailyProblemApi,
+    onError: (error) => {
+      toast.error(error.message);
+    },
     onSuccess: (data) => {
       queryClient.setQueryData<UserProblemFullClient[]>(
         queryKeys.problems,
