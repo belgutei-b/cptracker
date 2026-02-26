@@ -44,7 +44,10 @@ export async function serverPostProblem({
 }: {
   problemLink: string;
   userId: string;
-}): Promise<UserProblemFullClient> {
+}): Promise<{
+  problem: UserProblemFullClient | null;
+  isAlreadyAdded: boolean;
+}> {
   const titleSlug = problemLink.split("/")[4];
   const baseLink = "https://leetcode.com/problems/" + titleSlug;
 
@@ -63,7 +66,10 @@ export async function serverPostProblem({
   });
 
   if (oldUserProblem) {
-    throw new Error("Problem already added");
+    return {
+      problem: null,
+      isAlreadyAdded: true,
+    };
   }
 
   // 3. add problem to the user
@@ -80,7 +86,10 @@ export async function serverPostProblem({
     throw new Error("Error adding problem");
   }
 
-  return serializeDates(newUserProblem) as UserProblemFullClient;
+  return {
+    problem: serializeDates(newUserProblem) as UserProblemFullClient,
+    isAlreadyAdded: false,
+  };
 }
 
 export async function serverAddDailyProblem({ userId }: { userId: string }) {

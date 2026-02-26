@@ -13,8 +13,11 @@ async function addProblemApi({ problemLink }: { problemLink: string }) {
       problemLink,
     }),
   });
+  if (res.status === 409) {
+    throw new Error("Problem already added");
+  }
+
   if (!res.ok) {
-    toast.error("Failed to add problem");
     throw new Error("Error");
   }
   const data = (await res.json()) as { problem: UserProblemFullClient };
@@ -26,6 +29,10 @@ export function useAddProblemMutation() {
 
   return useMutation({
     mutationFn: addProblemApi,
+    onError(error) {
+      console.log(error);
+      toast.error(error.message);
+    },
     onSuccess: (data) => {
       queryClient.setQueryData<UserProblemFullClient[]>(
         queryKeys.problems,
