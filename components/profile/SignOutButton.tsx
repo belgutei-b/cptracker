@@ -14,6 +14,7 @@ export default function SignOutButton() {
     setIsLoading(true);
     try {
       await signOut();
+      localStorage.removeItem("tz");
       router.replace("/auth");
       router.refresh();
     } finally {

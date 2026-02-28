@@ -4,9 +4,35 @@ import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
 import AddProblem from "@/components/problems/AddProblem";
 import DashboardMain from "@/components/problems/DashboardMain";
 import Stat from "@/components/stat/Stat";
+import { useEffect } from "react";
 
 export default function Page() {
   const { data: problems = [], isLoading, isError } = useProblemsQuery();
+
+  useEffect(() => {
+    async function fetchRequest(timezone: string) {
+      const res = await fetch("/api/timezone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          timezone,
+        }),
+      });
+
+      /* If request succeed, store the last time that timezone stored */
+      if (res.ok) {
+        localStorage.setItem("tz", timezone);
+      }
+    }
+
+    const storedTz = localStorage.getItem("tz");
+    const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!storedTz || storedTz !== currentTz) {
+      // Source - https://stackoverflow.com/a/37512371
+      fetchRequest(currentTz);
+    }
+    // todo: when user logs out, remove the timezone
+  }, []);
 
   if (isError) {
     return <div>Error fetching problems</div>;
