@@ -130,7 +130,7 @@ export default function Page() {
             href="/upcoming"
             className="inline-flex items-center gap-2 rounded-lg border border-amber-300/40 bg-amber-300/10 px-5 py-3 text-sm font-semibold text-amber-100 transition-colors hover:bg-amber-300/20"
           >
-            See Upcoming Features
+            View Upcoming Features
             <ArrowRight size={16} />
           </Link>
         </div>
