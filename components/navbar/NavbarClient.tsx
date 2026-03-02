@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
+export default function NavbarClient() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobileMenu = () => setMobileOpen(false);
@@ -14,59 +14,46 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
     `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
       isActive ? "bg-[#333] text-white" : "text-gray-400 hover:text-white"
     }`;
-  const logoHref = signedIn ? "/dashboard" : "/";
 
   return (
     <>
       {/* desktop navbar */}
-      <nav className="hidden md:block bg-[#1a1a1a]/80 border-b border-neutral-700 px-6 py-4">
-        <div className="flex items-center gap-6">
+      <nav className="hidden md:block bg-[#1a1a1a]/80 border-b border-neutral-700">
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 pt-6 pb-4">
           <Link
-            href={logoHref}
+            href="/dashboard"
             className="text-xl font-bold text-amber-500 flex items-center gap-2 cursor-pointer"
           >
             <Brain size={24} /> CPTracker
           </Link>
-          {signedIn && (
-            <div className="flex w-full justify-between">
-              {/* left side */}
-              <div className="flex items-center gap-3">
-                <Link
-                  className={navItemClass(pathname === "/dashboard")}
-                  href="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className={navItemClass(pathname === "/analytics")}
-                  href="/analytics"
-                >
-                  Analytics
-                </Link>
-              </div>
-
-              {/* right side */}
-              <div className="flex">
-                <DailyQuestionButton />
-                <Link
-                  className={navItemClass(pathname === "/profile")}
-                  href="/profile"
-                >
-                  Profile
-                </Link>
-              </div>
-            </div>
-          )}
-          {!signedIn && (
-            <div className="flex flex-row-reverse w-full">
+          <div className="flex w-full justify-between">
+            {/* left side */}
+            <div className="flex items-center gap-3">
               <Link
-                className="inline-flex px-4 py-2 rounded-lg text-sm font-semibold border transition-colors bg-amber-500 text-neutral-900"
-                href="/auth"
+                className={navItemClass(pathname === "/dashboard")}
+                href="/dashboard"
               >
-                Sign In
+                Dashboard
+              </Link>
+              <Link
+                className={navItemClass(pathname === "/analytics")}
+                href="/analytics"
+              >
+                Analytics
               </Link>
             </div>
-          )}
+
+            {/* right side */}
+            <div className="flex">
+              <DailyQuestionButton />
+              <Link
+                className={navItemClass(pathname === "/profile")}
+                href="/profile"
+              >
+                Profile
+              </Link>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -74,7 +61,7 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
       <nav className="md:hidden bg-[#1a1a1a]/80 border-b border-neutral-700 px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <Link
-            href={logoHref}
+            href="/dashboard"
             onClick={closeMobileMenu}
             className="text-xl font-bold text-amber-500 flex items-center gap-2 cursor-pointer"
           >
@@ -104,40 +91,30 @@ export default function NavbarClient({ signedIn }: { signedIn: boolean }) {
         >
           <div className="overflow-hidden">
             <div className="border-t border-neutral-700 pt-4">
-              {signedIn ? (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    className={navItemClass(pathname === "/dashboard")}
-                    href="/dashboard"
-                    onClick={closeMobileMenu}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    className={navItemClass(pathname === "/analytics")}
-                    href="/analytics"
-                    onClick={closeMobileMenu}
-                  >
-                    Analytics
-                  </Link>
-                  <DailyQuestionButton />
-                  <Link
-                    className={navItemClass(pathname === "/profile")}
-                    href="/profile"
-                    onClick={closeMobileMenu}
-                  >
-                    Profile
-                  </Link>
-                </div>
-              ) : (
+              <div className="flex flex-col gap-2">
                 <Link
-                  className="inline-flex w-full items-center justify-center rounded-lg border bg-amber-500 px-4 py-2 text-sm font-semibold text-neutral-900 transition-colors"
-                  href="/auth"
+                  className={navItemClass(pathname === "/dashboard")}
+                  href="/dashboard"
                   onClick={closeMobileMenu}
                 >
-                  Sign In
+                  Dashboard
                 </Link>
-              )}
+                <Link
+                  className={navItemClass(pathname === "/analytics")}
+                  href="/analytics"
+                  onClick={closeMobileMenu}
+                >
+                  Analytics
+                </Link>
+                <DailyQuestionButton />
+                <Link
+                  className={navItemClass(pathname === "/profile")}
+                  href="/profile"
+                  onClick={closeMobileMenu}
+                >
+                  Profile
+                </Link>
+              </div>
             </div>
           </div>
         </div>

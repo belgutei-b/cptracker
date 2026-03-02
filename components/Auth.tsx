@@ -21,7 +21,7 @@ export default function Auth() {
         <Brain size={64} className="text-amber-500" />
       </div>
       <h1 className="text-5xl font-bold mb-8 tracking-tight text-white">
-        CP <span className="text-amber-500">Pulse</span>
+        CP <span className="text-amber-500">Tracker</span>
       </h1>
       <div className="bg-neutral-800 p-8 rounded-2xl border border-neutral-600 w-full max-w-md shadow-2xl">
         <h2 className="text-lg font-semibold mb-6 text-white">
