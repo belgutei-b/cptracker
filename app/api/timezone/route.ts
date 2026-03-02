@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     timezone: body.timezone,
     userId,
   });
+
   if (!res) {
     return NextResponse.json(
       {

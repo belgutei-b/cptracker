@@ -42,7 +42,12 @@ export default function Page() {
     <div className="flex flex-col md:flex-row-reverse md:justify-between w-full px-4">
       <div className="w-90 mt-5 md:mt-10 flex flex-col md:items-end space-y-5">
         <AddProblem />
-        <Stat problems={problems} isLoading={isLoading} className="" />
+        <Stat
+          problems={problems}
+          timezone={timezone}
+          isLoading={isLoading}
+          className=""
+        />
       </div>
       <DashboardMain
         problems={problems}

@@ -150,7 +150,6 @@ export async function serverAddDailyProblem({ userId }: { userId: string }) {
  * retrieve problems for the user
  */
 export async function getProblems({ userId }: { userId: string }) {
-  const timezone = await getUserTimezone({ userId });
   const problems = await prisma.userProblem.findMany({
     where: {
       userId,

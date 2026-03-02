@@ -9,10 +9,12 @@ import StatSkeloton from "@/components/stat/StatSkeloton";
 
 export default function Stat({
   problems,
+  timezone,
   className,
   isLoading,
 }: {
   problems: UserProblemFullClient[];
+  timezone: string;
   className?: string;
   isLoading: boolean;
 }) {
@@ -84,7 +86,7 @@ export default function Stat({
 
   return (
     <div className={["space-y-6", className].filter(Boolean).join(" ")}>
-      <BoxStats stats={stats} lastSolvedAt={lastSolvedAt} />
+      <BoxStats stats={stats} lastSolvedAt={lastSolvedAt} timezone={timezone} />
       <AverageDuration stats={stats} />
       <DifficultyRatio stats={stats} />
     </div>

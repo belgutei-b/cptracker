@@ -1,4 +1,4 @@
-import { getProfileOverview } from "@/lib/user";
+import { getProfileOverview, getUserTimezone } from "@/lib/user";
 import { auth } from "@/lib/auth";
 import { formatDayMonthYear } from "@/lib/date";
 import SignOutButton from "@/components/profile/SignOutButton";
@@ -16,6 +16,7 @@ export default async function Page() {
   if (!profile) {
     return <div className="px-4 py-6 text-white">User not found</div>;
   }
+  const timezone = await getUserTimezone({ userId: session.user.id });
 
   const providerText =
     profile.providers.length > 0
@@ -39,7 +40,9 @@ export default async function Page() {
 
         <div>
           <p className="text-sm text-gray-500">Joined Date</p>
-          <p className="font-medium">{formatDayMonthYear(profile.createdAt)}</p>
+          <p className="font-medium">
+            {formatDayMonthYear(profile.createdAt, timezone)}
+          </p>
         </div>
 
         <div className="pt-2 w-full flex justify-end">

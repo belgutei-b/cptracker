@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { IANAZone } from "luxon";
 
 export async function serverPostTimezone({
   timezone,
@@ -9,6 +10,11 @@ export async function serverPostTimezone({
   timezone: string;
   userId: string;
 }): Promise<boolean> {
+  // checking the timezone
+  if (!IANAZone.isValidZone(timezone)) {
+    return false;
+  }
+
   try {
     await prisma.user.update({
       where: {

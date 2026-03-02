@@ -6,9 +6,11 @@ import { formatDayMonthYear, formatDuration } from "@/lib/date";
 export default function BoxStats({
   stats,
   lastSolvedAt,
+  timezone,
 }: {
   stats: SolvedDurationStats;
   lastSolvedAt: string | null;
+  timezone: string;
 }) {
   const averageSeconds =
     stats[3].count > 0
@@ -40,7 +42,7 @@ export default function BoxStats({
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Last Solved</p>
           <p className="dashboard-stat-text">
-            {formatDayMonthYear(lastSolvedAt, undefined, "-")}
+            {formatDayMonthYear(lastSolvedAt, timezone, "-")}
           </p>
         </div>
       </div>
