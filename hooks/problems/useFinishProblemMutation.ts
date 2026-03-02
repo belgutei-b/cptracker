@@ -12,6 +12,11 @@ type FinishResponse = {
   duration?: number | null;
 };
 
+type ProblemsQueryData = {
+  timezone: string;
+  problems: UserProblemFullClient[];
+};
+
 async function finishProblemApi({
   problemId,
   newStatus,
@@ -51,27 +56,33 @@ export function useFinishProblemMutation() {
     mutationFn: finishProblemApi,
     onSuccess: (data, variables) => {
       const nowIso = new Date().toISOString();
-      queryClient.setQueryData<UserProblemFullClient[]>(
+      queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
-        (old = []) =>
-          old.map((p) =>
-            p.problemId === variables.problemId
-              ? {
-                  ...p,
-                  status: variables.newStatus,
-                  lastStartedAt: null,
-                  updatedAt: nowIso,
-                  solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
-                  duration:
-                    typeof data.duration === "number"
-                      ? data.duration
-                      : p.duration,
-                  note: variables.note,
-                  timeComplexity: variables.timeComplexity,
-                  spaceComplexity: variables.spaceComplexity,
-                }
-              : p,
-          ),
+        (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            problems: old.problems.map((p) =>
+              p.problemId === variables.problemId
+                ? {
+                    ...p,
+                    status: variables.newStatus,
+                    lastStartedAt: null,
+                    updatedAt: nowIso,
+                    solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
+                    duration:
+                      typeof data.duration === "number"
+                        ? data.duration
+                        : p.duration,
+                    note: variables.note,
+                    timeComplexity: variables.timeComplexity,
+                    spaceComplexity: variables.spaceComplexity,
+                  }
+                : p,
+            ),
+          };
+        },
       );
       toast.success("Successfully finished");
     },

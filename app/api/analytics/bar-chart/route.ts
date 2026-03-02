@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const timezone = (await getUserTimezone({ userId })) || "";
+    const timezone = await getUserTimezone({ userId });
 
     // retrieving query parameters from the url
     const searchParams = request.nextUrl.searchParams;

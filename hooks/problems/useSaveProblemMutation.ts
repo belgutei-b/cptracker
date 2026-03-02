@@ -9,6 +9,11 @@ type SaveResponse = {
   ok: boolean;
 };
 
+type ProblemsQueryData = {
+  timezone: string;
+  problems: UserProblemFullClient[];
+};
+
 async function saveProblemApi({
   problemId,
   note,
@@ -45,20 +50,26 @@ export function useSaveProblemMutation() {
     mutationFn: saveProblemApi,
     onSuccess: (_data, variables) => {
       const nowIso = new Date().toISOString();
-      queryClient.setQueryData<UserProblemFullClient[]>(
+      queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
-        (old = []) =>
-          old.map((p) =>
-            p.problemId === variables.problemId
-              ? {
-                  ...p,
-                  updatedAt: nowIso,
-                  note: variables.note,
-                  timeComplexity: variables.timeComplexity,
-                  spaceComplexity: variables.spaceComplexity,
-                }
-              : p,
-          ),
+        (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            problems: old.problems.map((p) =>
+              p.problemId === variables.problemId
+                ? {
+                    ...p,
+                    updatedAt: nowIso,
+                    note: variables.note,
+                    timeComplexity: variables.timeComplexity,
+                    spaceComplexity: variables.spaceComplexity,
+                  }
+                : p,
+            ),
+          };
+        },
       );
       toast.success("Notes saved");
     },

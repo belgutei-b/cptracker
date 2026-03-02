@@ -7,10 +7,12 @@ import { UserProblemFullClient } from "@/types/client";
 
 export default function DashboardMain({
   problems,
+  timezone,
   className,
   isLoading,
 }: {
   problems: UserProblemFullClient[];
+  timezone: string;
   className?: string;
   isLoading: boolean;
 }) {
@@ -56,7 +58,11 @@ export default function DashboardMain({
       {isLoading ? (
         <ProblemListSkeleton />
       ) : (
-        <ProblemList problems={problems} filters={{ difficulty, status }} />
+        <ProblemList
+          problems={problems}
+          timezone={timezone}
+          filters={{ difficulty, status }}
+        />
       )}
     </div>
   );

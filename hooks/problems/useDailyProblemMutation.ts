@@ -5,6 +5,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
 import toast from "react-hot-toast";
 
+type ProblemsQueryData = {
+  timezone: string;
+  problems: UserProblemFullClient[];
+};
+
 async function addDailyProblemApi() {
   const res = await fetch("/api/problems/daily", {
     method: "POST",
@@ -33,13 +38,24 @@ export function useDailyProblemMutation() {
       toast.error(error.message);
     },
     onSuccess: (data) => {
-      queryClient.setQueryData<UserProblemFullClient[]>(
+      queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
-        (old = []) => {
-          const withoutDuplicate = old.filter(
+        (old) => {
+          if (!old) {
+            return {
+              timezone: "UTC",
+              problems: [data],
+            };
+          }
+
+          const withoutDuplicate = old.problems.filter(
             (p) => p.problemId !== data.problemId,
           );
-          return [data, ...withoutDuplicate];
+
+          return {
+            ...old,
+            problems: [data, ...withoutDuplicate],
+          };
         },
       );
       toast.success(`${data.problem.title} added`);

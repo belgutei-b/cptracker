@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProblems, serverPostProblem } from "@/lib/problem";
-import { getCurrentUserId } from "@/lib/user";
+import { getCurrentUserId, getUserTimezone } from "@/lib/user";
 
 /**
  * user add problem
@@ -54,6 +54,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const timezone = await getUserTimezone({ userId });
   const problems = await getProblems({
     userId,
   });
@@ -61,6 +62,7 @@ export async function GET() {
   return NextResponse.json(
     {
       problems,
+      timezone,
     },
     { status: 200 },
   );

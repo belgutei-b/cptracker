@@ -3,7 +3,7 @@
 import { Difficulty, Status } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 import type { BarChartData } from "@/types/stat";
-import { DateTime, IANAZone } from "luxon";
+import { DateTime } from "luxon";
 
 type DifficultyKey = keyof Pick<BarChartData, "easy" | "medium" | "hard">;
 
@@ -22,8 +22,6 @@ export async function getBarChartData({
   userId: string;
   timezone: string;
 }): Promise<BarChartData[]> {
-  if (timezone === "" || !IANAZone.isValidZone(timezone)) timezone = "UTC";
-
   /* computing the start time in user timezone and then converting to UTC */
   const start = DateTime.now()
     .setZone(timezone)

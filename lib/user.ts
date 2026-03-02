@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { auth } from "./auth";
 import prisma from "./prisma";
+import { IANAZone } from "luxon";
 
 export async function getProfileOverview({ userId }: { userId: string }) {
   const user = await prisma.user.findUnique({
@@ -64,5 +65,7 @@ export async function getUserTimezone({ userId }: { userId: string }) {
   if (!user) {
     throw new Error("User not found");
   }
-  return user.timezone;
+  let tz = user.timezone || "UTC";
+  if (!IANAZone.isValidZone(tz)) tz = "UTC";
+  return tz;
 }

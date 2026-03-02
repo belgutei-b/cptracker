@@ -40,7 +40,7 @@ export default function BoxStats({
         <div className="dashboard-stat-box">
           <p className="dashboard-stat-title">Last Solved</p>
           <p className="dashboard-stat-text">
-            {formatDayMonthYear(lastSolvedAt, "-")}
+            {formatDayMonthYear(lastSolvedAt, undefined, "-")}
           </p>
         </div>
       </div>

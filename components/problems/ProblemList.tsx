@@ -27,12 +27,14 @@ function getDisplayDate(problem: UserProblemFullClient) {
 export default function ProblemList({
   filters = { difficulty: "all", status: "all" },
   problems,
+  timezone,
 }: {
   filters?: {
     difficulty: string;
     status: string;
   };
   problems: UserProblemFullClient[];
+  timezone: string;
 }) {
   const startMutation = useStartProblemMutation();
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
@@ -78,7 +80,10 @@ export default function ProblemList({
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {filteredProblems.map((problem) => {
-          const displayDate = formatDayMonthYear(getDisplayDate(problem));
+          const displayDate = formatDayMonthYear(
+            getDisplayDate(problem),
+            timezone,
+          );
           const isStarting =
             startMutation.isPending &&
             startMutation.variables === problem.problemId;
@@ -165,6 +170,7 @@ export default function ProblemList({
                   <div className="text-xs text-white font-semibold uppercase">
                     {problem.status}
                   </div>
+                  {/* TODO: use timezone here */}
                   <div className="text-[11px] text-gray-400">{displayDate}</div>
                 </div>
               </div>

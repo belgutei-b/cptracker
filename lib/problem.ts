@@ -1,9 +1,9 @@
 "use server";
 
 import { serializeDates, type UserProblemFullClient } from "@/types/client";
-import { unstable_noStore as noStore } from "next/cache";
 import { getLeetcodeDailyProblem, getProblemData } from "./leetcode";
 import prisma from "./prisma";
+import { getUserTimezone } from "@/lib/user";
 
 async function getOrCreateProblem({
   titleSlug,
@@ -150,7 +150,7 @@ export async function serverAddDailyProblem({ userId }: { userId: string }) {
  * retrieve problems for the user
  */
 export async function getProblems({ userId }: { userId: string }) {
-  noStore();
+  const timezone = await getUserTimezone({ userId });
   const problems = await prisma.userProblem.findMany({
     where: {
       userId,

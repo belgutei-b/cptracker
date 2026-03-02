@@ -7,7 +7,8 @@ import Stat from "@/components/stat/Stat";
 import { useEffect } from "react";
 
 export default function Page() {
-  const { data: problems = [], isLoading, isError } = useProblemsQuery();
+  const { data, isLoading, isError } = useProblemsQuery();
+  const { problems = [], timezone = "UTC" } = data ?? {};
 
   useEffect(() => {
     async function fetchRequest(timezone: string) {
@@ -45,6 +46,7 @@ export default function Page() {
       </div>
       <DashboardMain
         problems={problems}
+        timezone={timezone}
         isLoading={isLoading}
         className="mt-5 flex-1"
       />
