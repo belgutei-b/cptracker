@@ -3,18 +3,13 @@
 import { defineConfig } from "prisma/config";
 import "dotenv/config";
 
-// Currently i disabled strict certificate validation
-// Only Enterprise plan users can upload custom ssl
-// https://www.prisma.io/docs/orm/prisma-client/deployment/caveats-when-deploying-to-aws-platforms
+/**
+ * This file is used by Prisma CLI db push, generate, migrations...
+ */
 
-const currEnv = process.env.NODE_ENV;
-console.log(currEnv);
-
-// WARNING: running migration in prod
-// const url = process.env.DB_URL_PROD;
-
-const url =
-  currEnv === "production" ? process.env.DB_URL_PROD : process.env.DB_URL_TEST;
+// Prisma CLI/migrations should use a direct DB URL, not the Supabase pooler.
+const url = process.env.SUPABASE_PROD_DIRECT;
+// const url = process.env.SUPABASE_DEV_DIRECT;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -22,6 +17,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: url!,
+    url,
   },
 });

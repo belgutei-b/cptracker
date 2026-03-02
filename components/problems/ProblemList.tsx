@@ -34,7 +34,6 @@ export default function ProblemList({
   };
   problems: UserProblemFullClient[];
 }) {
-  // const { data: problems = [], isLoading, isError } = useProblemsQuery();
   const startMutation = useStartProblemMutation();
   const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
 

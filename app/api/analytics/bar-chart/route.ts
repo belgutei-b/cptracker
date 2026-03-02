@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/user";
+import { getCurrentUserId, getUserTimezone } from "@/lib/user";
 import { getBarChartData } from "@/lib/userStat";
 import { type NextRequest } from "next/server";
 
@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const timezone = (await getUserTimezone({ userId })) || "";
 
     // retrieving query parameters from the url
     const searchParams = request.nextUrl.searchParams;
@@ -27,6 +29,7 @@ export async function GET(request: NextRequest) {
     const ret = await getBarChartData({
       numberOfDays,
       userId,
+      timezone,
     });
 
     // return

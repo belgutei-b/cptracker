@@ -9,7 +9,6 @@ function isStatus(value: unknown): value is Status {
 
 export async function POST(
   request: NextRequest,
-
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -72,6 +71,7 @@ export async function POST(
           duration: newDuration,
           lastStartedAt: null,
           solvedAt: body.newStatus === "SOLVED" ? now : null,
+          triedAt: body.newStatus === "TRIED" ? now : null,
           ...(typeof body.note === "string" ? { note: body.note } : {}),
           ...(typeof body.timeComplexity === "string"
             ? { timeComplexity: body.timeComplexity }

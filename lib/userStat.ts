@@ -1,50 +1,58 @@
 "use server";
 
-import { Status } from "@/prisma/generated/prisma/enums";
+import { Difficulty, Status } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 import type { BarChartData } from "@/types/stat";
+import { DateTime, IANAZone } from "luxon";
+
+type DifficultyKey = keyof Pick<BarChartData, "easy" | "medium" | "hard">;
+
+const difficultyToKey: Record<Difficulty, DifficultyKey> = {
+  [Difficulty.Easy]: "easy",
+  [Difficulty.Medium]: "medium",
+  [Difficulty.Hard]: "hard",
+};
 
 export async function getBarChartData({
   numberOfDays,
   userId,
+  timezone,
 }: {
   numberOfDays: number;
   userId: string;
+  timezone: string;
 }): Promise<BarChartData[]> {
-  const now = new Date();
-  const endDate = new Date(now);
-  endDate.setHours(23, 59, 59, 999);
+  if (timezone === "" || !IANAZone.isValidZone(timezone)) timezone = "UTC";
 
-  const startDate = new Date(now);
-  startDate.setHours(0, 0, 0, 0);
-  startDate.setDate(startDate.getDate() - (numberOfDays - 1));
+  /* computing the start time in user timezone and then converting to UTC */
+  const start = DateTime.now()
+    .setZone(timezone)
+    .minus({ days: numberOfDays - 1 })
+    .startOf("day")
+    .toJSDate();
 
-  const statuses: Status[] = ["TRIED", "SOLVED", "IN_PROGRESS"];
+  const end = DateTime.now().setZone(timezone).endOf("day").toJSDate();
 
   const rows = await prisma.userProblem.findMany({
     where: {
       userId,
-      status: {
-        in: statuses,
-      },
       OR: [
         {
           solvedAt: {
-            gte: startDate,
-            lte: endDate,
+            gte: start,
+            lte: end,
           },
+          status: "SOLVED",
         },
         {
-          lastStartedAt: {
-            gte: startDate,
-            lte: endDate,
+          triedAt: {
+            gte: start,
+            lte: end,
           },
+          status: "TRIED",
         },
         {
-          updatedAt: {
-            gte: startDate,
-            lte: endDate,
-          },
+          status: "IN_PROGRESS",
         },
       ],
     },
@@ -52,6 +60,7 @@ export async function getBarChartData({
       status: true,
       duration: true,
       solvedAt: true,
+      triedAt: true,
       lastStartedAt: true,
       updatedAt: true,
       problem: {
@@ -62,54 +71,58 @@ export async function getBarChartData({
     },
   });
 
-  const pad = (value: number) => String(value).padStart(2, "0");
-  const toKey = (date: Date) =>
-    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  const toLabel = (date: Date) =>
-    `${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+  const ret: BarChartData[] = [];
+  const now = DateTime.now().setZone(timezone);
 
-  const dayMap = new Map<string, BarChartData>();
-  for (let i = 0; i < numberOfDays; i += 1) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
-    const key = toKey(date);
-    dayMap.set(key, {
-      date: toLabel(date),
+  for (let i = numberOfDays - 1; i >= 0; i--) {
+    const idx = numberOfDays - 1 - i;
+
+    const day = now.minus({ days: i });
+    const startOfDayJS = day.startOf("day").toJSDate();
+    const endOfDayJS = day.endOf("day").toJSDate();
+
+    ret.push({
+      date: day.toFormat("yyyy LLL dd"),
       easy: 0,
       medium: 0,
       hard: 0,
       problemCount: 0,
     });
+
+    for (const row of rows) {
+      /* IN_PROGRESS */
+      if (row.status === Status.IN_PROGRESS && i === 0) {
+        const difficulty: Difficulty = row.problem.difficulty;
+        const key = difficultyToKey[difficulty];
+        ret[idx][key] += row.duration;
+      }
+
+      /* TRIED */
+      if (
+        row.status === Status.TRIED &&
+        row.triedAt &&
+        startOfDayJS <= row.triedAt &&
+        row.triedAt <= endOfDayJS
+      ) {
+        const difficulty: Difficulty = row.problem.difficulty;
+        const key = difficultyToKey[difficulty];
+        ret[idx][key] += row.duration;
+      }
+
+      /* SOLVED */
+      if (
+        row.status === Status.SOLVED &&
+        row.solvedAt &&
+        startOfDayJS <= row.solvedAt &&
+        row.solvedAt <= endOfDayJS
+      ) {
+        const difficulty: Difficulty = row.problem.difficulty;
+        const key = difficultyToKey[difficulty];
+        ret[idx][key] += row.duration;
+        ret[idx].problemCount += 1;
+      }
+    }
   }
 
-  for (const row of rows) {
-    const durationDate =
-      row.status === "SOLVED"
-        ? row.solvedAt
-        : (row.lastStartedAt ?? row.updatedAt);
-
-    if (!durationDate) continue;
-
-    const key = toKey(durationDate);
-    const entry = dayMap.get(key);
-    if (!entry) continue;
-
-    let duration = row.duration ?? 0;
-    if (row.status === "IN_PROGRESS" && row.lastStartedAt) {
-      duration += Math.max(
-        0,
-        Math.floor((now.getTime() - row.lastStartedAt.getTime()) / 1000),
-      );
-    }
-
-    if (row.problem.difficulty === "Easy") entry.easy += duration;
-    if (row.problem.difficulty === "Medium") entry.medium += duration;
-    if (row.problem.difficulty === "Hard") entry.hard += duration;
-
-    if (row.status === "SOLVED" && row.solvedAt) {
-      entry.problemCount += 1;
-    }
-  }
-
-  return Array.from(dayMap.values());
+  return ret;
 }

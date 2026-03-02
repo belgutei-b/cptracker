@@ -31,7 +31,6 @@ export default function Page() {
       // Source - https://stackoverflow.com/a/37512371
       fetchRequest(currentTz);
     }
-    // todo: when user logs out, remove the timezone
   }, []);
 
   if (isError) {

@@ -10,7 +10,6 @@ export async function getProfileOverview({ userId }: { userId: string }) {
       id: userId,
     },
     select: {
-      id: true,
       username: true,
       email: true,
       createdAt: true,
@@ -51,4 +50,19 @@ export async function getCurrentUserId() {
     return userId;
   }
   return null;
+}
+
+export async function getUserTimezone({ userId }: { userId: string }) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      timezone: true,
+    },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user.timezone;
 }
