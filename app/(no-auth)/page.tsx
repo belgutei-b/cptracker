@@ -8,6 +8,9 @@ import {
   Gauge,
   TimerReset,
 } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const coreFeatures = [
   {
@@ -35,7 +38,15 @@ const coreFeatures = [
   },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="relative isolate overflow-hidden bg-neutral-950 text-white min-h-[calc(100dvh-72px)] md:min-h-[calc(100dvh-84px)]">
       <div className="pointer-events-none absolute inset-0">
@@ -53,10 +64,7 @@ export default function Page() {
             <Brain size={24} /> CPTracker
           </Link>
 
-          <Link
-            href="/auth"
-            className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-amber-400"
-          >
+          <Link href="/auth" className="landing-button">
             Sign In
           </Link>
         </div>
@@ -79,11 +87,8 @@ export default function Page() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/auth"
-              className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-amber-400"
-            >
-              Get started
+            <Link href="/auth" className="landing-button">
+              Get Started
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -108,11 +113,13 @@ export default function Page() {
                 key={feature.title}
                 className="group rounded-2xl bg-neutral-900/65 p-6 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
               >
-                <span className="inline-flex rounded-full bg-neutral-800 px-3 py-1 text-xs font-medium text-amber-200">
-                  Core Feature
-                </span>
-                <div className="mt-4 inline-flex rounded-lg bg-neutral-800 p-2 text-amber-300">
-                  <Icon size={18} />
+                <div className="flex items-start justify-between gap-3">
+                  <span className="inline-flex rounded-full bg-neutral-800 px-3 py-1 text-xs font-medium text-amber-200">
+                    Core Feature
+                  </span>
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-amber-300">
+                    <Icon className="h-5 w-5" />
+                  </div>
                 </div>
                 <h2 className="mt-3 text-lg font-bold text-white">
                   {feature.title}
@@ -126,10 +133,7 @@ export default function Page() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Link
-            href="/upcoming"
-            className="inline-flex items-center gap-2 rounded-lg border border-amber-300/40 bg-amber-300/10 px-5 py-3 text-sm font-semibold text-amber-100 transition-colors hover:bg-amber-300/20"
-          >
+          <Link href="/upcoming" className="landing-button">
             View Upcoming Features
             <ArrowRight size={16} />
           </Link>

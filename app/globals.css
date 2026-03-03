@@ -39,6 +39,11 @@ body {
   @apply bg-amber-500 hover:bg-amber-600;
 }
 
+.landing-button {
+  @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-black;
+  @apply bg-amber-500 transition-colors hover:bg-amber-400;
+}
+
 .dashboard-stat-box {
   @apply bg-[#282828] p-3 rounded-xl border border-[#3e3e3e];
 }
