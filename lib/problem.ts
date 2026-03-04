@@ -45,7 +45,7 @@ export async function serverPostProblem({
   problemLink: string;
   userId: string;
 }): Promise<{
-  problem: UserProblemFullClient | null;
+  problem: UserProblemFullClient;
   isAlreadyAdded: boolean;
 }> {
   const titleSlug = problemLink.split("/")[4];
@@ -63,11 +63,14 @@ export async function serverPostProblem({
       userId,
       problemId: problem.id,
     },
+    include: {
+      problem: true,
+    },
   });
 
   if (oldUserProblem) {
     return {
-      problem: null,
+      problem: serializeDates(oldUserProblem),
       isAlreadyAdded: true,
     };
   }

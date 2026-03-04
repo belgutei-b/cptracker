@@ -7,6 +7,8 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  // todo: support only specific extension id
+  trustedOrigins: ["chrome-extension://*"],
   baseURL:
     process.env.NODE_ENV !== "production"
       ? (process.env.BETTER_AUTH_URL_DEV ?? "http://localhost:3000")

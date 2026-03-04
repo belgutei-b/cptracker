@@ -12,14 +12,7 @@ export async function POST(request: NextRequest) {
     problemLink?: string;
   };
   if (!body.problemLink) {
-    return NextResponse.json(
-      {
-        error: "problem url missing",
-      },
-      {
-        status: 400,
-      },
-    );
+    return NextResponse.json({ error: "Problem url missing" }, { status: 400 });
   }
 
   const userId = await getCurrentUserId();
@@ -36,12 +29,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "true" }, { status: 409 });
   }
 
-  return NextResponse.json(
-    {
-      problem: res.problem,
-    },
-    { status: 200 },
-  );
+  return NextResponse.json({ problem: res.problem }, { status: 200 });
 }
 
 /**
