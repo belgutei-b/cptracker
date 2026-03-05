@@ -72,9 +72,6 @@ export async function serverSaveProblem({
     where: {
       userId,
       problemId,
-      status: {
-        in: ["TRIED", "SOLVED"],
-      },
     },
     data: {
       note,
