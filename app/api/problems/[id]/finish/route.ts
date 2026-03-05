@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/user";
-import type { Status } from "@/prisma/generated/prisma/enums";
-
-function isStatus(value: unknown): value is Status {
-  return value === "TRIED" || value === "SOLVED";
-}
+import { serverFinishProblem } from "@/lib/problem-action";
+import { HttpError } from "@/lib/errors";
 
 export async function POST(
   request: NextRequest,
@@ -17,77 +13,28 @@ export async function POST(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    let body: {
-      newStatus?: Status;
-      note?: string;
-      timeComplexity?: string;
-      spaceComplexity?: string;
-    } = {};
-    try {
-      body = await request.json();
-      // newStatus is either TRIED or SOLVED
-      if (!isStatus(body.newStatus)) {
-        throw new Error("Invalid newStatus");
-      }
-    } catch {
-      throw new Error("newStatus is missing in body");
-    }
-    const now = new Date();
 
-    let updatedDuration: number | null = null;
-
-    await prisma.$transaction(async (tx) => {
-      const existing = await tx.userProblem.findFirst({
-        where: {
-          userId,
-          problemId,
-        },
-        select: {
-          duration: true,
-          lastStartedAt: true,
-        },
-      });
-
-      if (!existing) return;
-
-      let addSeconds = 0;
-      if (existing.lastStartedAt) {
-        addSeconds = Math.max(
-          0,
-          Math.floor((now.getTime() - existing.lastStartedAt.getTime()) / 1000),
-        );
-      }
-
-      const newDuration = (existing.duration ?? 0) + addSeconds;
-      updatedDuration = newDuration;
-
-      await tx.userProblem.updateMany({
-        where: {
-          userId,
-          problemId,
-        },
-        data: {
-          status: body.newStatus,
-          duration: newDuration,
-          lastStartedAt: null,
-          solvedAt: body.newStatus === "SOLVED" ? now : null,
-          triedAt: body.newStatus === "TRIED" ? now : null,
-          ...(typeof body.note === "string" ? { note: body.note } : {}),
-          ...(typeof body.timeComplexity === "string"
-            ? { timeComplexity: body.timeComplexity }
-            : {}),
-          ...(typeof body.spaceComplexity === "string"
-            ? { spaceComplexity: body.spaceComplexity }
-            : {}),
-        },
-      });
+    const body = await request.json();
+    const res = await serverFinishProblem({
+      userId,
+      problemId,
+      newStatus: body.newStatus,
+      note: body.note,
+      timeComplexity: body.timeComplexity,
+      spaceComplexity: body.spaceComplexity,
     });
 
-    return NextResponse.json({ ok: true, duration: updatedDuration });
+    return NextResponse.json({ ok: true, duration: res.duration });
   } catch (err) {
-    console.log(err);
+    if (err instanceof HttpError) {
+      return Response.json(
+        { ok: false, message: err.message },
+        { status: err.status },
+      );
+    }
+
     return NextResponse.json(
-      { error: "Unexpected error occurred" },
+      { message: "Unexpected error occurred" },
       {
         status: 500,
       },

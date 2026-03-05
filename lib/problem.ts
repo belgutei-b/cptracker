@@ -3,7 +3,6 @@
 import { serializeDates, type UserProblemFullClient } from "@/types/client";
 import { getLeetcodeDailyProblem, getProblemData } from "./leetcode";
 import prisma from "./prisma";
-import { getUserTimezone } from "@/lib/user";
 
 async function getOrCreateProblem({
   titleSlug,

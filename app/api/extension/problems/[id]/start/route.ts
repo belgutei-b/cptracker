@@ -1,36 +1,42 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/user";
+import { auth } from "@/lib/auth";
 import { HttpError } from "@/lib/errors";
 import { serverStartProblem } from "@/lib/problem-action";
 
-/* Start */
 export async function POST(
-  _request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const problemId = (await params).id;
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) {
+      return Response.json(
+        { ok: false, message: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
     const res = await serverStartProblem({
-      userId,
       problemId,
+      userId: session.user.id,
     });
 
-    return NextResponse.json({ ok: true, lastStartedAt: res.lastStartedAt });
+    return Response.json(
+      { ok: true, lastStartedAt: res.lastStartedAt },
+      { status: 200 },
+    );
   } catch (err) {
     if (err instanceof HttpError) {
-      return NextResponse.json(
+      return Response.json(
         { ok: false, message: err.message },
         { status: err.status },
       );
     }
 
-    return NextResponse.json(
+    return Response.json(
       { ok: false, message: "Internal server error" },
       { status: 500 },
     );

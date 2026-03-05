@@ -54,7 +54,7 @@ export function useFinishProblemMutation() {
 
   return useMutation({
     mutationFn: finishProblemApi,
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       const nowIso = new Date().toISOString();
       queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
@@ -71,10 +71,7 @@ export function useFinishProblemMutation() {
                     lastStartedAt: null,
                     updatedAt: nowIso,
                     solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
-                    duration:
-                      typeof data.duration === "number"
-                        ? data.duration
-                        : p.duration,
+                    duration: p.duration,
                     note: variables.note,
                     timeComplexity: variables.timeComplexity,
                     spaceComplexity: variables.spaceComplexity,

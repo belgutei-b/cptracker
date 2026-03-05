@@ -116,10 +116,6 @@ function ProblemSolvingContent({
   );
   const formattedTimer = formatProblemTimer(displayedMilliseconds);
   const canSave = problem.status === "SOLVED";
-  const isDirty =
-    note !== (problem.note ?? "") ||
-    timeComplexity !== (problem.timeComplexity ?? "") ||
-    spaceComplexity !== (problem.spaceComplexity ?? "");
   const isFinishing = finishMutation.isPending;
   const isSaving = saveMutation.isPending;
 
@@ -263,7 +259,7 @@ function ProblemSolvingContent({
             {canSave && (
               <button
                 onClick={handleSave}
-                disabled={!isDirty || isSaving || isFinishing}
+                disabled={isSaving || isFinishing}
                 className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? "Updating..." : "Update notes"}

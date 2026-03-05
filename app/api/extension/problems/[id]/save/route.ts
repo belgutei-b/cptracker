@@ -1,31 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/user";
-import { serverSaveProblem } from "@/lib/problem-action";
+import { auth } from "@/lib/auth";
 import { HttpError } from "@/lib/errors";
+import { serverSaveProblem } from "@/lib/problem-action";
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const problemId = (await params).id;
-    const userId = await getCurrentUserId();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) {
+      return Response.json(
+        { ok: false, message: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
     const body = await request.json();
-
-    const res = await serverSaveProblem({
-      userId,
+    await serverSaveProblem({
+      userId: session.user.id,
       problemId,
       note: body.note,
       timeComplexity: body.timeComplexity,
       spaceComplexity: body.spaceComplexity,
     });
 
-    return NextResponse.json({ ok: true });
+    return Response.json({ ok: true }, { status: 200 });
   } catch (err) {
     if (err instanceof HttpError) {
       return Response.json(
@@ -34,8 +37,8 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json(
-      { error: "Unexpected error occurred" },
+    return Response.json(
+      { ok: false, message: "Internal server error" },
       { status: 500 },
     );
   }
