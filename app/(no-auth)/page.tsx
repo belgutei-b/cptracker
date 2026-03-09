@@ -4,13 +4,15 @@ import {
   ArrowRight,
   BarChart3,
   BookText,
-  Brain,
   Gauge,
   TimerReset,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Background from "@/components/no-auth/Background";
+import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import Logo from "@/components/no-auth/Logo";
 
 const coreFeatures = [
   {
@@ -49,34 +51,16 @@ export default async function Page() {
 
   return (
     <main className="relative isolate overflow-hidden bg-neutral-950 text-white min-h-[calc(100dvh-72px)] md:min-h-[calc(100dvh-84px)]">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-amber-500/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[26rem] w-[26rem] rounded-full bg-orange-500/15 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(251,191,36,0.16),transparent_42%),radial-gradient(circle_at_80%_80%,rgba(249,115,22,0.14),transparent_40%)]" />
-      </div>
+      <Background />
 
       <section className="relative mx-auto max-w-6xl px-6 mt-6 mb-10">
-        <div className="w-full flex justify-between">
-          <Link
-            href="/"
-            className="text-xl font-bold text-amber-500 flex items-center gap-2 hover:cursor-pointer"
-          >
-            <Brain size={24} /> CPTracker
-          </Link>
-
-          <Link href="/auth" className="landing-button">
-            Sign In
-          </Link>
-        </div>
-
+        <Logo className="mb-0!" />
         <div className="mx-auto max-w-3xl text-center mt-10">
-          <p className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-            Leetcode Tracker
-          </p>
+          <RoundedBoxedTitle title="Leetcode Tracker" />
 
           <h1 className="mt-6 text-4xl font-bold leading-tight md:text-6xl">
             Dashboard for your{" "}
-            <span className="bg-gradient-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
               leetcode progress
             </span>
           </h1>
