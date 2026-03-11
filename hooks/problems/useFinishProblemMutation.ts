@@ -54,7 +54,9 @@ export function useFinishProblemMutation() {
 
   return useMutation({
     mutationFn: finishProblemApi,
-    onSuccess: (_data, variables) => {
+    onSuccess: (data, variables) => {
+      /* data: return from the api request */
+
       const nowIso = new Date().toISOString();
       queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
@@ -66,16 +68,16 @@ export function useFinishProblemMutation() {
             problems: old.problems.map((p) =>
               p.problemId === variables.problemId
                 ? {
-                    ...p,
-                    status: variables.newStatus,
-                    lastStartedAt: null,
-                    updatedAt: nowIso,
-                    solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
-                    duration: p.duration,
-                    note: variables.note,
-                    timeComplexity: variables.timeComplexity,
-                    spaceComplexity: variables.spaceComplexity,
-                  }
+                  ...p,
+                  status: variables.newStatus,
+                  lastStartedAt: null,
+                  updatedAt: nowIso,
+                  solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
+                  duration: data.duration!,
+                  note: variables.note,
+                  timeComplexity: variables.timeComplexity,
+                  spaceComplexity: variables.spaceComplexity,
+                }
                 : p,
             ),
           };

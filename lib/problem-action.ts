@@ -89,6 +89,10 @@ export async function serverSaveProblem({
   };
 }
 
+/**
+ * @returns { ok: boolean, duration?: number }
+ *
+ */
 export async function serverFinishProblem({
   userId,
   problemId,
