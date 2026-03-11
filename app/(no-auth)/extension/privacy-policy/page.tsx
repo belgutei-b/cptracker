@@ -1,6 +1,5 @@
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
-import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 
 const dataCategories = [
   {
@@ -37,7 +36,6 @@ export default function Page() {
 
       <section className="relative mx-auto max-w-6xl px-6 mt-6 mb-10">
         <Logo />
-        <RoundedBoxedTitle title="Extension Privacy Policy" />
 
         <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           CPTracker Extension{" "}
