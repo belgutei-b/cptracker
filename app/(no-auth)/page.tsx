@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Orbitron } from "next/font/google";
+import { Orbitron, Space_Grotesk } from "next/font/google";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -10,6 +10,7 @@ import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import type { BarChartData } from "@/types/stat";
 
 const orbitron = Orbitron({ subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
 const mockChartData: BarChartData[] = [
   { date: "Mar 6", easy: 1800, medium: 2700, hard: 0, problemCount: 3 },
@@ -53,23 +54,22 @@ export default async function Page() {
           Time-first problem tracking
         </div>
 
-        <h1 className="text-5xl font-bold leading-tight md:text-7xl max-w-3xl">
-          Stop counting{" "}
-          <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
-            solves.
-          </span>
+        <h1
+          className={`${spaceGrotesk.className} text-5xl font-bold leading-tight md:text-7xl max-w-3xl`}
+        >
+          Solve count is good.
           <br />
-          Measure your{" "}
+          Solve count +{" "}
           <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
-            time.
+            time is better.
           </span>
         </h1>
 
         <p className="mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
-          In games, you always know your XP, your level, and whether you&apos;re
-          actually progressing. Competitive programming deserves the same
-          clarity. Solved count alone doesn&apos;t tell you how hard you worked
-          — time does.
+          Tracking solved problems is a solid metric. But knowing you solved 3
+          Hard problems that each took 90 minutes tells a completely different
+          story. CPTracker adds time to the equation — so you see not just what
+          you solved, but exactly how much effort it took.
         </p>
 
         <Link
@@ -163,7 +163,7 @@ export default async function Page() {
 
       {/* Chart section */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className="text-3xl font-bold text-white">
+        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white`}>
           Your time, at a glance.
         </h2>
         <p className="mt-3 text-neutral-400 max-w-xl leading-relaxed">
@@ -181,7 +181,7 @@ export default async function Page() {
 
       {/* Features section */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className="text-3xl font-bold text-white mb-10">
+        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}>
           Built around what matters.
         </h2>
 
@@ -190,13 +190,13 @@ export default async function Page() {
             <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
               01
             </div>
-            <h3 className="text-xl font-bold text-white">
-              Duration, not count
+            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
+              Count + time = the real picture
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              Solved 5 problems in 20 minutes, or 3 in 3 hours? Both look the
-              same in a streak counter. CPTracker shows you the time behind each
-              session so you always have the full picture.
+              Solved count is useful. But it doesn&apos;t tell you if you spent
+              20 minutes or 3 hours. Time is the missing half of the metric —
+              and CPTracker tracks both together.
             </p>
           </div>
 
@@ -204,7 +204,7 @@ export default async function Page() {
             <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
               02
             </div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
               Every attempt counts
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -218,7 +218,7 @@ export default async function Page() {
             <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
               03
             </div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
               Progress you can see
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -232,7 +232,7 @@ export default async function Page() {
 
       {/* How it works */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className="text-3xl font-bold text-white mb-10">Zero setup.</h2>
+        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}>Zero setup.</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             {
@@ -268,7 +268,7 @@ export default async function Page() {
                 >
                   {step.n}
                 </div>
-                <h3 className="text-xl font-bold text-white">{step.title}</h3>
+                <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>{step.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-neutral-400">
                   {step.desc}
                 </p>
@@ -280,7 +280,7 @@ export default async function Page() {
 
       {/* Bottom CTA */}
       <section className="relative mx-auto max-w-6xl px-6 py-20 text-center border-t border-white/5">
-        <h2 className="text-4xl font-bold text-white max-w-2xl mx-auto leading-tight">
+        <h2 className={`${spaceGrotesk.className} text-4xl font-bold text-white max-w-2xl mx-auto leading-tight`}>
           Ready to see how much time you&apos;re really putting in?
         </h2>
         <p className="mt-4 text-neutral-400 max-w-lg mx-auto">
