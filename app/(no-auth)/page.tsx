@@ -56,8 +56,6 @@ export default async function Page() {
       <section className="relative mx-auto max-w-6xl px-6 mt-6 mb-10">
         <Logo className="mb-0!" />
         <div className="mx-auto max-w-3xl text-center mt-10">
-          <RoundedBoxedTitle title="Leetcode Tracker" />
-
           <h1 className="mt-6 text-4xl font-bold leading-tight md:text-6xl">
             Dashboard for your{" "}
             <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
@@ -98,9 +96,6 @@ export default async function Page() {
                 className="group rounded-2xl bg-neutral-900/65 p-6 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="inline-flex rounded-full bg-neutral-800 px-3 py-1 text-xs font-medium text-amber-200">
-                    Core Feature
-                  </span>
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-amber-300">
                     <Icon className="h-5 w-5" />
                   </div>
