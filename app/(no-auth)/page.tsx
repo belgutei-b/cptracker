@@ -13,7 +13,7 @@ import Extension from "@/components/no-auth/Extension";
 const inter = Inter({ subsets: ["latin"] });
 const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
 
-const mockChartData: BarChartData[] = [
+const landingChartData: BarChartData[] = [
   { date: "Mon", easy: 0, medium: 0, hard: 0, problemCount: 0 },
   { date: "Tue", easy: 1800, medium: 2700, hard: 0, problemCount: 3 },
   { date: "Wed", easy: 900, medium: 0, hard: 4500, problemCount: 2 },
@@ -43,28 +43,28 @@ const goals = [
 
 const setupSteps = [
   {
-    n: "01",
+    number: "01",
     title: "Paste a LeetCode problem URL",
     desc: "The problem is added to your dashboard.",
   },
   {
-    n: "02",
+    number: "02",
     title: "Start the timer",
     desc: "Start solving the problem.",
   },
   {
-    n: "03",
+    number: "03",
     title: "Log notes & mark status",
     desc: "Write your approach and observations. Mark the problem Tried or Solved when you're done.",
   },
   {
-    n: "04",
+    number: "04",
     title: "Watch it add up",
     desc: "Your total time grows every session. Check your weekly breakdown anytime.",
   },
 ];
 
-const weeklyDifficultyTotals = mockChartData.reduce(
+const weeklyDifficultyTotals = landingChartData.reduce(
   (totals, day) => ({
     easy: totals.easy + day.easy,
     medium: totals.medium + day.medium,
@@ -78,19 +78,16 @@ const xpBars = [
     label: "Easy",
     hours: weeklyDifficultyTotals.easy / 3600,
     color: "#00b8a3",
-    note: "build rhythm",
   },
   {
     label: "Medium",
     hours: weeklyDifficultyTotals.medium / 3600,
     color: "#ffc01e",
-    note: "main volume",
   },
   {
     label: "Hard",
     hours: weeklyDifficultyTotals.hard / 3600,
     color: "#ff375f",
-    note: "real stretch",
   },
 ];
 
@@ -139,11 +136,11 @@ export default async function Page() {
           Solve count is good
           <br />
           <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-            Solve count + time is better
+            With time it is even better
           </span>
         </h1>
 
-        <p className="mb-3 max-w-[500px] text-[15px] leading-relaxed text-zinc-400">
+        <p className="mb-3 max-w-xl text-[15px] leading-relaxed text-zinc-400">
           Solved count burns people out. You grind for hours, submit nothing,
           and the number doesn&apos;t move.{" "}
           <span className="text-zinc-200">Time always moves.</span> Every
@@ -151,10 +148,10 @@ export default async function Page() {
         </p>
 
         <p
-          className={`${shareTechMono.className} mb-8 max-w-[460px] text-[13px] leading-relaxed text-zinc-600`}
+          className={"mb-8 max-w-lg text-[13px] leading-relaxed text-zinc-600"}
         >
           Think of it like XP. In a game you always know if you&apos;re leveling
-          up. CPTracker gives you that for practice.
+          up. CPTracker gives you that for your journey.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -166,7 +163,7 @@ export default async function Page() {
             <ArrowRight size={16} />
           </Link>
           <Link
-            href="/extension"
+            href="/upcoming"
             className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] px-5 py-3 text-sm font-medium text-zinc-400 transition-all hover:border-white/[0.14] hover:text-zinc-100"
           >
             Upcoming features
@@ -251,27 +248,21 @@ export default async function Page() {
       <section className="landing-section-outer">
         <p className="landing-section-title-desc">How it works</p>
         <h2 className="landing-section-title">Setup steps.</h2>
-        <div className="grid grid-cols-2 overflow-hidden rounded-2xl  border border-white/10 md:grid-cols-4">
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10 md:grid-cols-4">
           {setupSteps.map((step, i) => (
             <div
-              key={`how-it-works-${step.n}`}
+              key={step.number}
               className={`bg-neutral-900/70 p-6 ${
                 i < setupSteps.length - 1
                   ? "border-[#1e1e1e] border-r border-b md:border-b-0"
                   : ""
               }`}
             >
-              <p
-                className={`${shareTechMono.className} mb-3 text-[32px] leading-none font-light text-amber-400`}
-              >
-                {step.n}
+              <p className={`${shareTechMono.className} landing-box-number`}>
+                {step.number}
               </p>
-              <p className="mb-1.5 text-sm font-semibold tracking-tight text-zinc-100">
-                {step.title}
-              </p>
-              <p className="text-xs leading-relaxed text-zinc-500">
-                {step.desc}
-              </p>
+              <p className="mb-1.5 landing-box-title">{step.title}</p>
+              <p className="landing-box-desc">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -284,7 +275,7 @@ export default async function Page() {
 
         <TotalSolveDuration
           numberOfDays={7}
-          chartData={mockChartData}
+          chartData={landingChartData}
           isLoading={false}
         />
 
@@ -325,11 +316,6 @@ export default async function Page() {
                     </span>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`${shareTechMono.className} text-[10px] text-zinc-600`}
-                      >
-                        {bar.note}
-                      </span>
-                      <span
                         className={`${shareTechMono.className} text-xs`}
                         style={{ color: bar.color }}
                       >
@@ -365,13 +351,11 @@ export default async function Page() {
               key={goal.number}
               className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
             >
-              <div className="mb-4 text-5xl font-bold text-neutral-800">
+              <div className={`${shareTechMono.className} landing-box-number`}>
                 {goal.number}
               </div>
-              <h3 className="text-xl font-bold text-white">{goal.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-                {goal.desc}
-              </p>
+              <h3 className="landing-box-title">{goal.title}</h3>
+              <p className="mt-3 landing-box-desc">{goal.desc}</p>
             </div>
           ))}
         </div>

@@ -74,7 +74,7 @@ body {
   @apply shadow-[0_6px_28px_rgba(245,158,11,0.2)];
 }
 
-@utility section-title {
+.section-title {
   @apply text-3xl font-bold text-white mb-10;
 }
 
@@ -88,4 +88,16 @@ body {
 
 .landing-section-outer {
   @apply relative z-10 mx-auto max-w-6xl px-5 py-16 border-t border-white/5;
+}
+
+.landing-box-number {
+  @apply mb-3 text-4xl font-light text-amber-400;
+}
+
+.landing-box-title {
+  @apply text-base font-bold tracking-tight text-zinc-100;
+}
+
+.landing-box-desc {
+  @apply text-sm leading-relaxed text-zinc-500;
 }
