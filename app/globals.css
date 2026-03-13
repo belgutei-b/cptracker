@@ -67,3 +67,13 @@ body {
 .feature-description {
   @apply mt-3 text-sm leading-relaxed text-neutral-300;
 }
+
+.landing-orange-button {
+  @apply inline-flex items-center gap-2 rounded-lg font-semibold text-black;
+  @apply bg-amber-500 transition-colors hover:bg-amber-400;
+  @apply shadow-[0_6px_28px_rgba(245,158,11,0.2)];
+}
+
+@utility section-title {
+  @apply text-3xl font-bold text-white mb-10;
+}

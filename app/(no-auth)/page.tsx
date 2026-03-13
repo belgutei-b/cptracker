@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Orbitron, Space_Grotesk } from "next/font/google";
+import { ArrowRight, ChevronRight } from "lucide-react";
+import { Inter, Share_Tech_Mono } from "next/font/google";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -9,8 +9,8 @@ import Logo from "@/components/no-auth/Logo";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import type { BarChartData } from "@/types/stat";
 
-const orbitron = Orbitron({ subsets: ["latin"] });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
+const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
 
 const mockChartData: BarChartData[] = [
   { date: "Mon", easy: 0, medium: 0, hard: 0, problemCount: 0 },
@@ -22,6 +22,71 @@ const mockChartData: BarChartData[] = [
   { date: "Sun", easy: 1500, medium: 2100, hard: 0, problemCount: 3 },
 ];
 
+const setupSteps = [
+  {
+    n: "01",
+    title: "Paste a LeetCode problem URL",
+    desc: "The problem is added to your dashboard.",
+  },
+  {
+    n: "02",
+    title: "Start the timer",
+    desc: "Start solving the problem.",
+  },
+  {
+    n: "03",
+    title: "Log notes & mark status",
+    desc: "Write your approach and observations. Mark the problem Tried or Solved when you're done.",
+  },
+  {
+    n: "04",
+    title: "Watch it add up",
+    desc: "Your total time grows every session. Check your weekly breakdown anytime.",
+  },
+];
+
+const extensionHighlights = [
+  "Start the timer from any LeetCode page",
+  "Write notes in the popup and sync them to your dashboard",
+  "Mark a problem Tried or Solved without leaving the tab",
+];
+
+const weeklyDifficultyTotals = mockChartData.reduce(
+  (totals, day) => ({
+    easy: totals.easy + day.easy,
+    medium: totals.medium + day.medium,
+    hard: totals.hard + day.hard,
+  }),
+  { easy: 0, medium: 0, hard: 0 },
+);
+
+const xpBars = [
+  {
+    label: "Easy",
+    hours: weeklyDifficultyTotals.easy / 3600,
+    color: "#00b8a3",
+    note: "build rhythm",
+  },
+  {
+    label: "Medium",
+    hours: weeklyDifficultyTotals.medium / 3600,
+    color: "#ffc01e",
+    note: "main volume",
+  },
+  {
+    label: "Hard",
+    hours: weeklyDifficultyTotals.hard / 3600,
+    color: "#ff375f",
+    note: "real stretch",
+  },
+];
+
+const maxXpHours = Math.max(...xpBars.map((bar) => bar.hours), 1);
+
+function formatHours(hours: number): string {
+  return `${hours.toFixed(1)}h`;
+}
+
 export default async function Page() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -32,15 +97,18 @@ export default async function Page() {
   }
 
   return (
-    <main className="relative isolate overflow-hidden bg-neutral-950 text-white">
+    <main
+      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white`}
+    >
       <Background />
 
       {/* Nav */}
-      <nav className="relative mx-auto max-w-6xl px-6 pt-6 flex items-center justify-between">
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
         <Logo className="mb-0!" />
+
         <Link
           href="/auth"
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-black bg-amber-500 transition-colors hover:bg-amber-400 whitespace-nowrap shadow-[0_6px_28px_rgba(245,158,11,0.2)]"
+          className="landing-orange-button whitespace-nowrap px-4 py-2 text-sm"
         >
           Get Started
           <ArrowRight size={14} />
@@ -48,36 +116,50 @@ export default async function Page() {
       </nav>
 
       {/* Hero */}
-      <section className="relative mx-auto max-w-6xl px-6 pt-16 pb-10">
-        <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400 mb-6">
+      <section className="relative z-10 mx-auto max-w-6xl px-6 pt-10 pb-0">
+        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-          Time-first problem tracking
+          Competitive programming tracker
         </div>
 
-        <h1
-          className={`${spaceGrotesk.className} mb-5 max-w-5xl text-5xl font-extrabold leading-[0.93] tracking-[-0.035em] md:text-[70px]`}
-        >
+        <h1 className="mb-5 max-w-4xl text-5xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-[70px]">
           Solve count is good
           <br />
           <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-            Solve count+Time is better
+            Solve count + time is better
           </span>
         </h1>
 
-        <p className="mt-6 max-w-2xl text-lg text-neutral-400 leading-relaxed">
-          Tracking solved problems is a solid metric. But knowing you solved 3
-          Hard problems that each took 90 minutes tells a completely different
-          story. CPTracker adds time to the equation — so you see not just what
-          you solved, but exactly how much effort it took.
+        <p className="mb-3 max-w-[500px] text-[15px] leading-relaxed text-zinc-400">
+          Solved count burns people out. You grind for hours, submit nothing,
+          and the number doesn&apos;t move.{" "}
+          <span className="text-zinc-200">Time always moves.</span> Every
+          session, tried or solved, adds to a total you can actually see grow.
         </p>
 
-        <Link
-          href="/auth"
-          className="mt-8 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-base font-semibold text-black bg-amber-500 transition-colors hover:bg-amber-400 shadow-[0_6px_28px_rgba(245,158,11,0.2)]"
+        <p
+          className={`${shareTechMono.className} mb-8 max-w-[460px] text-[13px] leading-relaxed text-zinc-600`}
         >
-          Start tracking
-          <ArrowRight size={16} />
-        </Link>
+          Think of it like XP. In a game you always know if you&apos;re leveling
+          up. CPTracker gives you that for practice.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/auth"
+            className="landing-orange-button px-5 py-3 text-sm tracking-tight"
+          >
+            Start tracking
+            <ArrowRight size={16} />
+          </Link>
+          <Link
+            href="/extension"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] px-5 py-3 text-sm font-medium text-zinc-400 transition-all hover:border-white/[0.14] hover:text-zinc-100"
+          >
+            Upcoming features
+            <ChevronRight size={13} />
+          </Link>
+        </div>
 
         {/* Mock session + stats cards */}
         <div className="mt-14 grid md:grid-cols-3 gap-4">
@@ -102,7 +184,7 @@ export default async function Page() {
             </div>
 
             <div
-              className={`${orbitron.className} text-5xl font-bold text-amber-400 tracking-wider my-5`}
+              className={`${shareTechMono.className} my-5 text-5xl font-bold tracking-wider text-amber-400`}
             >
               00:23:47
             </div>
@@ -124,11 +206,7 @@ export default async function Page() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-3">
                 This Week
               </p>
-              <div
-                className={`${orbitron.className} text-3xl font-bold text-white`}
-              >
-                14h 32m
-              </div>
+              <div className="text-3xl font-bold text-white">14h 32m</div>
               <p className="text-neutral-500 text-xs mt-1">total time spent</p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div>
@@ -149,55 +227,136 @@ export default async function Page() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">
                 Streak
               </p>
-              <div
-                className={`${orbitron.className} text-3xl font-bold text-amber-400`}
-              >
-                6 days
-              </div>
+              <div className="text-3xl font-bold text-amber-400">6 days</div>
               <p className="text-neutral-500 text-xs mt-1">keep it going</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Chart section */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2
-          className={`${spaceGrotesk.className} text-3xl font-bold text-white`}
-        >
+      {/* How it works */}
+      <section className="relative z-10 mx-auto mt-16 max-w-6xl py-16 border-t border-white/5 px-6">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+          How it works
+        </p>
+        <h2 className="mb-8 max-w-xs text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px]">
+          Setup steps.
+        </h2>
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl  border border-white/10 md:grid-cols-4">
+          {setupSteps.map((step, i) => (
+            <div
+              key={`how-it-works-${step.n}`}
+              className={`bg-neutral-900/70 p-6 ${
+                i < setupSteps.length - 1
+                  ? "border-[#1e1e1e] border-r border-b md:border-b-0"
+                  : ""
+              }`}
+            >
+              <p
+                className={`${shareTechMono.className} mb-3 text-[32px] leading-none font-light text-amber-400`}
+              >
+                {step.n}
+              </p>
+              <p className="mb-1.5 text-sm font-semibold tracking-tight text-zinc-100">
+                {step.title}
+              </p>
+              <p className="text-xs leading-relaxed text-zinc-500">
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* XP signal */}
+      <section className="relative mx-auto max-w-6xl px-6 space-y-4 py-16 border-t border-white/5">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+          Analytics
+        </p>
+        <h2 className="mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px]">
           Your time, at a glance.
         </h2>
-        <p className="mt-3 text-neutral-400 max-w-xl leading-relaxed">
-          Every bar is a day. Every color is a difficulty level. See exactly how
-          much time you put in — not just whether you showed up.
-        </p>
-        <div className="mt-8">
-          <TotalSolveDuration
-            numberOfDays={7}
-            chartData={mockChartData}
-            isLoading={false}
-          />
+
+        <TotalSolveDuration
+          numberOfDays={7}
+          chartData={mockChartData}
+          isLoading={false}
+        />
+
+        <div className="relative overflow-hidden mt-10 rounded-2xl border border-[#1e1e1e] bg-[#111113] p-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(245,158,11,0.12),transparent_42%)]" />
+
+          <div className="flex w-full space-x-20">
+            <div className="w-80">
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                Time always moves
+              </div>
+
+              <h2 className="mt-4 max-w-sm text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
+                If you practiced,
+                <br />
+                it should show up.
+              </h2>
+
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-neutral-400">
+                Solve count only sees submissions. This sees the hours. Easy,
+                Medium, Hard. Tried or solved.
+              </p>
+
+              <p
+                className={`${shareTechMono.className} mt-3 max-w-sm text-[12px] leading-relaxed text-neutral-600`}
+              >
+                Think of it like XP. The bar should move when the work happens.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-4 flex-1">
+              {xpBars.map((bar) => (
+                <div key={bar.label} className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-semibold text-zinc-300">
+                      {bar.label}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`${shareTechMono.className} text-[10px] text-zinc-600`}
+                      >
+                        {bar.note}
+                      </span>
+                      <span
+                        className={`${shareTechMono.className} text-xs`}
+                        style={{ color: bar.color }}
+                      >
+                        {formatHours(bar.hours)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-2 overflow-hidden rounded-full bg-[#1a1a1a]">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${(bar.hours / maxXpHours) * 100}%`,
+                        background: bar.color,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features section */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2
-          className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}
-        >
-          Built around what matters.
-        </h2>
+        <h2 className="section-title">Built around what matters.</h2>
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div
-              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
-            >
-              01
-            </div>
-            <h3
-              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
-            >
+            <div className="mb-4 text-5xl font-bold text-neutral-800">01</div>
+            <h3 className="text-xl font-bold text-white">
               Count + time = the real picture
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -208,14 +367,8 @@ export default async function Page() {
           </div>
 
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div
-              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
-            >
-              02
-            </div>
-            <h3
-              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
-            >
+            <div className="mb-4 text-5xl font-bold text-neutral-800">02</div>
+            <h3 className="text-xl font-bold text-white">
               Every attempt counts
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -226,14 +379,8 @@ export default async function Page() {
           </div>
 
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div
-              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
-            >
-              03
-            </div>
-            <h3
-              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
-            >
+            <div className="mb-4 text-5xl font-bold text-neutral-800">03</div>
+            <h3 className="text-xl font-bold text-white">
               Progress you can see
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -245,79 +392,136 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* Chrome extension teaser */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2
-          className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}
-        >
-          Zero setup.
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            {
-              n: "01",
-              title: "Paste a LeetCode URL",
-              desc: "The problem is added to your dashboard automatically.",
-            },
-            {
-              n: "02",
-              title: "Start the timer",
-              desc: "One click. The clock runs through thinking, failing, and retrying.",
-            },
-            {
-              n: "03",
-              title: "Log notes & mark status",
-              desc: "Write your approach. Mark it Tried or Solved when you're done.",
-            },
-            {
-              n: "04",
-              title: "Watch it add up",
-              desc: "Your total time grows every session. Check your weekly breakdown anytime.",
-            },
-          ].map((step, i) => (
-            <div key={step.n} className="relative">
-              {i < 3 && (
-                <div
-                  className={`absolute top-13 left-full w-4 h-px bg-neutral-700/60 z-10 ${i % 2 === 0 ? "" : "hidden md:block"}`}
-                />
-              )}
-              <div className="h-full rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-                <div
-                  className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
-                >
-                  {step.n}
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/80">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_50%,rgba(245,158,11,0.12),transparent_45%)]" />
+
+          <div className="relative flex flex-col gap-10 p-8 md:flex-row md:items-center md:p-10">
+            <div className="flex-1">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  Chrome extension
+                </span>
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                  Pending Chrome Web Store review
+                </span>
+              </div>
+
+              <h2 className="text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white md:text-4xl">
+                Stay in the flow.
+                <br />
+                <span className="text-neutral-400">No more tab switching.</span>
+              </h2>
+
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-400 md:text-base">
+                The CPTracker Chrome extension lets you add a problem, start the
+                timer, and save notes right from LeetCode. Same workflow, fewer
+                interruptions.
+              </p>
+
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-500">
+                It is currently pending review in the Google Chrome Web Store.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3">
+                {extensionHighlights.map((line) => (
+                  <div key={line} className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+                    <span className="text-sm text-neutral-300">{line}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href="/extension"
+                className="mt-7 inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-white/20 hover:text-white"
+              >
+                See extension details
+                <ChevronRight size={14} />
+              </Link>
+            </div>
+
+            <div className="w-full shrink-0 md:w-64">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-neutral-950 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/5 px-3 py-2">
+                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
+                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
+                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
+                  <span className="ml-auto text-[9px] text-neutral-500">
+                    cptracker
+                  </span>
                 </div>
-                <h3
-                  className={`${spaceGrotesk.className} text-xl font-bold text-white`}
-                >
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-                  {step.desc}
-                </p>
+
+                <div className="p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+                      Active
+                    </span>
+                    <span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-yellow-400">
+                      Medium
+                    </span>
+                  </div>
+
+                  <p className="mb-3 text-xs font-semibold leading-snug text-neutral-200">
+                    3Sum
+                  </p>
+
+                  <div className="mb-3 rounded-lg border border-white/10 py-3 text-center text-3xl text-neutral-100">
+                    18:<span className="text-amber-400">44</span>
+                  </div>
+
+                  <div className="mb-2 rounded-lg bg-amber-500 py-2 text-center text-xs font-bold text-black">
+                    Pause
+                  </div>
+
+                  <div className="mb-2 flex gap-2">
+                    <div className="flex-1 rounded-md border border-white/10 py-1.5 text-center text-[10px] font-semibold text-neutral-500">
+                      Tried
+                    </div>
+                    <div className="flex-1 rounded-md border border-white/10 py-1.5 text-center text-[10px] font-semibold text-neutral-500">
+                      Solved
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-white/10 bg-white/5 p-2 text-[10px] text-neutral-500">
+                    Two pointers after sort...
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
       {/* Bottom CTA */}
-      <section className="relative mx-auto max-w-6xl px-6 py-20 text-center border-t border-white/5">
-        <h2
-          className={`${spaceGrotesk.className} text-4xl font-bold text-white max-w-2xl mx-auto leading-tight`}
-        >
-          Ready to see how much time you&apos;re really putting in?
-        </h2>
-        <p className="mt-4 text-neutral-400 max-w-lg mx-auto">
-          Start tracking your sessions today. Free to use, no setup needed.
-        </p>
-        <Link
-          href="/auth"
-          className="mt-8 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-base font-semibold text-black bg-amber-500 transition-colors hover:bg-amber-400 shadow-[0_6px_28px_rgba(245,158,11,0.2)]"
-        >
-          Get started — it&apos;s free
-          <ArrowRight size={16} />
-        </Link>
+      <section className="relative mx-auto max-w-6xl px-6 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-amber-500/15 bg-[#111113] px-8 py-12 text-center md:px-12 md:py-16">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(245,158,11,0.09),transparent_58%)]" />
+
+          <div className="relative">
+            <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-[-0.03em] leading-[1.05] text-white md:text-5xl">
+              Ready to see how much time
+              <br />
+              <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+                you&apos;re really putting in?
+              </span>
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-neutral-400">
+              Start tracking your sessions today. Free to use, no setup needed.
+            </p>
+
+            <Link
+              href="/auth"
+              className="landing-orange-button relative mt-8 px-6 py-3.5 text-sm tracking-tight transition-all hover:-translate-y-px"
+            >
+              Get started
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );
