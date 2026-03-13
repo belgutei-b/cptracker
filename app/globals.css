@@ -77,3 +77,15 @@ body {
 @utility section-title {
   @apply text-3xl font-bold text-white mb-10;
 }
+
+.landing-section-title-desc {
+  @apply mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400;
+}
+
+.landing-section-title {
+  @apply mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px];
+}
+
+.landing-section-outer {
+  @apply relative z-10 mx-auto max-w-6xl px-5 py-16 border-t border-white/5;
+}

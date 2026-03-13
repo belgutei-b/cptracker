@@ -8,6 +8,7 @@ import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import type { BarChartData } from "@/types/stat";
+import Extension from "@/components/no-auth/Extension";
 
 const inter = Inter({ subsets: ["latin"] });
 const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
@@ -20,6 +21,24 @@ const mockChartData: BarChartData[] = [
   { date: "Fri", easy: 600, medium: 1800, hard: 5400, problemCount: 3 },
   { date: "Sat", easy: 2400, medium: 4200, hard: 3600, problemCount: 6 },
   { date: "Sun", easy: 1500, medium: 2100, hard: 0, problemCount: 3 },
+];
+
+const goals = [
+  {
+    number: "01",
+    title: "Count + time = the real picture",
+    desc: "Solved count is useful. But it doesn't tell you if you spent 20 minutes or 3 hours. Time is the missing half of the metric — and CPTracker tracks both together.",
+  },
+  {
+    number: "02",
+    title: "Every attempt counts",
+    desc: "Spent 90 minutes on a problem you didn't submit? That's not a failure — that's real work. Mark it as tried. It still counts toward your total time and keeps your progress honest.",
+  },
+  {
+    number: "03",
+    title: "Progress you can see",
+    desc: "Daily breakdowns, weekly totals, average time per difficulty. When your progress is visible, you always know if you're moving forward — or just going through the motions.",
+  },
 ];
 
 const setupSteps = [
@@ -43,12 +62,6 @@ const setupSteps = [
     title: "Watch it add up",
     desc: "Your total time grows every session. Check your weekly breakdown anytime.",
   },
-];
-
-const extensionHighlights = [
-  "Start the timer from any LeetCode page",
-  "Write notes in the popup and sync them to your dashboard",
-  "Mark a problem Tried or Solved without leaving the tab",
 ];
 
 const weeklyDifficultyTotals = mockChartData.reduce(
@@ -116,7 +129,7 @@ export default async function Page() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 pt-10 pb-0">
+      <section className="landing-section-outer border-t-0!">
         <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
           Competitive programming tracker
@@ -235,13 +248,9 @@ export default async function Page() {
       </section>
 
       {/* How it works */}
-      <section className="relative z-10 mx-auto mt-16 max-w-6xl py-16 border-t border-white/5 px-6">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-          How it works
-        </p>
-        <h2 className="mb-8 max-w-xs text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px]">
-          Setup steps.
-        </h2>
+      <section className="landing-section-outer">
+        <p className="landing-section-title-desc">How it works</p>
+        <h2 className="landing-section-title">Setup steps.</h2>
         <div className="grid grid-cols-2 overflow-hidden rounded-2xl  border border-white/10 md:grid-cols-4">
           {setupSteps.map((step, i) => (
             <div
@@ -268,14 +277,10 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* XP signal */}
-      <section className="relative mx-auto max-w-6xl px-6 space-y-4 py-16 border-t border-white/5">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-          Analytics
-        </p>
-        <h2 className="mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px]">
-          Your time, at a glance.
-        </h2>
+      {/* Analytics */}
+      <section className="landing-section-outer">
+        <p className="landing-section-title-desc">Analytics</p>
+        <h2 className="landing-section-title">Your time, at a glance.</h2>
 
         <TotalSolveDuration
           numberOfDays={7}
@@ -349,154 +354,34 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* Features section */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className="section-title">Built around what matters.</h2>
+      {/* Goal */}
+      <section className="landing-section-outer">
+        <p className="landing-section-title-desc">Goal</p>
+        <h2 className="landing-section-title">Built around what matters.</h2>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className="mb-4 text-5xl font-bold text-neutral-800">01</div>
-            <h3 className="text-xl font-bold text-white">
-              Count + time = the real picture
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              Solved count is useful. But it doesn&apos;t tell you if you spent
-              20 minutes or 3 hours. Time is the missing half of the metric —
-              and CPTracker tracks both together.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className="mb-4 text-5xl font-bold text-neutral-800">02</div>
-            <h3 className="text-xl font-bold text-white">
-              Every attempt counts
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              Spent 90 minutes on a problem you didn&apos;t submit? That&apos;s
-              not a failure — that&apos;s real work. Mark it as tried. It still
-              counts toward your total time and keeps your progress honest.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className="mb-4 text-5xl font-bold text-neutral-800">03</div>
-            <h3 className="text-xl font-bold text-white">
-              Progress you can see
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              Daily breakdowns, weekly totals, average time per difficulty. When
-              your progress is visible, you always know if you&apos;re moving
-              forward — or just going through the motions.
-            </p>
-          </div>
+          {goals.map((goal) => (
+            <div
+              key={goal.number}
+              className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
+            >
+              <div className="mb-4 text-5xl font-bold text-neutral-800">
+                {goal.number}
+              </div>
+              <h3 className="text-xl font-bold text-white">{goal.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+                {goal.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Chrome extension teaser */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/80">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_50%,rgba(245,158,11,0.12),transparent_45%)]" />
-
-          <div className="relative flex flex-col gap-10 p-8 md:flex-row md:items-center md:p-10">
-            <div className="flex-1">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                  Chrome extension
-                </span>
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-                  Pending Chrome Web Store review
-                </span>
-              </div>
-
-              <h2 className="text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white md:text-4xl">
-                Stay in the flow.
-                <br />
-                <span className="text-neutral-400">No more tab switching.</span>
-              </h2>
-
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-400 md:text-base">
-                The CPTracker Chrome extension lets you add a problem, start the
-                timer, and save notes right from LeetCode. Same workflow, fewer
-                interruptions.
-              </p>
-
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-500">
-                It is currently pending review in the Google Chrome Web Store.
-              </p>
-
-              <div className="mt-6 flex flex-col gap-3">
-                {extensionHighlights.map((line) => (
-                  <div key={line} className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
-                    <span className="text-sm text-neutral-300">{line}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link
-                href="/extension"
-                className="mt-7 inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-white/20 hover:text-white"
-              >
-                See extension details
-                <ChevronRight size={14} />
-              </Link>
-            </div>
-
-            <div className="w-full shrink-0 md:w-64">
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-neutral-950 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
-                <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/5 px-3 py-2">
-                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
-                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
-                  <span className="h-2 w-2 rounded-full bg-neutral-700" />
-                  <span className="ml-auto text-[9px] text-neutral-500">
-                    cptracker
-                  </span>
-                </div>
-
-                <div className="p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-                      Active
-                    </span>
-                    <span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-yellow-400">
-                      Medium
-                    </span>
-                  </div>
-
-                  <p className="mb-3 text-xs font-semibold leading-snug text-neutral-200">
-                    3Sum
-                  </p>
-
-                  <div className="mb-3 rounded-lg border border-white/10 py-3 text-center text-3xl text-neutral-100">
-                    18:<span className="text-amber-400">44</span>
-                  </div>
-
-                  <div className="mb-2 rounded-lg bg-amber-500 py-2 text-center text-xs font-bold text-black">
-                    Pause
-                  </div>
-
-                  <div className="mb-2 flex gap-2">
-                    <div className="flex-1 rounded-md border border-white/10 py-1.5 text-center text-[10px] font-semibold text-neutral-500">
-                      Tried
-                    </div>
-                    <div className="flex-1 rounded-md border border-white/10 py-1.5 text-center text-[10px] font-semibold text-neutral-500">
-                      Solved
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-2 text-[10px] text-neutral-500">
-                    Two pointers after sort...
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Chrome extension */}
+      <Extension />
 
       {/* Bottom CTA */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16">
+      <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
         <div className="relative overflow-hidden rounded-3xl border border-amber-500/15 bg-[#111113] px-8 py-12 text-center md:px-12 md:py-16">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(245,158,11,0.09),transparent_58%)]" />
 
