@@ -12,7 +12,7 @@ export default function Extension() {
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/80">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_50%,rgba(245,158,11,0.12),transparent_45%)]" />
 
-        <div className="relative flex flex-col gap-10 p-8 md:flex-row md:items-center md:p-10">
+        <div className="relative flex flex-col gap-10 p-4 md:p-10 md:flex-row md:items-center">
           <div className="flex-1">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">

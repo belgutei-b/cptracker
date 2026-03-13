@@ -248,11 +248,11 @@ export default async function Page() {
       <section className="landing-section-outer">
         <p className="landing-section-title-desc">How it works</p>
         <h2 className="landing-section-title">Setup steps.</h2>
-        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10 md:grid-cols-4">
+        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-white/10 md:grid-cols-4">
           {setupSteps.map((step, i) => (
             <div
               key={step.number}
-              className={`bg-neutral-900/70 p-6 ${
+              className={`bg-neutral-900/70 p-4 md:p-6 ${
                 i < setupSteps.length - 1
                   ? "border-[#1e1e1e] border-r border-b md:border-b-0"
                   : ""
@@ -282,9 +282,9 @@ export default async function Page() {
         <div className="relative overflow-hidden mt-10 rounded-2xl border border-[#1e1e1e] bg-[#111113] p-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(245,158,11,0.12),transparent_42%)]" />
 
-          <div className="flex w-full space-x-20">
+          <div className="flex flex-col md:flex-row w-full space-y-5 md:space-x-20">
             <div className="w-80">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                 Time always moves
               </div>
@@ -349,7 +349,7 @@ export default async function Page() {
           {goals.map((goal) => (
             <div
               key={goal.number}
-              className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
+              className="rounded-2xl bg-neutral-900/65 p-4 md:p-6 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
             >
               <div className={`${shareTechMono.className} landing-box-number`}>
                 {goal.number}
