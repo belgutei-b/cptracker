@@ -1,7 +1,11 @@
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import { ArrowRight } from "lucide-react";
+import { Inter, Share_Tech_Mono } from "next/font/google";
 import Link from "next/link";
+
+const inter = Inter({ subsets: ["latin"] });
 
 const upcomingFeatures = [
   {
@@ -23,50 +27,47 @@ const upcomingFeatures = [
 
 export default function Page() {
   return (
-    <main className="relative isolate overflow-hidden bg-neutral-950 text-white min-h-dvh">
+    <main
+      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white min-h-dvh`}
+    >
       <Background />
 
-      <section className="relative mx-auto max-w-6xl px-6 mt-6 mb-10">
-        <Logo />
-        <RoundedBoxedTitle title="Product Roadmap" />
+      {/* Nav */}
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
+        <Logo className="mb-0!" />
 
-        <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-          Upcoming Features Built to Make Your LeetCode Grind{" "}
-          <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
-            Faster and Sharper
+        <Link
+          href="/auth"
+          className="landing-orange-button whitespace-nowrap px-4 py-2 text-sm"
+        >
+          Get Started
+          <ArrowRight size={14} />
+        </Link>
+      </nav>
+
+      <section className="landing-section-outer border-t-0!">
+        <RoundedBoxedTitle title="Product roadmap" />
+
+        <h1 className="mt-7 mb-5 max-w-4xl text-5xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-[70px]">
+          Upcoming Features for
+          <br />
+          <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+            Better Experience
           </span>
         </h1>
 
-        <p className="mt-5 max-w-2xl text-base text-neutral-300 sm:text-lg">
-          The next wave focuses on speed, consistency, and healthy competition.
-          We are shipping tools that keep you in flow while making progress
-          measurable every day.
+        <p className="mb-3 max-w-xl text-[15px] leading-relaxed text-zinc-400">
+          The next wave focuses on speed, consistency, and competition. We are
+          shipping tools that keep you in flow while making progress measurable
+          every day.
         </p>
 
         <div className="mt-10 grid gap-5">
           {upcomingFeatures.map((feature) => (
-            <article key={feature.title} className="group feature-article">
-              <span className="inline-flex rounded-full bg-neutral-800 px-3 py-1 text-xs font-medium text-amber-200">
-                {feature.eta}
-              </span>
-              <h2 className="mt-4 feature-title">{feature.title}</h2>
-              <p className="feature-description">{feature.description}</p>
-              {feature.privacyPolicyLink && (
-                <p className="mt-3 text-sm text-neutral-400">
-                  Extension privacy policy is available at:{" "}
-                  <Link
-                    href="/extension/privacy-policy"
-                    className="text-amber-300 underline underline-offset-2 hover:text-amber-200"
-                  >
-                    {feature.privacyPolicyLink}
-                  </Link>
-                </p>
-              )}
-              <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-neutral-800">
-                <div
-                  className={`h-full rounded-full ${feature.progressClass}`}
-                />
-              </div>
+            <article key={feature.title} className="group landing-box">
+              <RoundedBoxedTitle title={feature.eta} />
+              <h2 className="mt-4 landing-box-title">{feature.title}</h2>
+              <p className="mt-3 landing-box-desc">{feature.description}</p>
             </article>
           ))}
         </div>

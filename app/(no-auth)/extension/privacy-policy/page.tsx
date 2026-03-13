@@ -57,9 +57,9 @@ export default function Page() {
 
         <div className="mt-10 grid gap-5">
           {dataCategories.map((category) => (
-            <article key={category.title} className="group feature-article">
-              <h2 className="feature-title capitalize">{category.title}</h2>
-              <p className="feature-description">{category.description}</p>
+            <article key={category.title} className="group landing-box">
+              <h2 className="landing-box-title capitalize">{category.title}</h2>
+              <p className="landing-box-desc">{category.description}</p>
             </article>
           ))}
         </div>

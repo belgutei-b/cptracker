@@ -56,18 +56,6 @@ body {
   @apply font-bold mt-1 text-white;
 }
 
-.feature-article {
-  @apply rounded-2xl bg-neutral-900/65 p-6 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40;
-}
-
-.feature-title {
-  @apply text-xl font-bold text-white;
-}
-
-.feature-description {
-  @apply mt-3 text-sm leading-relaxed text-neutral-300;
-}
-
 .landing-orange-button {
   @apply inline-flex items-center gap-2 rounded-lg font-semibold text-black;
   @apply bg-amber-500 transition-colors hover:bg-amber-400;
@@ -88,6 +76,12 @@ body {
 
 .landing-section-outer {
   @apply relative z-10 mx-auto max-w-6xl px-5 py-16 border-t border-white/5;
+}
+
+.landing-box {
+  @apply rounded-2xl bg-neutral-900/65 p-4 md:p-6;
+  @apply ring-1 ring-white/10 backdrop-blur transition duration-300;
+  @apply hover:-translate-y-1 hover:ring-amber-400/40;
 }
 
 .landing-box-number {

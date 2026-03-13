@@ -1,7 +1,8 @@
 export default function RoundedBoxedTitle({ title }: { title: string }) {
   return (
-    <p className="inline-flex w-fit rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
+    <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
       {title}
-    </p>
+    </div>
   );
 }

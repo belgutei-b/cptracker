@@ -9,6 +9,7 @@ import Logo from "@/components/no-auth/Logo";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
 import type { BarChartData } from "@/types/stat";
 import Extension from "@/components/no-auth/Extension";
+import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 
 const inter = Inter({ subsets: ["latin"] });
 const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
@@ -127,12 +128,9 @@ export default async function Page() {
 
       {/* Hero */}
       <section className="landing-section-outer border-t-0!">
-        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-          Competitive programming tracker
-        </div>
+        <RoundedBoxedTitle title="Competitive programming tracker" />
 
-        <h1 className="mb-5 max-w-4xl text-5xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-[70px]">
+        <h1 className="mt-7 mb-5 max-w-4xl text-5xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-[70px]">
           Solve count is good
           <br />
           <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
@@ -347,10 +345,7 @@ export default async function Page() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {goals.map((goal) => (
-            <div
-              key={goal.number}
-              className="rounded-2xl bg-neutral-900/65 p-4 md:p-6 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40"
-            >
+            <div key={goal.number} className="landing-box">
               <div className={`${shareTechMono.className} landing-box-number`}>
                 {goal.number}
               </div>

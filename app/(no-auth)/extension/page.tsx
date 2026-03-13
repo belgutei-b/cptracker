@@ -56,9 +56,9 @@ export default function Page() {
           , this extension removes tab-switching friction while you solve.
         </p>
 
-        <article className="mt-10 feature-article">
-          <h2 className="feature-title">Why install it?</h2>
-          <p className="feature-description">
+        <article className="mt-10 landing-box">
+          <h2 className="landing-box-title">Why install it?</h2>
+          <p className="landing-box-desc">
             Stay focused on coding in LeetCode while still capturing the data
             you need for reflection and improvement. Your tracked sessions power
             CPTracker analytics like total time spent, average solve duration,
@@ -76,7 +76,7 @@ export default function Page() {
               return (
                 <div key={screen.title}>
                   <article
-                    className={`feature-article w-full md:max-w-3xl ${
+                    className={`landing-box w-full md:max-w-3xl ${
                       isLeft ? "md:mr-auto" : "md:ml-auto"
                     }`}
                   >
