@@ -30,11 +30,38 @@ function formatSeconds(seconds: number): string {
 }
 
 function formatYAxis(seconds: number): string {
-  const minutes = seconds / 60;
-  if (minutes === 0) return "0";
-  if (minutes < 60) return `${Math.round(minutes)}m`;
-  const h = minutes / 60;
-  return Number.isInteger(h) ? `${h}h` : `${h.toFixed(1)}h`;
+  const minutes = Math.round(seconds / 60);
+  return `${minutes}m`;
+}
+
+function getYAxisTicks(chartData: BarChartData[]): number[] {
+  const maxDuration = Math.max(
+    ...chartData.map((data) => data.easy + data.medium + data.hard),
+    0,
+  );
+
+  if (maxDuration === 0) {
+    return [0, 900, 1800, 2700, 3600];
+  }
+
+  const targetTickCount = 5;
+  const rawStepMinutes = Math.ceil(
+    maxDuration / 60 / (targetTickCount - 1),
+  );
+  const stepOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120];
+  const stepMinutes =
+    stepOptions.find((step) => rawStepMinutes <= step) ??
+    Math.ceil(rawStepMinutes / 60) * 60;
+  const maxTickMinutes =
+    Math.ceil(maxDuration / 60 / stepMinutes) * stepMinutes;
+
+  const ticks: number[] = [];
+
+  for (let minutes = 0; minutes <= maxTickMinutes; minutes += stepMinutes) {
+    ticks.push(minutes * 60);
+  }
+
+  return ticks;
 }
 
 export default function TotalSolveDuration({
@@ -42,88 +69,123 @@ export default function TotalSolveDuration({
   chartData,
   isLoading,
 }: Props) {
-  const barSize = numberOfDays === 7 ? 28 : numberOfDays === 14 ? 16 : 10;
+  const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 16 : 10;
+  const overviewLabel = `past ${numberOfDays} days · tried + solved`;
+  const yAxisTicks = getYAxisTicks(chartData);
+  const maxYAxisTick = yAxisTicks[yAxisTicks.length - 1] ?? 0;
 
   return (
-    <div className="bg-neutral-950 p-6 rounded-2xl border border-white/8 w-full">
+    <div className="relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
+
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">
-            {numberOfDays}-day overview
+          <p className="text-sm font-semibold tracking-tight text-white">
+            Total Time
           </p>
-          <p className="text-lg font-bold text-white">Time Spent</p>
+          <p className="mt-0.5 font-mono text-xs text-neutral-600">
+            {overviewLabel}
+          </p>
         </div>
-        <div className="flex items-center gap-4 text-[11px] font-semibold">
+
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div
-              className="w-2.5 h-2.5 rounded-sm"
+              className="h-2 w-2 rounded-full"
               style={{ backgroundColor: COLORS.Easy }}
             />
-            <span className="text-neutral-500">Easy</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Easy
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <div
-              className="w-2.5 h-2.5 rounded-sm"
+              className="h-2 w-2 rounded-full"
               style={{ backgroundColor: COLORS.Medium }}
             />
-            <span className="text-neutral-500">Medium</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Medium
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <div
-              className="w-2.5 h-2.5 rounded-sm"
+              className="h-2 w-2 rounded-full"
               style={{ backgroundColor: COLORS.Hard }}
             />
-            <span className="text-neutral-500">Hard</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Hard
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 border-l border-neutral-800 pl-3">
+          <div className="ml-1 flex items-center gap-1.5">
             <div
-              className="w-4 h-0.5 rounded-full"
+              className="h-px w-3.5"
               style={{ backgroundColor: "#ffa116" }}
             />
-            <span className="text-neutral-500">Solved</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Solved
+            </span>
           </div>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="relative h-64">
+      <div className="relative h-52">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 4, right: 16, bottom: 0, left: 0 }}
+            margin={{ top: 6, right: 12, bottom: 0, left: 0 }}
           >
             <CartesianGrid
-              strokeDasharray="0"
+              yAxisId="left"
+              strokeDasharray="3 3"
               vertical={false}
-              stroke="#1e1e20"
-              strokeWidth={1}
+              horizontalValues={yAxisTicks}
+              syncWithTicks
+              stroke="#1e1e1e"
             />
             <XAxis
               dataKey="date"
-              tick={{ fill: "#525252", fontSize: 11, fontWeight: 600 }}
+              tick={{
+                fill: "#555",
+                fontSize: 11,
+                fontWeight: 600,
+                fontFamily: "monospace",
+              }}
               axisLine={false}
               tickLine={false}
-              dy={10}
+              dy={6}
             />
             <YAxis
               yAxisId="left"
+              domain={[0, maxYAxisTick]}
+              ticks={yAxisTicks}
+              interval={0}
+              allowDecimals={false}
               tickFormatter={formatYAxis}
-              tick={{ fill: "#525252", fontSize: 10 }}
+              tick={{
+                fill: "#555",
+                fontSize: 10,
+                fontFamily: "monospace",
+              }}
               axisLine={false}
               tickLine={false}
-              width={38}
+              width={52}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fill: "#525252", fontSize: 10 }}
+              tick={{
+                fill: "#555",
+                fontSize: 10,
+                fontFamily: "monospace",
+              }}
               axisLine={false}
               tickLine={false}
               width={24}
             />
             <Tooltip
-              cursor={{ fill: "#ffffff06", radius: 6 }}
+              cursor={{ fill: "rgba(255,255,255,0.03)" }}
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
 
@@ -134,64 +196,56 @@ export default function TotalSolveDuration({
                 const easy = Number(byName.get("Easy")?.value ?? 0);
                 const medium = Number(byName.get("Medium")?.value ?? 0);
                 const hard = Number(byName.get("Hard")?.value ?? 0);
-                const total = easy + medium + hard;
                 const solved = Number(byName.get("Total Solved")?.value ?? 0);
 
                 const rows = [
-                  { label: "Easy", value: easy, color: COLORS.Easy },
-                  { label: "Medium", value: medium, color: COLORS.Medium },
-                  { label: "Hard", value: hard, color: COLORS.Hard },
-                ].filter((r) => r.value > 0);
+                  {
+                    label: "Easy",
+                    value: easy,
+                    color: COLORS.Easy,
+                    hide: true,
+                  },
+                  {
+                    label: "Medium",
+                    value: medium,
+                    color: COLORS.Medium,
+                    hide: true,
+                  },
+                  {
+                    label: "Hard",
+                    value: hard,
+                    color: COLORS.Hard,
+                    hide: true,
+                  },
+                  {
+                    label: "Total Solved",
+                    value: solved,
+                    color: "#ffa116",
+                    hide: false,
+                  },
+                ].filter((row) => !(row.hide && row.value === 0));
 
                 return (
-                  <div className="rounded-xl border border-neutral-800 bg-[#161618] px-4 py-3 shadow-2xl min-w-40">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-3">
+                  <div className="min-w-36 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-[11px] shadow-xl">
+                    <p className="mb-1.5 text-xs font-medium text-zinc-300">
                       {String(label)}
                     </p>
                     {rows.length === 0 ? (
-                      <p className="text-xs text-neutral-600">No sessions</p>
+                      <p className="leading-[1.7] text-zinc-600">No sessions</p>
                     ) : (
-                      <div className="flex flex-col gap-1.5">
+                      <div>
                         {rows.map((row) => (
-                          <div
+                          <p
                             key={row.label}
-                            className="flex items-center justify-between gap-8"
+                            className="leading-[1.7]"
+                            style={{ color: row.color }}
                           >
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-2 h-2 rounded-sm shrink-0"
-                                style={{ backgroundColor: row.color }}
-                              />
-                              <span className="text-xs text-neutral-400">
-                                {row.label}
-                              </span>
-                            </div>
-                            <span className="text-xs font-bold text-white">
-                              {formatSeconds(row.value)}
-                            </span>
-                          </div>
+                            {row.label}:{" "}
+                            {row.label === "Total Solved"
+                              ? row.value
+                              : formatSeconds(row.value)}
+                          </p>
                         ))}
-                        <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between gap-8">
-                          <span className="text-xs text-neutral-500">
-                            Total
-                          </span>
-                          <span className="text-xs font-bold text-white">
-                            {formatSeconds(total)}
-                          </span>
-                        </div>
-                        {solved > 0 && (
-                          <div className="flex items-center justify-between gap-8">
-                            <span className="text-xs text-neutral-500">
-                              Solved
-                            </span>
-                            <span
-                              className="text-xs font-bold"
-                              style={{ color: "#ffa116" }}
-                            >
-                              {solved} {solved === 1 ? "problem" : "problems"}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -233,8 +287,13 @@ export default function TotalSolveDuration({
               dataKey="problemCount"
               name="Total Solved"
               stroke="#ffa116"
-              strokeWidth={2}
-              dot={{ r: 3, fill: "#ffa116", strokeWidth: 0 }}
+              strokeWidth={2.5}
+              dot={{
+                r: 3.5,
+                fill: "#ffa116",
+                strokeWidth: 2,
+                stroke: "#09090b",
+              }}
               activeDot={{ r: 5, fill: "#ffa116", strokeWidth: 0 }}
             />
           </ComposedChart>

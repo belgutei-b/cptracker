@@ -13,13 +13,13 @@ const orbitron = Orbitron({ subsets: ["latin"] });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
 const mockChartData: BarChartData[] = [
-  { date: "Mar 6", easy: 1800, medium: 2700, hard: 0, problemCount: 3 },
-  { date: "Mar 7", easy: 0, medium: 3600, hard: 5400, problemCount: 2 },
-  { date: "Mar 8", easy: 900, medium: 1800, hard: 3600, problemCount: 3 },
-  { date: "Mar 9", easy: 1200, medium: 4500, hard: 0, problemCount: 4 },
-  { date: "Mar 10", easy: 1800, medium: 2700, hard: 4500, problemCount: 4 },
-  { date: "Mar 11", easy: 0, medium: 0, hard: 0, problemCount: 0 },
-  { date: "Mar 12", easy: 900, medium: 3600, hard: 5400, problemCount: 3 },
+  { date: "Mon", easy: 0, medium: 0, hard: 0, problemCount: 0 },
+  { date: "Tue", easy: 1800, medium: 2700, hard: 0, problemCount: 3 },
+  { date: "Wed", easy: 900, medium: 0, hard: 4500, problemCount: 2 },
+  { date: "Thu", easy: 1200, medium: 3600, hard: 0, problemCount: 4 },
+  { date: "Fri", easy: 600, medium: 1800, hard: 5400, problemCount: 3 },
+  { date: "Sat", easy: 2400, medium: 4200, hard: 3600, problemCount: 6 },
+  { date: "Sun", easy: 1500, medium: 2100, hard: 0, problemCount: 3 },
 ];
 
 export default async function Page() {
@@ -55,13 +55,12 @@ export default async function Page() {
         </div>
 
         <h1
-          className={`${spaceGrotesk.className} text-5xl font-bold leading-tight md:text-7xl max-w-3xl`}
+          className={`${spaceGrotesk.className} mb-5 max-w-5xl text-5xl font-extrabold leading-[0.93] tracking-[-0.035em] md:text-[70px]`}
         >
-          Solve count is good.
+          Solve count is good
           <br />
-          Solve count +{" "}
-          <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
-            time is better.
+          <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+            Solve count+Time is better
           </span>
         </h1>
 
@@ -76,7 +75,7 @@ export default async function Page() {
           href="/auth"
           className="mt-8 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-base font-semibold text-black bg-amber-500 transition-colors hover:bg-amber-400 shadow-[0_6px_28px_rgba(245,158,11,0.2)]"
         >
-          Start tracking for free
+          Start tracking
           <ArrowRight size={16} />
         </Link>
 
@@ -163,7 +162,9 @@ export default async function Page() {
 
       {/* Chart section */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white`}>
+        <h2
+          className={`${spaceGrotesk.className} text-3xl font-bold text-white`}
+        >
           Your time, at a glance.
         </h2>
         <p className="mt-3 text-neutral-400 max-w-xl leading-relaxed">
@@ -181,16 +182,22 @@ export default async function Page() {
 
       {/* Features section */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}>
+        <h2
+          className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}
+        >
           Built around what matters.
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
+            <div
+              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
+            >
               01
             </div>
-            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
+            <h3
+              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
+            >
               Count + time = the real picture
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -201,10 +208,14 @@ export default async function Page() {
           </div>
 
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
+            <div
+              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
+            >
               02
             </div>
-            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
+            <h3
+              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
+            >
               Every attempt counts
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -215,10 +226,14 @@ export default async function Page() {
           </div>
 
           <div className="rounded-2xl bg-neutral-900/65 p-7 ring-1 ring-white/10 backdrop-blur transition duration-300 hover:-translate-y-1 hover:ring-amber-400/40">
-            <div className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}>
+            <div
+              className={`${orbitron.className} text-5xl font-bold text-neutral-800 mb-4`}
+            >
               03
             </div>
-            <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>
+            <h3
+              className={`${spaceGrotesk.className} text-xl font-bold text-white`}
+            >
               Progress you can see
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
@@ -232,7 +247,11 @@ export default async function Page() {
 
       {/* How it works */}
       <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <h2 className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}>Zero setup.</h2>
+        <h2
+          className={`${spaceGrotesk.className} text-3xl font-bold text-white mb-10`}
+        >
+          Zero setup.
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             {
@@ -268,7 +287,11 @@ export default async function Page() {
                 >
                   {step.n}
                 </div>
-                <h3 className={`${spaceGrotesk.className} text-xl font-bold text-white`}>{step.title}</h3>
+                <h3
+                  className={`${spaceGrotesk.className} text-xl font-bold text-white`}
+                >
+                  {step.title}
+                </h3>
                 <p className="mt-3 text-sm leading-relaxed text-neutral-400">
                   {step.desc}
                 </p>
@@ -280,7 +303,9 @@ export default async function Page() {
 
       {/* Bottom CTA */}
       <section className="relative mx-auto max-w-6xl px-6 py-20 text-center border-t border-white/5">
-        <h2 className={`${spaceGrotesk.className} text-4xl font-bold text-white max-w-2xl mx-auto leading-tight`}>
+        <h2
+          className={`${spaceGrotesk.className} text-4xl font-bold text-white max-w-2xl mx-auto leading-tight`}
+        >
           Ready to see how much time you&apos;re really putting in?
         </h2>
         <p className="mt-4 text-neutral-400 max-w-lg mx-auto">
