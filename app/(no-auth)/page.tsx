@@ -119,7 +119,7 @@ export default async function Page() {
 
         <Link
           href="/auth"
-          className="landing-orange-button whitespace-nowrap px-4 py-2 text-sm"
+          className="landing-button landing-button-orange whitespace-nowrap"
         >
           Get Started
           <ArrowRight size={14} />
@@ -152,17 +152,14 @@ export default async function Page() {
           up. CPTracker gives you that for your journey.
         </p>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/auth"
-            className="landing-orange-button px-5 py-3 text-sm tracking-tight"
-          >
+        <div className="flex flex-wrap flex-col items-start md:flex-row md:items-center gap-3">
+          <Link href="/auth" className="landing-button landing-button-orange">
             Start tracking
             <ArrowRight size={16} />
           </Link>
           <Link
             href="/upcoming"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] px-5 py-3 text-sm font-medium text-zinc-400 transition-all hover:border-white/[0.14] hover:text-zinc-100"
+            className="landing-button landing-button-transparent"
           >
             Upcoming features
             <ChevronRight size={13} />
@@ -379,7 +376,7 @@ export default async function Page() {
 
             <Link
               href="/auth"
-              className="landing-orange-button relative mt-8 px-6 py-3.5 text-sm tracking-tight transition-all hover:-translate-y-px"
+              className="landing-button landing-button-orange mt-6"
             >
               Get started
               <ArrowRight size={16} />

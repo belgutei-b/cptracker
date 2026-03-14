@@ -9,14 +9,6 @@ const inter = Inter({ subsets: ["latin"] });
 
 const upcomingFeatures = [
   {
-    title: "Browser Extension (Chrome + Firefox)",
-    eta: "In Development",
-    description:
-      "Start and track problems directly on LeetCode with synced timer, quick notes, and focus mode without leaving the problem tab.",
-    progressClass: "w-3/4 bg-amber-400",
-    privacyPolicyLink: "https://www.cptracker.org/extension/privacy-policy",
-  },
-  {
     title: "Public Leaderboard",
     eta: "Planned",
     description:
@@ -38,7 +30,7 @@ export default function Page() {
 
         <Link
           href="/auth"
-          className="landing-orange-button whitespace-nowrap px-4 py-2 text-sm"
+          className="landing-button landing-button-orange whitespace-nowrap"
         >
           Get Started
           <ArrowRight size={14} />

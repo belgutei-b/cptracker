@@ -39,11 +39,6 @@ body {
   @apply bg-amber-500 hover:bg-amber-600;
 }
 
-.landing-button {
-  @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-black;
-  @apply bg-amber-500 transition-colors hover:bg-amber-400;
-}
-
 .dashboard-stat-box {
   @apply bg-[#282828] p-3 rounded-xl border border-[#3e3e3e];
 }
@@ -56,10 +51,20 @@ body {
   @apply font-bold mt-1 text-white;
 }
 
-.landing-orange-button {
-  @apply inline-flex items-center gap-2 rounded-lg font-semibold text-black;
-  @apply bg-amber-500 transition-colors hover:bg-amber-400;
+.landing-button {
+  @apply inline-flex items-center gap-2 rounded-xl font-semibold;
+  @apply px-4 py-2.5 text-sm tracking-tight transition-all;
+  @apply disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.landing-button-orange {
+  @apply bg-amber-500 hover:bg-amber-400 transition-colors text-black;
   @apply shadow-[0_6px_28px_rgba(245,158,11,0.2)];
+}
+
+.landing-button-transparent {
+  @apply border border-white/10 hover:border-white/20;
+  @apply transition-all text-neutral-300 hover:text-white;
 }
 
 .section-title {

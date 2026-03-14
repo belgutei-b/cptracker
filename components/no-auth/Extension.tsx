@@ -1,4 +1,5 @@
-import { ChevronRight } from "lucide-react";
+import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Extension() {
@@ -14,17 +15,9 @@ export default function Extension() {
 
         <div className="relative flex flex-col gap-10 p-4 md:p-10 md:flex-row md:items-center">
           <div className="flex-1">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                Chrome extension
-              </span>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-                Pending Chrome Web Store review
-              </span>
-            </div>
+            <RoundedBoxedTitle title="Chrome extension" />
 
-            <h2 className="text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white md:text-4xl">
+            <h2 className="mt-4 text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white md:text-4xl">
               Stay in the flow.
               <br />
               <span className="text-neutral-400">No more tab switching.</span>
@@ -36,10 +29,6 @@ export default function Extension() {
               interruptions.
             </p>
 
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-500">
-              It is currently pending review in the Google Chrome Web Store.
-            </p>
-
             <div className="mt-6 flex flex-col gap-3">
               {extensionHighlights.map((line) => (
                 <div key={line} className="flex items-start gap-3">
@@ -49,13 +38,24 @@ export default function Extension() {
               ))}
             </div>
 
-            <Link
-              href="/extension"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-white/20 hover:text-white"
-            >
-              See extension details
-              <ChevronRight size={14} />
-            </Link>
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mt-7 md:mt-5">
+              <Link
+                href="https://chromewebstore.google.com/detail/ojpjlobnleonmgehlhoibaicokoadcnm?utm_source=item-share-cb"
+                className="landing-button landing-button-orange"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Add extension
+                <ArrowRight size={16} />
+              </Link>
+              <Link
+                href="/extension"
+                className="landing-button landing-button-transparent"
+              >
+                View extension details
+                <ChevronRight size={14} />
+              </Link>
+            </div>
           </div>
 
           <div className="w-full shrink-0 md:w-64">

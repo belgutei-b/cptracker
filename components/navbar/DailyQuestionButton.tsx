@@ -21,7 +21,7 @@ export default function DailyQuestionButton() {
       type="button"
       onClick={handleClick}
       disabled={dailyProblemMutation.isPending}
-      className="landing-button font-normal! disabled:cursor-not-allowed disabled:opacity-50"
+      className="landing-button landing-button-orange font-normal!"
     >
       <Swords size={16} />
       Daily Question
