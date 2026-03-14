@@ -7,9 +7,9 @@ import { redirect } from "next/navigation";
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
-import type { BarChartData } from "@/types/stat";
 import Extension from "@/components/no-auth/Extension";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import type { BarChartData } from "@/types/stat";
 
 const inter = Inter({ subsets: ["latin"] });
 const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });

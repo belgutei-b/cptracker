@@ -1,9 +1,9 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Inter } from "next/font/google";
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
-import { ArrowRight } from "lucide-react";
-import { Inter, Share_Tech_Mono } from "next/font/google";
-import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
