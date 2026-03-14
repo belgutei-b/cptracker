@@ -1,8 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
+import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 const workflowScreens = [
   {
@@ -30,100 +34,103 @@ const workflowScreens = [
 
 export default function Page() {
   return (
-    <main className="relative isolate overflow-hidden bg-neutral-950 text-white min-h-dvh">
+    <main
+      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white min-h-dvh`}
+    >
       <Background />
 
-      <section className="relative mx-auto max-w-6xl px-6 mt-6 mb-10">
-        <Logo />
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
+        <Logo className="mb-0!" />
+      </div>
 
-        <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-          CPTracker Extension brings CPTracker directly into your{" "}
-          <span className="bg-linear-to-r from-amber-200 via-orange-300 to-amber-500 bg-clip-text text-transparent">
-            LeetCode workflow
+      <section className="landing-section-outer border-t-0!">
+        <RoundedBoxedTitle title="Chrome extension" />
+
+        <h1 className="mt-7 mb-5 max-w-4xl text-4xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-5xl">
+          CPTracker Extension brings CPTracker
+          <br />
+          <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+            Directly into your LeetCode flow
           </span>
         </h1>
 
-        <p className="mt-5 max-w-3xl text-base text-neutral-300 sm:text-lg">
-          If you already use{" "}
-          <Link
-            href="https://www.cptracker.org"
-            target="_blank"
-            rel="noreferrer"
-            className="text-amber-300 underline underline-offset-4 transition hover:text-amber-200"
-          >
-            cptracker.org
-          </Link>
-          , this extension removes tab-switching friction while you solve.
+        <p className="my-5 text-neutral-300 text-base sm:text-lg">
+          Removes tab-switching friction while you solve.
         </p>
 
-        <article className="mt-10 landing-box">
-          <h2 className="landing-box-title">Why install it?</h2>
-          <p className="landing-box-desc">
-            Stay focused on coding in LeetCode while still capturing the data
-            you need for reflection and improvement. Your tracked sessions power
-            CPTracker analytics like total time spent, average solve duration,
-            and progress by difficulty.
-          </p>
-        </article>
+        <div className="flex flex-wrap items-start md:flex-row md:items-center gap-3 mt-10 md:mt-20">
+          <Link
+            href="https://chromewebstore.google.com/detail/ojpjlobnleonmgehlhoibaicokoadcnm?utm_source=item-share-cb"
+            target="_blank"
+            rel="noreferrer"
+            className="landing-button landing-button-orange"
+          >
+            Install extension
+            <ArrowRight size={16} />
+          </Link>
+          <Link
+            href="/extension/privacy-policy"
+            className="landing-button landing-button-transparent"
+          >
+            Privacy policy
+            <ChevronRight size={13} />
+          </Link>
+        </div>
+      </section>
 
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white">How it flows</h2>
+      {/* Why install it */}
+      <section className="landing-section-outer">
+        <p className="landing-section-title-desc">Why install it.</p>
+        <h2 className="landing-section-title">Motivation.</h2>
+        <p className="text-neutral-300">
+          Stay focused on coding in LeetCode while still capturing the data you
+          need for reflection and improvement. Your tracked sessions power
+          CPTracker analytics like total time spent, average solve duration, and
+          progress by difficulty.
+        </p>
+      </section>
 
-          <div className="mt-5 space-y-4">
-            {workflowScreens.map((screen, index) => {
-              const isLeft = index % 2 === 0;
+      {/* How to use it */}
+      <section className="landing-section-outer">
+        <p className="landing-section-title-desc">How to use it</p>
+        <h2 className="landing-section-title">Workflow.</h2>
+        <div className="mt-5 space-y-8 md:space-y-10">
+          {workflowScreens.map((screen, index) => {
+            const isLeft = index % 2 === 0;
 
-              return (
-                <div key={screen.title}>
-                  <article
-                    className={`landing-box w-full md:max-w-3xl ${
-                      isLeft ? "md:mr-auto" : "md:ml-auto"
-                    }`}
-                  >
-                    <p className="text-xs font-semibold tracking-wide text-amber-200 uppercase">
+            return (
+              <div key={screen.title}>
+                <article
+                  className={`landing-box w-full flex flex-col md:items-center md:justify-between md:gap-10 ${
+                    isLeft ? "md:flex-row" : "md:flex-row-reverse"
+                  }`}
+                >
+                  <div className="max-w-80 md:flex-1">
+                    <p className="text-xs font-semibold tracking-wide text-amber-400 uppercase">
                       Step {index + 1}
                     </p>
-                    <h3 className="mt-2 text-lg font-bold text-white">
+                    <h3 className="mt-2 text-2xl font-bold text-white">
                       {screen.title}
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-neutral-300">
                       {screen.description}
                     </p>
+                  </div>
 
-                    <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-white/10 bg-neutral-950/80">
-                      <Image
-                        src={screen.image}
-                        alt={screen.alt}
-                        width={1800}
-                        height={1100}
-                        className="h-auto w-full object-cover"
-                      />
-                    </div>
-                  </article>
-
-                  {index < workflowScreens.length - 1 ? (
-                    <div
-                      className={`mt-3 hidden text-amber-300 md:flex ${
-                        isLeft ? "justify-end pr-10" : "justify-start pl-10"
-                      }`}
-                    >
-                      <ArrowRight
-                        className={`h-5 w-5 ${
-                          isLeft ? "rotate-90" : "-rotate-90"
-                        }`}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
+                  <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-white/10 bg-neutral-950/80 md:mt-0 md:w-110 lg:w-140 md:shrink-0">
+                    <Image
+                      src={screen.image}
+                      alt={screen.alt}
+                      width={1800}
+                      height={1100}
+                      className="h-auto w-full object-cover"
+                    />
+                  </div>
+                </article>
+              </div>
+            );
+          })}
         </div>
-
-        <p className="mt-6 text-xs text-neutral-400">
-          CPTracker Extension is an independent tool and is not affiliated with
-          or endorsed by LeetCode.
-        </p>
       </section>
     </main>
   );

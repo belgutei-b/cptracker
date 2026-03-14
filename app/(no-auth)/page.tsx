@@ -158,10 +158,10 @@ export default async function Page() {
             <ArrowRight size={16} />
           </Link>
           <Link
-            href="/upcoming"
+            href="/extension"
             className="landing-button landing-button-transparent"
           >
-            Upcoming features
+            Chrome extension
             <ChevronRight size={13} />
           </Link>
         </div>
