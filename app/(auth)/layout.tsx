@@ -1,4 +1,4 @@
-import NavbarClient from "@/components/navbar/NavbarClient";
+import Navbar from "@/components/navbar/Navbar";
 
 export default function RootLayout({
   children,
@@ -6,9 +6,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      <NavbarClient />
+    <>
+      <Navbar />
       {children}
-    </div>
+    </>
   );
 }

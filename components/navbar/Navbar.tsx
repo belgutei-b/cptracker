@@ -5,13 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-export default function NavbarClient() {
+/**
+ * Navbar for authenticated users
+ * @returns
+ */
+export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobileMenu = () => setMobileOpen(false);
 
   const navItemClass = (isActive: boolean) =>
-    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
       isActive ? "bg-[#333] text-white" : "text-gray-400 hover:text-white"
     }`;
 
@@ -28,7 +32,7 @@ export default function NavbarClient() {
           </Link>
           <div className="flex w-full justify-between">
             {/* left side */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Link
                 className={navItemClass(pathname === "/dashboard")}
                 href="/dashboard"
@@ -40,6 +44,12 @@ export default function NavbarClient() {
                 href="/analytics"
               >
                 Analytics
+              </Link>
+              <Link
+                className={navItemClass(pathname === "/extension")}
+                href="/extension"
+              >
+                Extension
               </Link>
             </div>
 
@@ -105,6 +115,13 @@ export default function NavbarClient() {
                   onClick={closeMobileMenu}
                 >
                   Analytics
+                </Link>
+                <Link
+                  className={navItemClass(pathname === "/extension")}
+                  href="/extension"
+                  onClick={closeMobileMenu}
+                >
+                  Extension
                 </Link>
                 <DailyQuestionButton />
                 <Link
