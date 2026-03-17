@@ -138,7 +138,7 @@ export async function serverFinishProblem({
         lastStartedAt: true,
       },
     });
-  } catch (_err) {
+  } catch {
     throw new HttpError(404, "Problem not found");
   }
 

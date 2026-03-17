@@ -19,7 +19,8 @@ export const googleSignIn = async () => {
 };
 
 export const githubSignIn = async () => {
-  const data = await authClient.signIn.social({
+  // const data = await authClient.signIn.social({
+  await authClient.signIn.social({
     provider: "github",
     callbackURL: "/dashboard",
   });
