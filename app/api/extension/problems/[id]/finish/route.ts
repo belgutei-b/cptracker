@@ -3,7 +3,7 @@ import { HttpError } from "@/lib/errors";
 import { serverFinishProblem } from "@/lib/problem-action";
 
 /**
- * User finish solving problem
+ * User finish solving problem, new status SOLVED | TRIED
  * @param request
  */
 export async function POST(
