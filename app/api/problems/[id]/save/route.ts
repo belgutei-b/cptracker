@@ -17,7 +17,7 @@ export async function PATCH(
 
     const body = await request.json();
 
-    const res = await serverSaveProblem({
+    await serverSaveProblem({
       userId,
       problemId,
       note: body.note,

@@ -18,9 +18,10 @@ export function serializeDates<T>(value: T): DateToString<T> {
   if (value instanceof Date) return value.toISOString() as DateToString<T>;
   if (Array.isArray(value)) return value.map(serializeDates) as DateToString<T>;
   if (value && typeof value === "object") {
-    const out: any = {};
-    for (const [k, v] of Object.entries(value as any))
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
       out[k] = serializeDates(v);
+    }
     return out as DateToString<T>;
   }
   return value as DateToString<T>;
