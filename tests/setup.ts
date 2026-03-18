@@ -12,6 +12,16 @@ export const testUser = {
   emailVerified: true,
 };
 
+export const testProblem = {
+  id: "cmmvhlad00004uw0zalksq4zq",
+  link: "https://leetcode.com/problems/two-sum",
+  title: "Two Sum",
+  titleSlug: "two-sum",
+  questionId: "1",
+  difficulty: "Easy" as const,
+  tags: ["Array", "Hash Table"],
+};
+
 /* runs before it() */
 beforeEach(async () => {
   vi.resetAllMocks();
@@ -19,6 +29,10 @@ beforeEach(async () => {
   await prisma.problem.deleteMany();
   await prisma.user.deleteMany();
   await prisma.user.create({ data: testUser });
+  await prisma.problem.create({ data: testProblem });
+  await prisma.userProblem.create({
+    data: { userId: testUser.id, problemId: testProblem.id },
+  });
 });
 
 afterAll(async () => {
