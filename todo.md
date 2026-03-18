@@ -2,23 +2,6 @@
 
 [-] add daily problem
 
-[-] post problem
-[-] leetcode graphql (on 2 problems)
-[-] daily problem
-
-status flow can be:
-any state (not solved) -> solved
-solved (can't be changed into any state)
-
-### unauthenticated user adding problem
-
-[-] adding a problem (fail)
-
-### user adding problem
-
-[-] adding a problem
-[-] adding a same problem (fail)
-
 ### testing solving flow
 
 [-] start posted problem
