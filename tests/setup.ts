@@ -1,4 +1,4 @@
-import { vi, beforeEach, afterAll, beforeAll } from "vitest";
+import { vi, beforeEach, afterAll } from "vitest";
 import { PrismaClient } from "@/prisma/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -30,9 +30,6 @@ beforeEach(async () => {
   await prisma.user.deleteMany();
   await prisma.user.create({ data: testUser });
   await prisma.problem.create({ data: testProblem });
-  await prisma.userProblem.create({
-    data: { userId: testUser.id, problemId: testProblem.id },
-  });
 });
 
 afterAll(async () => {

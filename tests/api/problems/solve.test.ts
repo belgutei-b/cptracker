@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { testUser, testProblem } from "@/tests/setup";
+import { testUser, testProblem, prisma } from "@/tests/setup";
 import { getCurrentUserId } from "@/lib/user";
 import {
   startProblem,
@@ -20,8 +20,11 @@ vi.mock("@/lib/user", () => ({
  * 4. finish to SOLVED → restart → 404
  */
 describe("Problem solving flow", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue(testUser.id);
+    await prisma.userProblem.create({
+      data: { userId: testUser.id, problemId: testProblem.id },
+    });
   });
 
   const start = () => startProblem(testProblem.id);

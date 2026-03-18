@@ -28,8 +28,11 @@ describe("PATCH /api/problems/:id/save", () => {
     spaceComplexity: "O(1)",
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue(testUser.id);
+    await prisma.userProblem.create({
+      data: { userId: testUser.id, problemId: testProblem.id },
+    });
   });
 
   const start = () => startProblem(testProblem.id);
@@ -60,7 +63,7 @@ describe("PATCH /api/problems/:id/save", () => {
 
   it("returns 400 for invalid field type", async () => {
     const res = await saveProblem(testProblem.id, {
-      note: null as any,
+      note: null as unknown as string,
       timeComplexity: "",
       spaceComplexity: "",
     });

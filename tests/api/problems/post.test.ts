@@ -1,3 +1,4 @@
+import type { NextRequest } from "next/server";
 import { vi, describe, it, expect } from "vitest";
 import { testUser, prisma } from "@/tests/setup";
 import { getCurrentUserId } from "@/lib/user";
@@ -30,7 +31,7 @@ describe("POST /api/problems", () => {
       }),
     });
 
-    const res = await POST_PROBLEM(req as any);
+    const res = await POST_PROBLEM(req as unknown as NextRequest);
     expect(res.status).toBe(401);
   });
 
@@ -42,7 +43,7 @@ describe("POST /api/problems", () => {
       body: JSON.stringify({}),
     });
 
-    const res = await POST_PROBLEM(req as any);
+    const res = await POST_PROBLEM(req as unknown as NextRequest);
     expect(res.status).toBe(400);
   });
 
@@ -56,7 +57,7 @@ describe("POST /api/problems", () => {
       }),
     });
 
-    const res = await POST_PROBLEM(req as any);
+    const res = await POST_PROBLEM(req as unknown as NextRequest);
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -83,8 +84,8 @@ describe("POST /api/problems", () => {
         }),
       });
 
-    await POST_PROBLEM(req() as any);
-    const res = await POST_PROBLEM(req() as any);
+    await POST_PROBLEM(req() as unknown as NextRequest);
+    const res = await POST_PROBLEM(req() as unknown as NextRequest);
     expect(res.status).toBe(409);
   });
 });
