@@ -2,7 +2,11 @@ import { vi, beforeEach, afterAll } from "vitest";
 import { PrismaClient } from "@/prisma/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaPg({ connectionString: process.env.DB_URL_TEST! });
+const adapter = new PrismaPg({
+  connectionString:
+    process.env.DB_URL_TEST ||
+    "postgresql://cp_user:cp_pass@localhost:5432/cp?schema=public",
+});
 export const prisma = new PrismaClient({ adapter });
 
 export const testUser = {

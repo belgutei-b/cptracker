@@ -44,6 +44,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
+      - run: npx prisma generate
       - run: npm run lint
       - run: SUPABASE_PROD_DIRECT="postgresql://cp_user:cp_pass@localhost:5432/cp" npx prisma migrate deploy
       - run: npm test
