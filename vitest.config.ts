@@ -13,6 +13,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     fileParallelism: false,
+    coverage: {
+      provider: "v8",
+      include: ["app/api/**", "lib/**"],
+    },
   },
   resolve: {
     alias: {
