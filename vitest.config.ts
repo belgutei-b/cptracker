@@ -16,6 +16,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["app/api/**", "lib/**"],
+      exclude: ["app/api/extension/**"],
     },
   },
   resolve: {
