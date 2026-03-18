@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <a href="https://cptracker.org/">
+    <img src="https://github.com/belgutei-b/cptracker/blob/main/public/favicon_io/android-chrome-512x512.png" width="140px" alt="CPTracker logo" />
+  </a>
+</p>
 
-## Getting Started
+# CPTracker
 
-First, run the development server:
+[CPTracker](https://cptracker.org) is a time-based LeetCode tracker. Solved count is a good metric — but it doesn't capture the hours you spent on a hard problem you didn't submit. Those sessions matter too. CPTracker tracks both: every session, tried or solved, adds to a total you can actually see grow. The analytics page shows your daily time breakdown by difficulty in a bar chart, so you always know if you're moving forward.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## How it works
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Sign in** with your Google or GitHub account.
+2. **Add a problem** by pasting a LeetCode problem URL — it appears in your dashboard instantly.
+3. **Start the timer** and begin solving. Write down your observations, approach, and time/space complexity as you go.
+4. **Mark it when you're done** — either Solved or Tried. Your notes and session duration are saved.
+5. **Check your analytics** — the analytics page shows a daily bar chart of time spent broken down by difficulty, so you can see exactly where your hours are going.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Chrome extension
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The [CPTracker Chrome extension](https://github.com/belgutei-b/cptracker-extension) brings CPTracker into your LeetCode workflow — no tab switching. From the popup, you can add the current problem, start and stop the timer, write notes, and mark it Tried or Solved, all without leaving LeetCode.
 
-## Learn More
+[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/ojpjlobnleonmgehlhoibaicokoadcnm?utm_source=item-share-cb)
 
-To learn more about Next.js, take a look at the following resources:
+## Technology
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+CPTracker is built with Next.js and TailwindCSS, with a PostgreSQL database accessed via Prisma ORM. Deployed on [Vercel](https://vercel.com), database hosted on [Supabase](https://supabase.com).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Licensed under the [MIT License](./LICENSE).
