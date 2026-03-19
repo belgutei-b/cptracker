@@ -2,45 +2,59 @@ import type { NextRequest } from "next/server";
 import { POST as START_PROBLEM } from "@/app/api/problems/[id]/start/route";
 import { POST as FINISH_PROBLEM } from "@/app/api/problems/[id]/finish/route";
 import { PATCH as SAVE_PROBLEM } from "@/app/api/problems/[id]/save/route";
-import { prisma, testUser } from "@/tests/setup";
+import { prisma } from "@/tests/setup";
 
-export const startProblem = (problemId: string) =>
-  START_PROBLEM(
+export function startProblem(problemId: string) {
+  return START_PROBLEM(
     new Request(`http://localhost/api/problems/${problemId}/start`, {
       method: "POST",
     }) as unknown as NextRequest,
     { params: Promise.resolve({ id: problemId }) },
   );
+}
 
-export const finishProblem = (
+export function finishProblem(
   problemId: string,
   newStatus: string,
-  { note = "", timeComplexity = "", spaceComplexity = "" } = {},
-) =>
-  FINISH_PROBLEM(
+  note = "",
+  timeComplexity = "",
+  spaceComplexity = "",
+) {
+  return FINISH_PROBLEM(
     new Request(`http://localhost/api/problems/${problemId}/finish`, {
       method: "POST",
       body: JSON.stringify({ newStatus, note, timeComplexity, spaceComplexity }),
     }) as unknown as NextRequest,
     { params: Promise.resolve({ id: problemId }) },
   );
+}
 
-export const saveProblem = (
+export function saveProblem(
   problemId: string,
-  { note = "", timeComplexity = "", spaceComplexity = "" } = {},
-) =>
-  SAVE_PROBLEM(
+  note = "",
+  timeComplexity = "",
+  spaceComplexity = "",
+) {
+  return SAVE_PROBLEM(
     new Request(`http://localhost/api/problems/${problemId}/save`, {
       method: "PATCH",
       body: JSON.stringify({ note, timeComplexity, spaceComplexity }),
     }) as unknown as NextRequest,
     { params: Promise.resolve({ id: problemId }) },
   );
+}
 
-export const getProblemStatus = (problemId: string) =>
-  prisma.userProblem
+export function getProblemStatus(userId: string, problemId: string) {
+  return prisma.userProblem
     .findFirst({
-      where: { userId: testUser.id, problemId },
+      where: { userId, problemId },
       select: { status: true },
     })
     .then((r) => r?.status);
+}
+
+export function getSolveSessions(userId: string, problemId: string) {
+  return prisma.solveSession.findMany({
+    where: { userProblem: { userId, problemId } },
+  });
+}

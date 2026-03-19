@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { testUser, testProblem, prisma } from "@/tests/setup";
+import { testUser0, testProblem0, prisma } from "@/tests/setup";
 import { getCurrentUserId } from "@/lib/user";
 import {
   startProblem,
@@ -21,16 +21,16 @@ vi.mock("@/lib/user", () => ({
  */
 describe("Problem solving flow", () => {
   beforeEach(async () => {
-    vi.mocked(getCurrentUserId).mockResolvedValue(testUser.id);
+    vi.mocked(getCurrentUserId).mockResolvedValue(testUser0.id);
     await prisma.userProblem.create({
-      data: { userId: testUser.id, problemId: testProblem.id },
+      data: { userId: testUser0.id, problemId: testProblem0.id },
     });
   });
 
-  const start = () => startProblem(testProblem.id);
+  const start = () => startProblem(testProblem0.id);
   const finish = (newStatus: string) =>
-    finishProblem(testProblem.id, newStatus);
-  const getStatus = () => getProblemStatus(testProblem.id);
+    finishProblem(testProblem0.id, newStatus);
+  const getStatus = () => getProblemStatus(testUser0.id, testProblem0.id);
 
   it("finish with invalid status returns 422, status stays IN_PROGRESS", async () => {
     const res = await start();

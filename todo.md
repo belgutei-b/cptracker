@@ -1,29 +1,27 @@
-### testing save notes api
+adding a new problem (check no new sessions are created)
+todo -> in_progress
+1 session (not finished) for the problem
 
-[-] 401 unauthenticated
+in_progress -> tried
+1 finished session for the problem
 
-[-] save nonexistent problem (400)
+update the note (make sure that there are no new session | only 1 created session)
 
-[-] save with invalid field types e.g. null note (400)
+tried -> in_progress
+2 session (finished and not finished) for the problem
 
-[-] save todo problem
-[-] check saved values persisted (note, timeComplexity, spaceComplexity)
-[-] check status unchanged (TODO)
+in_progress -> solved
+2 finished session
 
-[-] start problem
-[-] save in-progress problem
-[-] check saved values persisted
-[-] check status unchanged (IN_PROGRESS)
+make sure that the total duration fo 2 sessions is equal to total in the UserProblem
 
-[-] finish problem (TRIED)
-[-] save TRIED problem
-[-] check saved values persisted
-[-] check status unchanged (TRIED)
+update the notes on the 1st problem.
+make sure that the 2 finished session stays the same. (as updating the notes shouldn't change the session)
 
-[-] restart problem
-[-] finish problem (SOLVED)
-[-] save SOLVED problem
-[-] check saved values persisted
-[-] check status unchanged (SOLVED)
+add the 2nd problem
+todo -> in_progress
+new session for the problem and other session should be kept the same (as finished)
+in_progress -> solved
+the session should be finished for the problem.
 
-[-] overwrite: save again with different values, check new values are stored
+is the above valid for the basic testing?
