@@ -46,6 +46,7 @@ export const testProblem1 = {
 /* runs before it() */
 beforeEach(async () => {
   vi.resetAllMocks();
+  await prisma.solveSession.deleteMany();
   await prisma.userProblem.deleteMany();
   await prisma.problem.deleteMany();
   await prisma.user.deleteMany();

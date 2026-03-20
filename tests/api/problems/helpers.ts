@@ -4,28 +4,33 @@ import { POST as FINISH_PROBLEM } from "@/app/api/problems/[id]/finish/route";
 import { PATCH as SAVE_PROBLEM } from "@/app/api/problems/[id]/save/route";
 import { prisma } from "@/tests/setup";
 
-export function startProblem(problemId: string) {
+export function startProblem(userProblemId: string) {
   return START_PROBLEM(
-    new Request(`http://localhost/api/problems/${problemId}/start`, {
+    new Request(`http://localhost/api/problems/${userProblemId}/start`, {
       method: "POST",
     }) as unknown as NextRequest,
-    { params: Promise.resolve({ id: problemId }) },
+    { params: Promise.resolve({ id: userProblemId }) },
   );
 }
 
 export function finishProblem(
-  problemId: string,
+  userProblemId: string,
   newStatus: string,
   note = "",
   timeComplexity = "",
   spaceComplexity = "",
 ) {
   return FINISH_PROBLEM(
-    new Request(`http://localhost/api/problems/${problemId}/finish`, {
+    new Request(`http://localhost/api/problems/${userProblemId}/finish`, {
       method: "POST",
-      body: JSON.stringify({ newStatus, note, timeComplexity, spaceComplexity }),
+      body: JSON.stringify({
+        newStatus,
+        note,
+        timeComplexity,
+        spaceComplexity,
+      }),
     }) as unknown as NextRequest,
-    { params: Promise.resolve({ id: problemId }) },
+    { params: Promise.resolve({ id: userProblemId }) },
   );
 }
 
@@ -44,10 +49,10 @@ export function saveProblem(
   );
 }
 
-export function getProblemStatus(userId: string, problemId: string) {
+export function getProblemStatus(userId: string, userProblemId: string) {
   return prisma.userProblem
     .findFirst({
-      where: { userId, problemId },
+      where: { userId, id: userProblemId },
       select: { status: true },
     })
     .then((r) => r?.status);

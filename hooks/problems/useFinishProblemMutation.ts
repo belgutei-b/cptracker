@@ -18,19 +18,19 @@ type ProblemsQueryData = {
 };
 
 async function finishProblemApi({
-  problemId,
+  userProblemId,
   newStatus,
   note,
   timeComplexity,
   spaceComplexity,
 }: {
-  problemId: string;
+  userProblemId: string;
   newStatus: FinishStatus;
   note: string;
   timeComplexity: string;
   spaceComplexity: string;
 }) {
-  const res = await fetch(`/api/problems/${problemId}/finish`, {
+  const res = await fetch(`/api/problems/${userProblemId}/finish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -66,18 +66,19 @@ export function useFinishProblemMutation() {
           return {
             ...old,
             problems: old.problems.map((p) =>
-              p.problemId === variables.problemId
+              p.id === variables.userProblemId
                 ? {
-                  ...p,
-                  status: variables.newStatus,
-                  lastStartedAt: null,
-                  updatedAt: nowIso,
-                  solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
-                  duration: data.duration!,
-                  note: variables.note,
-                  timeComplexity: variables.timeComplexity,
-                  spaceComplexity: variables.spaceComplexity,
-                }
+                    ...p,
+                    status: variables.newStatus,
+                    lastStartedAt: null,
+                    updatedAt: nowIso,
+                    solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
+                    triedAt: variables.newStatus === "TRIED" ? nowIso : null,
+                    duration: data.duration!,
+                    note: variables.note,
+                    timeComplexity: variables.timeComplexity,
+                    spaceComplexity: variables.spaceComplexity,
+                  }
                 : p,
             ),
           };

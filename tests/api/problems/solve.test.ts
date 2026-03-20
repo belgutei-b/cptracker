@@ -20,17 +20,19 @@ vi.mock("@/lib/user", () => ({
  * 4. finish to SOLVED → restart → 404
  */
 describe("Problem solving flow", () => {
+  let userProblemId: string | null = null;
   beforeEach(async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue(testUser0.id);
-    await prisma.userProblem.create({
+    const userProblem = await prisma.userProblem.create({
       data: { userId: testUser0.id, problemId: testProblem0.id },
     });
+    userProblemId = userProblem.id;
   });
 
-  const start = () => startProblem(testProblem0.id);
+  const start = () => startProblem(userProblemId!);
   const finish = (newStatus: string) =>
-    finishProblem(testProblem0.id, newStatus);
-  const getStatus = () => getProblemStatus(testUser0.id, testProblem0.id);
+    finishProblem(userProblemId!, newStatus);
+  const getStatus = () => getProblemStatus(testUser0.id, userProblemId!);
 
   it("finish with invalid status returns 422, status stays IN_PROGRESS", async () => {
     const res = await start();

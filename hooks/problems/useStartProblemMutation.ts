@@ -10,8 +10,8 @@ type ProblemsQueryData = {
   problems: UserProblemFullClient[];
 };
 
-async function startProblemApi(problemId: string) {
-  const res = await fetch(`/api/problems/${problemId}/start`, {
+async function startProblemApi(userProblemId: string) {
+  const res = await fetch(`/api/problems/${userProblemId}/start`, {
     method: "POST",
   });
   if (!res.ok) {
@@ -27,7 +27,7 @@ export function useStartProblemMutation() {
     mutationFn: startProblemApi,
     // onMutate: for optimistic update
     // onError: if mutationFn fails
-    onSuccess: (data, problemId) => {
+    onSuccess: (data, userProblemId) => {
       queryClient.setQueryData<ProblemsQueryData | undefined>(
         queryKeys.problems,
         (old) => {
@@ -36,7 +36,7 @@ export function useStartProblemMutation() {
           return {
             ...old,
             problems: old.problems.map((p) =>
-              p.problemId === problemId
+              p.id === userProblemId
                 ? {
                     ...p,
                     status: "IN_PROGRESS",

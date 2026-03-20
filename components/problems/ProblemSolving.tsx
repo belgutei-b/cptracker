@@ -90,7 +90,7 @@ function ProblemSolvingContent({
 
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
     await finishMutation.mutateAsync({
-      problemId: problem.problemId,
+      userProblemId: problem.id,
       newStatus: isSolved ? "SOLVED" : "TRIED",
       note,
       timeComplexity,
@@ -100,7 +100,7 @@ function ProblemSolvingContent({
 
   async function handleSave() {
     await saveMutation.mutateAsync({
-      problemId: problem.problemId,
+      userProblemId: problem.id,
       note,
       timeComplexity,
       spaceComplexity,

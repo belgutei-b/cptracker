@@ -64,8 +64,8 @@ export default function ProblemList({
   );
   const nowMs = useNowTick(anyRunning);
 
-  function startProblem(problemId: string) {
-    const existing = problems.find((p) => p.problemId === problemId);
+  function startProblem(userProblemId: string, problemId: string) {
+    const existing = problems.find((p) => p.id === userProblemId);
 
     // Always open the modal
     setActiveProblemId(problemId);
@@ -74,8 +74,9 @@ export default function ProblemList({
     if (existing?.status === "IN_PROGRESS" && existing.lastStartedAt) return;
     if (existing?.status === "SOLVED") return;
 
-    startMutation.mutate(problemId);
+    startMutation.mutate(userProblemId);
   }
+
   return (
     <>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
@@ -159,7 +160,7 @@ export default function ProblemList({
               {/* BOTTOM PART */}
               <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
                 <button
-                  onClick={() => startProblem(problem.problemId)}
+                  onClick={() => startProblem(problem.id, problem.problemId)}
                   disabled={isStarting}
                   className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e] disabled:opacity-50 disabled:cursor-not-allowed"
                 >

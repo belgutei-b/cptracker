@@ -8,7 +8,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const problemId = (await params).id;
+    const userProblemId = (await params).id;
     const userId = await getCurrentUserId();
 
     if (!userId) {
@@ -19,7 +19,7 @@ export async function PATCH(
 
     await serverSaveProblem({
       userId,
-      problemId,
+      userProblemId,
       note: body.note,
       timeComplexity: body.timeComplexity,
       spaceComplexity: body.spaceComplexity,
