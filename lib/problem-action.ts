@@ -166,7 +166,7 @@ export async function serverFinishProblem({
 
   // update duration & status of the UserProblem
   const now = new Date();
-  let addSeconds: number =
+  const addSeconds: number =
     (now.getTime() - activeSession.startedAt.getTime()) / 1000;
 
   const newDuration = activeSession.userProblem.duration + addSeconds;
