@@ -13,6 +13,15 @@ const difficultyToKey: Record<Difficulty, DifficultyKey> = {
   [Difficulty.Hard]: "hard",
 };
 
+/**
+ * @returns {Promise<Array<{
+ *   date: string;
+ *   easy: number; // seconds solving easy problems
+ *   medium: number;
+ *   hard: number;
+ *   problemCount: number;
+ * }>>}
+ */
 export async function getBarChartData({
   numberOfDays,
   userId,
