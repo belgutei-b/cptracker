@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
       timezone,
     });
 
-    // return
     return NextResponse.json({ data: ret }, { status: 200 });
   } catch (error) {
     console.error("Failed to fetch bar chart data", error);

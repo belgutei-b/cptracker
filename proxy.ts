@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth } from "./lib/auth";
+import { auth, authBaseURL, extensionOrigin } from "@/lib/auth";
 
 const protectedRoutes = ["/profile", "/dashboard", "/analytics"];
 const authRoutes = ["/auth"];
+const ALLOWED_WEB_ORIGIN = new URL(authBaseURL).origin;
 
 export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
+
+  if (path.startsWith("/api/extension")) {
+    const origin = req.headers.get("origin");
+    if (origin !== extensionOrigin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
+  if (path.startsWith("/api") && !path.startsWith("/api/auth")) {
+    // origin is only sent in cross-origin requests
+    const origin = req.headers.get("origin");
+    if (origin !== null && origin !== ALLOWED_WEB_ORIGIN) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
   const isProtectedRoute = protectedRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
 
@@ -28,5 +47,5 @@ export default async function proxy(req: NextRequest) {
 
 // Routes Proxy should not run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/((?!_next/static|_next/image|.*\\.png$).*)"],
 };

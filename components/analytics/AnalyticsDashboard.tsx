@@ -133,7 +133,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Easy }}
                 />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Easy</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">
+                  Easy
+                </span>
               </div>
               <span className="font-mono text-xs font-semibold">
                 {isLoading
@@ -148,7 +150,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Medium }}
                 />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Medium</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">
+                  Medium
+                </span>
               </div>
               <span className="font-mono text-xs font-semibold">
                 {isLoading
@@ -163,7 +167,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Hard }}
                 />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Hard</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">
+                  Hard
+                </span>
               </div>
               <span className="font-mono text-xs font-semibold">
                 {isLoading
