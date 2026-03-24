@@ -74,7 +74,7 @@ export function useFinishProblemMutation() {
                     updatedAt: nowIso,
                     solvedAt: variables.newStatus === "SOLVED" ? nowIso : null,
                     triedAt: variables.newStatus === "TRIED" ? nowIso : null,
-                    duration: data.duration!,
+                    duration: Math.floor(data.duration!),
                     note: variables.note,
                     timeComplexity: variables.timeComplexity,
                     spaceComplexity: variables.spaceComplexity,
