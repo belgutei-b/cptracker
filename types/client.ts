@@ -1,4 +1,8 @@
-import type { Problem, UserProblem } from "@/prisma/generated/prisma/client";
+import type {
+  Problem,
+  SolveSession,
+  UserProblem,
+} from "@/prisma/generated/prisma/client";
 
 type DateToString<T> = T extends Date
   ? string
@@ -13,6 +17,7 @@ type DateToString<T> = T extends Date
 export type UserProblemFullServer = UserProblem & { problem: Problem };
 
 export type UserProblemFullClient = DateToString<UserProblemFullServer>;
+export type SolveSessionClient = DateToString<SolveSession>;
 
 export function serializeDates<T>(value: T): DateToString<T> {
   if (value instanceof Date) return value.toISOString() as DateToString<T>;
@@ -25,4 +30,14 @@ export function serializeDates<T>(value: T): DateToString<T> {
     return out as DateToString<T>;
   }
   return value as DateToString<T>;
+}
+
+export function deserializeSolveSession(
+  session: SolveSessionClient,
+): SolveSession {
+  return {
+    ...session,
+    startedAt: new Date(session.startedAt),
+    finishedAt: session.finishedAt ? new Date(session.finishedAt) : null,
+  };
 }
