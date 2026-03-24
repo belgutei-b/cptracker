@@ -1,8 +1,8 @@
 "use server";
 
 import { serializeDates, type UserProblemFullClient } from "@/types/client";
-import { getLeetcodeDailyProblem, getProblemData } from "./leetcode";
-import prisma from "./prisma";
+import { getLeetcodeDailyProblem, getProblemData } from "@/lib/leetcode";
+import prisma from "@/lib/prisma";
 
 async function getOrCreateProblem({
   titleSlug,
