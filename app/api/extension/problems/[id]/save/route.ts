@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { HttpError } from "@/lib/errors";
-import { serverSaveProblem } from "@/lib/problem-action";
+import { serverSaveProblem, getUserProblemId } from "@/lib/problem-action";
 
 export async function PATCH(
   request: Request,
@@ -19,10 +19,15 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
-    await serverSaveProblem({
+    const userProblemId = await getUserProblemId({
       userId: session.user.id,
       problemId,
+    });
+    const body = await request.json();
+
+    await serverSaveProblem({
+      userId: session.user.id,
+      userProblemId,
       note: body.note,
       timeComplexity: body.timeComplexity,
       spaceComplexity: body.spaceComplexity,

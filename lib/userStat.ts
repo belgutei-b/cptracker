@@ -114,7 +114,5 @@ export async function getBarChartData({
     }
   }
 
-  console.log(ret);
-
   return ret;
 }

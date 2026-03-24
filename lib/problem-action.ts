@@ -4,6 +4,27 @@ import prisma from "@/lib/prisma";
 import { HttpError } from "@/lib/errors";
 
 /**
+ * from userId and problemId
+ * get the userProblemId
+ * (helper function for the extension)
+ * (too lazy to update the extension to pass userProblemId)
+ */
+export async function getUserProblemId({
+  userId,
+  problemId,
+}: {
+  userId: string;
+  problemId: string;
+}): Promise<string> {
+  const userProblem = await prisma.userProblem.findFirst({
+    where: { userId, problemId },
+    select: { id: true },
+  });
+  if (!userProblem) throw new HttpError(404, "Problem not found");
+  return userProblem.id;
+}
+
+/**
  * Start solving a problem
  *  - create new SolveSession
  *  - if SolveSession exists, return false

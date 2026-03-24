@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { HttpError } from "@/lib/errors";
-import { serverFinishProblem } from "@/lib/problem-action";
+import { serverFinishProblem, getUserProblemId } from "@/lib/problem-action";
 
 /**
  * User finish solving problem, new status SOLVED | TRIED
@@ -23,17 +23,22 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    await serverFinishProblem({
+    const userProblemId = await getUserProblemId({
       userId: session.user.id,
       problemId,
+    });
+    const body = await request.json();
+
+    const res = await serverFinishProblem({
+      userId: session.user.id,
+      userProblemId,
       newStatus: body.newStatus,
       note: body.note,
       timeComplexity: body.timeComplexity,
       spaceComplexity: body.spaceComplexity,
     });
 
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, duration: res.duration });
   } catch (err) {
     if (err instanceof HttpError) {
       return Response.json(

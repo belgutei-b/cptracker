@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { HttpError } from "@/lib/errors";
-import { serverStartProblem } from "@/lib/problem-action";
+import { serverStartProblem, getUserProblemId } from "@/lib/problem-action";
 
 export async function POST(
   request: Request,
@@ -19,8 +19,13 @@ export async function POST(
       );
     }
 
-    const res = await serverStartProblem({
+    const userProblemId = await getUserProblemId({
+      userId: session.user.id,
       problemId,
+    });
+
+    const res = await serverStartProblem({
+      userProblemId,
       userId: session.user.id,
     });
 
