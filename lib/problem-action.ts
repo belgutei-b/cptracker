@@ -3,29 +3,69 @@
 import prisma from "@/lib/prisma";
 import { HttpError } from "@/lib/errors";
 
-export async function serverStartProblem({
+/**
+ * from userId and problemId
+ * get the userProblemId
+ * (helper function for the extension)
+ * (too lazy to update the extension to pass userProblemId)
+ */
+export async function getUserProblemId({
+  userId,
   problemId,
+}: {
+  userId: string;
+  problemId: string;
+}): Promise<string> {
+  const userProblem = await prisma.userProblem.findFirst({
+    where: { userId, problemId },
+    select: { id: true },
+  });
+  if (!userProblem) throw new HttpError(404, "Problem not found");
+  return userProblem.id;
+}
+
+/**
+ * Start solving a problem
+ *  - create new SolveSession
+ *  - if SolveSession exists, return false
+ * @returns
+ */
+export async function serverStartProblem({
+  userProblemId,
   userId,
 }: {
-  problemId: string;
+  userProblemId: string;
   userId: string;
 }) {
   if (!userId) {
     throw new HttpError(400, "userId is missing");
   }
 
-  if (!problemId) {
+  if (!userProblemId) {
     throw new HttpError(400, "problemId is missing");
+  }
+
+  // check if there is any active session
+  const activeSession = await prisma.solveSession.findFirst({
+    where: {
+      userProblemId,
+      finishedAt: null,
+    },
+  });
+  if (activeSession) {
+    throw new HttpError(409, "Already solving");
   }
 
   const now = new Date();
 
+  // make sure that problem status is either TODO or TRIED => updating the row
+  // added userId to ensure that user owns the userProblem
   const result = await prisma.userProblem.updateMany({
     where: {
       userId,
-      problemId,
+      id: userProblemId,
       status: {
-        notIn: ["SOLVED"],
+        in: ["TODO", "TRIED"],
       },
     },
     data: {
@@ -38,27 +78,35 @@ export async function serverStartProblem({
     throw new HttpError(404, "Failed to start problem");
   }
 
+  // create a new session
+  await prisma.solveSession.create({
+    data: {
+      userProblemId,
+      startedAt: now,
+    },
+  });
+
   return {
     ok: true,
-    lastStartedAt: now.toISOString(),
+    lastStartedAt: now,
   };
 }
 
 export async function serverSaveProblem({
   userId,
-  problemId,
+  userProblemId,
   note,
   timeComplexity,
   spaceComplexity,
 }: {
   userId?: string;
-  problemId?: string;
+  userProblemId?: string;
   note?: string;
   timeComplexity?: string;
   spaceComplexity?: string;
 }) {
   if (!userId) throw new HttpError(401, "userId is missing");
-  if (!problemId) throw new HttpError(400, "problemId is missing");
+  if (!userProblemId) throw new HttpError(400, "userProblemId is missing");
 
   if (
     typeof note !== "string" ||
@@ -71,7 +119,7 @@ export async function serverSaveProblem({
   const result = await prisma.userProblem.updateMany({
     where: {
       userId,
-      problemId,
+      id: userProblemId,
     },
     data: {
       note,
@@ -95,21 +143,21 @@ export async function serverSaveProblem({
  */
 export async function serverFinishProblem({
   userId,
-  problemId,
+  userProblemId,
   newStatus,
   note,
   timeComplexity,
   spaceComplexity,
 }: {
   userId?: string;
-  problemId?: string;
+  userProblemId?: string;
   newStatus?: string;
   note?: string;
   timeComplexity?: string;
   spaceComplexity?: string;
 }) {
   if (!userId) throw new HttpError(401, "userId is missing");
-  if (!problemId) throw new HttpError(400, "problemId is missing");
+  if (!userProblemId) throw new HttpError(400, "userProblemId is missing");
 
   if (!newStatus || (newStatus !== "TRIED" && newStatus !== "SOLVED")) {
     throw new HttpError(422, "Invalid status");
@@ -123,60 +171,64 @@ export async function serverFinishProblem({
     throw new HttpError(400, "Invalid field");
   }
 
-  let problem = null;
-  try {
-    problem = await prisma.userProblem.findUniqueOrThrow({
-      where: {
-        userId_problemId: {
-          userId,
-          problemId,
-        },
-        status: "IN_PROGRESS",
-      },
-      select: {
-        duration: true,
-        lastStartedAt: true,
-      },
-    });
-  } catch {
-    throw new HttpError(404, "Problem not found");
-  }
-
-  if (!problem) throw new HttpError(404, "Problem not found");
-
-  let addSeconds: number = 0;
-  const now = new Date();
-  if (problem.lastStartedAt) {
-    addSeconds += Math.floor(
-      (now.getTime() - problem.lastStartedAt.getTime()) / 1000,
-    );
-  }
-
-  const newDuration = problem.duration + addSeconds;
-
-  const result = await prisma.userProblem.updateMany({
+  // find active session
+  let activeSession = null;
+  activeSession = await prisma.solveSession.findFirst({
     where: {
-      userId,
-      problemId,
+      userProblemId: userProblemId,
+      finishedAt: null,
     },
-    data: {
-      status: newStatus,
-      duration: newDuration,
-      lastStartedAt: null,
-      solvedAt: newStatus === "SOLVED" ? now : null,
-      triedAt: newStatus === "TRIED" ? now : null,
-      note,
-      timeComplexity,
-      spaceComplexity,
+    select: {
+      userProblem: true,
+      startedAt: true,
     },
   });
+  if (!activeSession) throw new HttpError(404, "active session not found");
 
-  if (result.count === 0) {
-    throw new HttpError(400, "Failed to finish problem");
-  }
+  // update duration & status of the UserProblem
+  const now = new Date();
+  const sessionDuration: number =
+    (now.getTime() - activeSession.startedAt.getTime()) / 1000;
+
+  const newTotalDuration = activeSession.userProblem.duration + sessionDuration;
+
+  // rollback if either query throws an error
+  await prisma.$transaction(async (tx) => {
+    const result0 = await tx.userProblem.updateMany({
+      where: {
+        userId,
+        id: userProblemId,
+      },
+      data: {
+        status: newStatus,
+        duration: newTotalDuration,
+        lastStartedAt: null,
+        solvedAt: newStatus === "SOLVED" ? now : null,
+        triedAt: newStatus === "TRIED" ? now : null,
+        note,
+        timeComplexity,
+        spaceComplexity,
+      },
+    });
+    if (result0.count === 0)
+      throw new HttpError(400, "Failed to finish problem");
+
+    const result1 = await tx.solveSession.updateMany({
+      where: {
+        userProblemId,
+        finishedAt: null,
+      },
+      data: {
+        finishedAt: now,
+        duration: sessionDuration,
+      },
+    });
+    if (result1.count === 0)
+      throw new HttpError(400, "Failed to finish problem");
+  });
 
   return {
     ok: true,
-    duration: newDuration,
+    duration: newTotalDuration,
   };
 }

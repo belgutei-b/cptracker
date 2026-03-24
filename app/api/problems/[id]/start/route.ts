@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const problemId = (await params).id;
+    const userProblemId = (await params).id;
 
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -18,7 +18,7 @@ export async function POST(
 
     const res = await serverStartProblem({
       userId,
-      problemId,
+      userProblemId,
     });
 
     return NextResponse.json({ ok: true, lastStartedAt: res.lastStartedAt });

@@ -15,17 +15,17 @@ type ProblemsQueryData = {
 };
 
 async function saveProblemApi({
-  problemId,
+  userProblemId,
   note,
   timeComplexity,
   spaceComplexity,
 }: {
-  problemId: string;
+  userProblemId: string;
   note: string;
   timeComplexity: string;
   spaceComplexity: string;
 }) {
-  const res = await fetch(`/api/problems/${problemId}/save`, {
+  const res = await fetch(`/api/problems/${userProblemId}/save`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -58,7 +58,7 @@ export function useSaveProblemMutation() {
           return {
             ...old,
             problems: old.problems.map((p) =>
-              p.problemId === variables.problemId
+              p.id === variables.userProblemId
                 ? {
                     ...p,
                     updatedAt: nowIso,

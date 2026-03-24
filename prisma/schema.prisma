@@ -37,7 +37,7 @@ model User {
   name          String
   emailVerified Boolean   @default(false)
   image         String?
-  timezone      String?
+  timezone      String?   @db.VarChar(50)
   sessions      Session[]
   accounts      Account[]
 
@@ -58,12 +58,13 @@ model Problem {
 }
 
 model UserProblem {
+  id              String @id @default(cuid())
   userId          String
   problemId       String
   status          Status @default(TODO)
-  note            String @default("")
-  timeComplexity  String @default("")
-  spaceComplexity String @default("")
+  note            String @default("") @db.VarChar(5000)
+  timeComplexity  String @default("") @db.VarChar(100)
+  spaceComplexity String @default("") @db.VarChar(100)
 
   user    User    @relation(fields: [userId], references: [id])
   problem Problem @relation(fields: [problemId], references: [id])
@@ -76,7 +77,19 @@ model UserProblem {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
 
-  @@id([userId, problemId])
+  solveSessions SolveSession[]
+
+  @@unique([userId, problemId])
+}
+
+model SolveSession {
+  id            String      @id @default(cuid())
+  userProblemId String
+  userProblem   UserProblem @relation(fields: [userProblemId], references: [id])
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  duration   Int       @default(0)
 }
 
 model Session {

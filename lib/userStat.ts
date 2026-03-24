@@ -1,6 +1,6 @@
 "use server";
 
-import { Difficulty, Status } from "@/prisma/generated/prisma/enums";
+import { Difficulty } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 import type { BarChartData } from "@/types/stat";
 import { DateTime } from "luxon";
@@ -13,6 +13,15 @@ const difficultyToKey: Record<Difficulty, DifficultyKey> = {
   [Difficulty.Hard]: "hard",
 };
 
+/**
+ * @returns {Promise<Array<{
+ *   date: string;
+ *   easy: number; // seconds solving easy problems
+ *   medium: number;
+ *   hard: number;
+ *   problemCount: number;
+ * }>>}
+ */
 export async function getBarChartData({
   numberOfDays,
   userId,
@@ -29,54 +38,46 @@ export async function getBarChartData({
     .startOf("day")
     .toJSDate();
 
-  const end = DateTime.now().setZone(timezone).endOf("day").toJSDate();
-
-  const rows = await prisma.userProblem.findMany({
+  const solvedProblems = await prisma.userProblem.findMany({
     where: {
       userId,
+      solvedAt: { gte: start },
+    },
+    select: { solvedAt: true },
+  });
+
+  const rows = await prisma.solveSession.findMany({
+    where: {
+      userProblem: {
+        userId: userId,
+      },
       OR: [
+        { finishedAt: null },
         {
-          solvedAt: {
+          finishedAt: {
             gte: start,
-            lte: end,
           },
-          status: "SOLVED",
-        },
-        {
-          triedAt: {
-            gte: start,
-            lte: end,
-          },
-          status: "TRIED",
-        },
-        {
-          status: "IN_PROGRESS",
         },
       ],
     },
-    select: {
-      status: true,
-      duration: true,
-      solvedAt: true,
-      triedAt: true,
-      lastStartedAt: true,
-      updatedAt: true,
-      problem: {
-        select: {
-          difficulty: true,
+    include: {
+      userProblem: {
+        include: {
+          problem: true,
         },
       },
     },
   });
 
   const ret: BarChartData[] = [];
-  const now = DateTime.now().setZone(timezone);
 
+  const now = DateTime.now().setZone(timezone);
   for (let i = numberOfDays - 1; i >= 0; i--) {
     const idx = numberOfDays - 1 - i;
 
+    // between start and end of the day
     const day = now.minus({ days: i });
-    const startOfDayJS = day.startOf("day").toJSDate();
+    const startOfDayJs = day.startOf("day").toJSDate();
     const endOfDayJS = day.endOf("day").toJSDate();
 
     ret.push({
@@ -87,37 +88,28 @@ export async function getBarChartData({
       problemCount: 0,
     });
 
+    // number of solved problems
+    ret[idx].problemCount = solvedProblems.filter(
+      (p) => p.solvedAt! >= startOfDayJs && p.solvedAt! < endOfDayJS,
+    ).length;
+
+    // sessions
     for (const row of rows) {
-      /* IN_PROGRESS */
-      if (row.status === Status.IN_PROGRESS && i === 0) {
-        const difficulty: Difficulty = row.problem.difficulty;
-        const key = difficultyToKey[difficulty];
-        ret[idx][key] += row.duration;
-      }
+      const difficulty: Difficulty = row.userProblem.problem.difficulty;
+      const key = difficultyToKey[difficulty];
 
-      /* TRIED */
-      if (
-        row.status === Status.TRIED &&
-        row.triedAt &&
-        startOfDayJS <= row.triedAt &&
-        row.triedAt <= endOfDayJS
-      ) {
-        const difficulty: Difficulty = row.problem.difficulty;
-        const key = difficultyToKey[difficulty];
-        ret[idx][key] += row.duration;
-      }
+      const finishedAt = row.finishedAt ?? new Date();
 
-      /* SOLVED */
-      if (
-        row.status === Status.SOLVED &&
-        row.solvedAt &&
-        startOfDayJS <= row.solvedAt &&
-        row.solvedAt <= endOfDayJS
-      ) {
-        const difficulty: Difficulty = row.problem.difficulty;
-        const key = difficultyToKey[difficulty];
-        ret[idx][key] += row.duration;
-        ret[idx].problemCount += 1;
+      // on day, start and beginning
+      const newStart =
+        row.startedAt > startOfDayJs ? row.startedAt : startOfDayJs;
+      const newEnd = finishedAt < endOfDayJS ? finishedAt : endOfDayJS;
+
+      // adding number of seconds between [newStart, newEnd]
+      if (newEnd > newStart) {
+        ret[idx][key] += Math.floor(
+          (newEnd.getTime() - newStart.getTime()) / 1000,
+        );
       }
     }
   }

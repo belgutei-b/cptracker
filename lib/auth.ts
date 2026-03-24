@@ -2,17 +2,22 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 
-// const prisma = new PrismaClient();
+export const extensionOrigin =
+  process.env.NODE_ENV === "development"
+    ? "chrome-extension://dmlmlnablbjnmlblnffnlgplnjecjhdo"
+    : "chrome-extension://ojpjlobnleonmgehlhoibaicokoadcnm";
+
+export const authBaseURL =
+  process.env.NODE_ENV !== "production"
+    ? (process.env.BETTER_AUTH_URL_DEV ?? "http://localhost:3000")
+    : (process.env.BETTER_AUTH_URL_PROD ?? "https://www.cptracker.org");
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  // todo: support only specific extension id
-  trustedOrigins: ["chrome-extension://*"],
-  baseURL:
-    process.env.NODE_ENV !== "production"
-      ? (process.env.BETTER_AUTH_URL_DEV ?? "http://localhost:3000")
-      : (process.env.BETTER_AUTH_URL_PROD ?? "https://www.cptracker.org"),
+  trustedOrigins: [extensionOrigin],
+  baseURL: authBaseURL,
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,

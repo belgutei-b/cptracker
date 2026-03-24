@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const problemId = (await params).id;
+    const userProblemId = (await params).id;
     const userId = await getCurrentUserId();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -17,7 +17,7 @@ export async function POST(
     const body = await request.json();
     const res = await serverFinishProblem({
       userId,
-      problemId,
+      userProblemId,
       newStatus: body.newStatus,
       note: body.note,
       timeComplexity: body.timeComplexity,

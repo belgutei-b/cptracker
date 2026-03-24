@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { testUser, testProblem, prisma } from "@/tests/setup";
+import { testUser0, testProblem0, prisma } from "@/tests/setup";
 import { getCurrentUserId } from "@/lib/user";
 
 import {
@@ -28,20 +28,29 @@ describe("PATCH /api/problems/:id/save", () => {
     spaceComplexity: "O(1)",
   };
 
+  let userProblemId: string | null = null;
   beforeEach(async () => {
-    vi.mocked(getCurrentUserId).mockResolvedValue(testUser.id);
-    await prisma.userProblem.create({
-      data: { userId: testUser.id, problemId: testProblem.id },
+    vi.mocked(getCurrentUserId).mockResolvedValue(testUser0.id);
+    const userProblem = await prisma.userProblem.create({
+      data: { userId: testUser0.id, problemId: testProblem0.id },
     });
+    userProblemId = userProblem.id;
   });
 
-  const start = () => startProblem(testProblem.id);
-  const finish = (newStatus: string) => finishProblem(testProblem.id, newStatus);
-  const save = (fields = NOTES) => saveProblem(testProblem.id, fields);
+  const start = () => startProblem(userProblemId!);
+  const finish = (newStatus: string) =>
+    finishProblem(userProblemId!, newStatus);
+  const save = (fields = NOTES) =>
+    saveProblem(
+      userProblemId!,
+      fields.note,
+      fields.timeComplexity,
+      fields.spaceComplexity,
+    );
 
   const getRow = () =>
     prisma.userProblem.findFirst({
-      where: { userId: testUser.id, problemId: testProblem.id },
+      where: { userId: testUser0.id, problemId: testProblem0.id },
       select: {
         status: true,
         note: true,
@@ -62,11 +71,12 @@ describe("PATCH /api/problems/:id/save", () => {
   });
 
   it("returns 400 for invalid field type", async () => {
-    const res = await saveProblem(testProblem.id, {
-      note: null as unknown as string,
-      timeComplexity: "",
-      spaceComplexity: "",
-    });
+    const res = await saveProblem(
+      userProblemId!,
+      null as unknown as string,
+      "",
+      "",
+    );
     expect(res.status).toBe(400);
   });
 

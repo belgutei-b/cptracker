@@ -85,12 +85,22 @@ function ProblemSolvingContent({
   const [spaceComplexity, setSpaceComplexity] = useState(
     problem.spaceComplexity ?? "",
   );
+  const [savedValues, setSavedValues] = useState({
+    note: problem.note ?? "",
+    timeComplexity: problem.timeComplexity ?? "",
+    spaceComplexity: problem.spaceComplexity ?? "",
+  });
   const finishMutation = useFinishProblemMutation();
   const saveMutation = useSaveProblemMutation();
 
+  const hasChanges =
+    note !== savedValues.note ||
+    timeComplexity !== savedValues.timeComplexity ||
+    spaceComplexity !== savedValues.spaceComplexity;
+
   async function handleFinish({ isSolved }: { isSolved: boolean }) {
     await finishMutation.mutateAsync({
-      problemId: problem.problemId,
+      userProblemId: problem.id,
       newStatus: isSolved ? "SOLVED" : "TRIED",
       note,
       timeComplexity,
@@ -100,11 +110,12 @@ function ProblemSolvingContent({
 
   async function handleSave() {
     await saveMutation.mutateAsync({
-      problemId: problem.problemId,
+      userProblemId: problem.id,
       note,
       timeComplexity,
       spaceComplexity,
     });
+    setSavedValues({ note, timeComplexity, spaceComplexity });
   }
 
   const isTimerRunning =
@@ -238,7 +249,7 @@ function ProblemSolvingContent({
 
         {(problem.status !== "SOLVED" || canSave) && (
           <div className="border-t border-[#3e3e3e] flex items-center justify-end gap-2 p-4">
-            {problem.status !== "SOLVED" && (
+            {problem.status !== "SOLVED" && problem.status !== "TRIED" && (
               <>
                 <button
                   onClick={() => handleFinish({ isSolved: false })}
@@ -256,10 +267,10 @@ function ProblemSolvingContent({
                 </button>
               </>
             )}
-            {canSave && (
+            {(canSave || problem.status === "TRIED") && (
               <button
                 onClick={handleSave}
-                disabled={isSaving || isFinishing}
+                disabled={isSaving || isFinishing || !hasChanges}
                 className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? "Updating..." : "Update notes"}
