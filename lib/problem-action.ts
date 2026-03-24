@@ -166,10 +166,10 @@ export async function serverFinishProblem({
 
   // update duration & status of the UserProblem
   const now = new Date();
-  const addSeconds: number =
+  const sessionDuration: number =
     (now.getTime() - activeSession.startedAt.getTime()) / 1000;
 
-  const newDuration = activeSession.userProblem.duration + addSeconds;
+  const newTotalDuration = activeSession.userProblem.duration + sessionDuration;
 
   // rollback if either query throws an error
   await prisma.$transaction(async (tx) => {
@@ -180,7 +180,7 @@ export async function serverFinishProblem({
       },
       data: {
         status: newStatus,
-        duration: newDuration,
+        duration: newTotalDuration,
         lastStartedAt: null,
         solvedAt: newStatus === "SOLVED" ? now : null,
         triedAt: newStatus === "TRIED" ? now : null,
@@ -199,7 +199,7 @@ export async function serverFinishProblem({
       },
       data: {
         finishedAt: now,
-        duration: addSeconds,
+        duration: sessionDuration,
       },
     });
     if (result1.count === 0)
@@ -208,6 +208,6 @@ export async function serverFinishProblem({
 
   return {
     ok: true,
-    duration: newDuration,
+    duration: newTotalDuration,
   };
 }

@@ -11,6 +11,7 @@ import {
 } from "@/tests/setup";
 import { insertSolveSession, getBarChart } from "@/tests/api/analytics/helpers";
 
+// all tests are written in UTC
 function dateAt(daysAgo: number, hour: number): Date {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
@@ -166,8 +167,8 @@ describe("Basic /analytics/bar-chart", () => {
 
   it("unfinished solveSession started yesterday", async () => {
     // session started yesterday at 20:00, still running
-    // yesterday's contribution: 20:00 → midnight = 4h = 14400s (deterministic)
-    // today's contribution: midnight → now (non-deterministic, assert > 0)
+    // yesterday's contribution: 20:00 → midnight (around 4h = 14400s | giving 10second window)
+    // today's contribution: midnight → now (assert > 0)
     await insertSolveSession(user0Problem0Id, dateAt(1, 20), null, null);
 
     const rows = await getBarChart();
@@ -185,11 +186,14 @@ describe("Basic /analytics/bar-chart", () => {
     }
 
     expect(rows[5]).toMatchObject({
-      easy: 14400,
       medium: 0,
       hard: 0,
       problemCount: 0,
     });
+    // giving 10 seconds gap
+    expect(rows[5].easy).toBeGreaterThan(14390);
+    expect(rows[5].easy).toBeLessThan(14410);
+
     expect(rows[6].easy).toBeGreaterThan(0);
   });
 
