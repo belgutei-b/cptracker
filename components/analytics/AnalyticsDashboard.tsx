@@ -108,11 +108,12 @@ export default function AnalyticsDashboard() {
           numberOfDays={numberOfDays}
           chartData={chartData}
           isLoading={isLoading}
+          variant="card"
         />
 
         <div className="bg-[#282828] w-100 p-6 rounded-2xl border border-[#3e3e3e] shadow-xl text-white">
-          <p className="text-lg font-bold">Total Time</p>
-          <p className="text-xs uppercase tracking-widest text-gray-500 mt-1">
+          <p className="text-sm font-semibold tracking-tight">Total Time</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-gray-500 mt-1">
             {getRangeLabel(numberOfDays)}
           </p>
 
@@ -120,7 +121,7 @@ export default function AnalyticsDashboard() {
             <p className="text-3xl font-extrabold text-[#ffa116]">
               {isLoading ? "Loading..." : formatDuration(totalSeconds)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="font-mono text-xs text-gray-500 mt-2">
               {isLoading ? "" : `${totalSolved} problems solved`}
             </p>
           </div>
@@ -132,9 +133,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Easy }}
                 />
-                <span className="text-gray-300">Easy</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Easy</span>
               </div>
-              <span className="font-semibold">
+              <span className="font-mono text-xs font-semibold">
                 {isLoading
                   ? "--"
                   : formatDuration(totalSecondsByDifficulty.easy)}
@@ -147,9 +148,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Medium }}
                 />
-                <span className="text-gray-300">Medium</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Medium</span>
               </div>
-              <span className="font-semibold">
+              <span className="font-mono text-xs font-semibold">
                 {isLoading
                   ? "--"
                   : formatDuration(totalSecondsByDifficulty.medium)}
@@ -162,9 +163,9 @@ export default function AnalyticsDashboard() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: DIFFICULTY_COLORS.Hard }}
                 />
-                <span className="text-gray-300">Hard</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-300">Hard</span>
               </div>
-              <span className="font-semibold">
+              <span className="font-mono text-xs font-semibold">
                 {isLoading
                   ? "--"
                   : formatDuration(totalSecondsByDifficulty.hard)}

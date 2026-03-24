@@ -18,14 +18,18 @@ type Props = {
   numberOfDays: AnalyticsRangeDays;
   chartData: BarChartData[];
   isLoading: boolean;
+  variant?: "dark" | "card";
 };
 
 function formatSeconds(seconds: number): string {
-  const totalMinutes = Math.round(seconds / 60);
-  if (totalMinutes === 0) return "0m";
-  if (totalMinutes < 60) return `${totalMinutes}m`;
-  const h = Math.floor(totalMinutes / 60);
-  const m = totalMinutes % 60;
+  if (seconds < 3600) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m === 0) return `${s}s`;
+    return s === 0 ? `${m}m` : `${m}m ${s}s`;
+  }
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
@@ -45,9 +49,7 @@ function getYAxisTicks(chartData: BarChartData[]): number[] {
   }
 
   const targetTickCount = 5;
-  const rawStepMinutes = Math.ceil(
-    maxDuration / 60 / (targetTickCount - 1),
-  );
+  const rawStepMinutes = Math.ceil(maxDuration / 60 / (targetTickCount - 1));
   const stepOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120];
   const stepMinutes =
     stepOptions.find((step) => rawStepMinutes <= step) ??
@@ -68,14 +70,20 @@ export default function TotalSolveDuration({
   numberOfDays,
   chartData,
   isLoading,
+  variant = "dark",
 }: Props) {
   const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 16 : 10;
   const overviewLabel = `past ${numberOfDays} days · tried + solved`;
   const yAxisTicks = getYAxisTicks(chartData);
   const maxYAxisTick = yAxisTicks[yAxisTicks.length - 1] ?? 0;
 
+  const containerClass =
+    variant === "card"
+      ? "relative w-full overflow-hidden rounded-2xl border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
+      : "relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5";
+
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
+    <div className={containerClass}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       {/* Header */}
@@ -147,7 +155,7 @@ export default function TotalSolveDuration({
             <XAxis
               dataKey="date"
               tick={{
-                fill: "#555",
+                fill: variant === "card" ? "#d1d5db" : "#555",
                 fontSize: 11,
                 fontWeight: 600,
                 fontFamily: "monospace",
@@ -164,8 +172,9 @@ export default function TotalSolveDuration({
               allowDecimals={false}
               tickFormatter={formatYAxis}
               tick={{
-                fill: "#555",
-                fontSize: 10,
+                fill: variant === "card" ? "#d1d5db" : "#555",
+                fontSize: 11,
+                fontWeight: 600,
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -176,7 +185,7 @@ export default function TotalSolveDuration({
               yAxisId="right"
               orientation="right"
               tick={{
-                fill: "#555",
+                fill: variant === "card" ? "#d1d5db" : "#555",
                 fontSize: 10,
                 fontFamily: "monospace",
               }}
