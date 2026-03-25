@@ -58,7 +58,7 @@ export function getProblemStatus(userId: string, userProblemId: string) {
     .then((r) => r?.status);
 }
 
-export function getSolveSessions(userId: string, problemId: string) {
+export function getSolveSessionsFromDB(userId: string, problemId: string) {
   return prisma.solveSession.findMany({
     where: { userProblem: { userId, problemId } },
   });
