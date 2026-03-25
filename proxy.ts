@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth, authBaseURL, extensionOrigin } from "@/lib/auth";
 
-const protectedRoutes = ["/profile", "/dashboard", "/analytics"];
+const protectedRoutes = ["/profile", "/dashboard"];
 const authRoutes = ["/auth"];
 const ALLOWED_WEB_ORIGIN = new URL(authBaseURL).origin;
 

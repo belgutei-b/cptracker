@@ -66,7 +66,7 @@ function getYAxisTicks(chartData: BarChartData[]): number[] {
   return ticks;
 }
 
-export default function TotalSolveDuration({
+export default function TotalTimeBarChart({
   numberOfDays,
   chartData,
   isLoading,
@@ -79,7 +79,7 @@ export default function TotalSolveDuration({
 
   const containerClass =
     variant === "card"
-      ? "relative w-full overflow-hidden rounded-2xl border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
+      ? "relative w-full overflow-hidden border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
       : "relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5";
 
   return (
@@ -138,7 +138,7 @@ export default function TotalSolveDuration({
       </div>
 
       {/* Chart */}
-      <div className="relative h-52">
+      <div className="relative h-60">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
