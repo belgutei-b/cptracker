@@ -6,7 +6,7 @@ const currEnv = process.env.NODE_ENV;
 const url =
   currEnv === "production"
     ? process.env.SUPABASE_PROD_URL
-    : process.env.SUPABASE_DEV_URL;
+    : process.env.DB_URL_DEV;
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
