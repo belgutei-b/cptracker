@@ -23,7 +23,7 @@ export default function DashboardMain({
       <div className="flex justify-between items-center">
         <div>
           <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
-          <div className="text-gray-400 mb-5">
+          <div className="text-gray-300 mb-5">
             Keep track of your leetcode progress and efficiency.
           </div>
         </div>
