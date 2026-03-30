@@ -1,32 +1,30 @@
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 import { ArrowRight, ChevronRight } from "lucide-react";
+import { Share_Tech_Mono } from "next/font/google";
 import Link from "next/link";
+
+const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
 
 const dataCategories = [
   {
     title: "Personally identifiable information",
-    description:
-      "We process account-level profile data associated with your CPTracker account, such as user ID and username/email when available, only to identify your account and sync your problem tracking data.",
+    desc: "We process account-level profile data associated with your CPTracker account, such as user ID and username/email when available, only to identify your account and sync your problem tracking data.",
   },
   {
     title: "Authentication information",
-    description:
-      "We use your existing cptracker.org authenticated session state to authorize extension requests. We do not collect passwords or PINs in the extension popup.",
+    desc: "We use your existing cptracker.org authenticated session state to authorize extension requests. We do not collect passwords or PINs in the extension popup.",
   },
   {
     title: "Web history",
-    description:
-      "When you open the extension popup, we read the active tab URL only to confirm it is a LeetCode problem page and connect that problem to your CPTracker account.",
+    desc: "When you open the extension popup, we read the active tab URL only to confirm it is a LeetCode problem page and connect that problem to your CPTracker account.",
   },
   {
     title: "Website content",
-    description:
-      "We process the LeetCode problem link (URL/hyperlink) as website resource content so your timer, notes, and status updates are saved for the correct problem.",
+    desc: "We process the LeetCode problem link (URL/hyperlink) as website resource content so your timer, notes, and status updates are saved for the correct problem.",
   },
   {
     title: "How data is used?",
-    description:
-      "We do not sell user data. We do not use user data for advertising. We only use these data categories to power extension features such as problem linking, timer actions, notes updates, and analytics sync with cptracker.org.",
+    desc: "We do not sell user data. We do not use user data for advertising. We only use these data categories to power extension features such as problem linking, timer actions, notes updates, and analytics sync with cptracker.org.",
   },
 ];
 
@@ -81,14 +79,13 @@ export default function ExtensionPrivacyBody({ isAuth }: { isAuth: boolean }) {
       </section>
 
       <div className="landing-section-outer md:mt-10 grid gap-5">
-        {dataCategories.map((category) => (
+        {dataCategories.map((category, i) => (
           <article key={category.title} className="group landing-box">
-            <h2 className="landing-box-title capitalize text-amber-400!">
-              {category.title}
-            </h2>
-            <p className="landing-box-desc text-neutral-300!">
-              {category.description}
-            </p>
+            <div className={`${shareTechMono.className} landing-box-number`}>
+              0{i + 1}
+            </div>
+            <h3 className="landing-box-title">{category.title}</h3>
+            <p className="landing-box-desc mt-3">{category.desc}</p>
           </article>
         ))}
       </div>
