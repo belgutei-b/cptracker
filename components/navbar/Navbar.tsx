@@ -7,7 +7,6 @@ import { useState } from "react";
 
 /**
  * Navbar for authenticated users
- * @returns
  */
 export default function Navbar() {
   const pathname = usePathname();
@@ -46,8 +45,8 @@ export default function Navbar() {
                 Analytics
               </Link>
               <Link
-                className={navItemClass(pathname === "/extension")}
-                href="/extension"
+                className={navItemClass(pathname.startsWith("/extension-auth"))}
+                href="/extension-auth"
               >
                 Extension
               </Link>
@@ -117,8 +116,10 @@ export default function Navbar() {
                   Analytics
                 </Link>
                 <Link
-                  className={navItemClass(pathname === "/extension")}
-                  href="/extension"
+                  className={navItemClass(
+                    pathname.startsWith("/extension-auth"),
+                  )}
+                  href="/extension-auth"
                   onClick={closeMobileMenu}
                 >
                   Extension
