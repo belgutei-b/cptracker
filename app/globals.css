@@ -100,3 +100,79 @@ body {
 .landing-box-desc {
   @apply text-sm leading-relaxed text-zinc-500;
 }
+
+.problem-note-markdown {
+  @apply rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-2 text-xs leading-5 text-gray-200;
+}
+
+.problem-note-markdown > :first-child {
+  margin-top: 0;
+}
+
+.problem-note-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.problem-note-markdown h1 {
+  @apply mb-3 text-base font-semibold text-white;
+}
+
+.problem-note-markdown h2 {
+  @apply mb-3 text-sm font-semibold text-white;
+}
+
+.problem-note-markdown h3 {
+  @apply mb-3 text-[13px] font-semibold text-white;
+}
+
+.problem-note-markdown h4,
+.problem-note-markdown h5,
+.problem-note-markdown h6,
+.problem-note-markdown p,
+.problem-note-markdown ul,
+.problem-note-markdown ol,
+.problem-note-markdown pre,
+.problem-note-markdown blockquote {
+  @apply mb-3;
+}
+
+.problem-note-markdown ul,
+.problem-note-markdown ol {
+  @apply pl-5;
+}
+
+.problem-note-markdown ul {
+  list-style: disc;
+}
+
+.problem-note-markdown ol {
+  list-style: decimal;
+}
+
+.problem-note-markdown li + li {
+  margin-top: 1px;
+}
+
+.problem-note-markdown a {
+  @apply text-sky-300 hover:text-sky-200;
+}
+
+.problem-note-markdown blockquote {
+  @apply border-l-2 border-stone-600 pl-3 text-stone-300;
+}
+
+.problem-note-markdown code {
+  @apply rounded bg-[#2a2a2a] px-1 py-0.5 font-mono text-[11px] text-stone-100;
+}
+
+.problem-note-markdown pre {
+  @apply overflow-x-auto rounded-lg border border-[#3e3e3e] bg-[#181818] p-3;
+}
+
+.problem-note-markdown pre code {
+  @apply bg-transparent p-0;
+}
+
+.problem-note-markdown hr {
+  @apply my-3 border-0 border-t border-[#3e3e3e];
+}

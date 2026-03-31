@@ -1,8 +1,9 @@
 "use client";
 
+import Markdown from "markdown-to-jsx";
 import Link from "next/link";
 import localFont from "next/font/local";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { ExternalLink, CheckCircle, X } from "lucide-react";
 
 import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
@@ -20,6 +21,23 @@ const timerFont = localFont({
     },
   ],
 });
+
+type ProblemNoteMode = "edit" | "preview";
+
+const DEFAULT_NOTE_HEIGHT = 160;
+
+const PROBLEM_NOTE_MARKDOWN_OPTIONS = {
+  disableParsingRawHTML: true,
+  wrapper: Fragment,
+  overrides: {
+    a: {
+      props: {
+        target: "_blank",
+        rel: "noreferrer",
+      },
+    },
+  },
+};
 
 function formatProblemTimer(totalMs: number) {
   const safeMs = Math.max(0, Math.floor(totalMs));
@@ -79,6 +97,8 @@ function ProblemSolvingContent({
   onCloseAction: () => void;
 }) {
   const [note, setNote] = useState(problem.note ?? "");
+  const [noteMode, setNoteMode] = useState<ProblemNoteMode>("edit");
+  const [noteHeight, setNoteHeight] = useState(DEFAULT_NOTE_HEIGHT);
   const [timeComplexity, setTimeComplexity] = useState(
     problem.timeComplexity ?? "",
   );
@@ -90,6 +110,7 @@ function ProblemSolvingContent({
     timeComplexity: problem.timeComplexity ?? "",
     spaceComplexity: problem.spaceComplexity ?? "",
   });
+  const noteTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const finishMutation = useFinishProblemMutation();
   const saveMutation = useSaveProblemMutation();
 
@@ -129,6 +150,24 @@ function ProblemSolvingContent({
   const canSave = problem.status === "SOLVED";
   const isFinishing = finishMutation.isPending;
   const isSaving = saveMutation.isPending;
+
+  useEffect(() => {
+    if (noteMode !== "edit") return;
+
+    const textarea = noteTextareaRef.current;
+    if (!textarea) return;
+
+    const syncHeight = () => {
+      setNoteHeight(textarea.offsetHeight || DEFAULT_NOTE_HEIGHT);
+    };
+
+    syncHeight();
+
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(textarea);
+
+    return () => observer.disconnect();
+  }, [noteMode]);
 
   return (
     <div
@@ -240,11 +279,63 @@ function ProblemSolvingContent({
             </div>
           </div>
 
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="text-sm rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-2 text-gray-200 w-full h-40"
-          />
+          <div>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-300">
+                Notes
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setNoteMode((currentMode) =>
+                    currentMode === "edit" ? "preview" : "edit",
+                  )
+                }
+                aria-pressed={noteMode === "preview"}
+                aria-label={
+                  noteMode === "preview"
+                    ? "Back to notes editor"
+                    : "Preview notes as markdown"
+                }
+                title={
+                  noteMode === "preview"
+                    ? "Back to editor"
+                    : "Preview markdown"
+                }
+                className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-400 transition-all duration-150 ${
+                  noteMode === "preview"
+                    ? "border-stone-500 bg-stone-700"
+                    : "border-[#3e3e3e] hover:border-stone-500"
+                }`}
+              >
+                Markdown
+              </button>
+            </div>
+
+            {noteMode === "edit" ? (
+              <textarea
+                ref={noteTextareaRef}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Write notes (Markdown is supported)"
+                style={{ height: noteHeight }}
+                className="w-full resize-y overflow-auto rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-2 text-xs leading-5 text-gray-200 placeholder:text-stone-600"
+              />
+            ) : (
+              <div
+                className="problem-note-markdown overflow-auto"
+                style={{ height: noteHeight }}
+              >
+                {note.trim() ? (
+                  <Markdown options={PROBLEM_NOTE_MARKDOWN_OPTIONS}>
+                    {note}
+                  </Markdown>
+                ) : (
+                  <p className="text-stone-400">Nothing to preview yet.</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {(problem.status !== "SOLVED" || canSave) && (
