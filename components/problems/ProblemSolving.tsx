@@ -66,15 +66,6 @@ export default function ProblemSolving({
   problem: UserProblemFullClient | null;
   nowMs: number;
 }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseAction();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onCloseAction]);
-
   if (!open || !problem) return null;
 
   return (
@@ -151,6 +142,22 @@ function ProblemSolvingContent({
   const isFinishing = finishMutation.isPending;
   const isSaving = saveMutation.isPending;
 
+  async function handleClose() {
+    if (isSaving || isFinishing) return;
+
+    if (hasChanges) {
+      // if mutation fails, the notes will be lost
+      saveMutation.mutate({
+        userProblemId: problem.id,
+        note,
+        timeComplexity,
+        spaceComplexity,
+      });
+    }
+
+    onCloseAction();
+  }
+
   useEffect(() => {
     if (noteMode !== "edit") return;
 
@@ -169,6 +176,27 @@ function ProblemSolvingContent({
     return () => observer.disconnect();
   }, [noteMode]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        void handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    hasChanges,
+    isFinishing,
+    isSaving,
+    note,
+    onCloseAction,
+    problem.id,
+    saveMutation,
+    spaceComplexity,
+    timeComplexity,
+  ]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -178,7 +206,8 @@ function ProblemSolvingContent({
     >
       <button
         className="absolute inset-0 bg-black/60"
-        onClick={onCloseAction}
+        onClick={() => void handleClose()}
+        disabled={isSaving || isFinishing}
         aria-label="Close modal"
       />
 
@@ -228,7 +257,8 @@ function ProblemSolvingContent({
           </div>
 
           <button
-            onClick={onCloseAction}
+            onClick={() => void handleClose()}
+            disabled={isSaving || isFinishing}
             className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
           >
             <X size={24} />
@@ -298,9 +328,7 @@ function ProblemSolvingContent({
                     : "Preview notes as markdown"
                 }
                 title={
-                  noteMode === "preview"
-                    ? "Back to editor"
-                    : "Preview markdown"
+                  noteMode === "preview" ? "Back to editor" : "Preview markdown"
                 }
                 className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-400 transition-all duration-150 ${
                   noteMode === "preview"

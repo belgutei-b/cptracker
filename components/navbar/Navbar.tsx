@@ -39,12 +39,6 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <Link
-                className={navItemClass(pathname === "/analytics")}
-                href="/analytics"
-              >
-                Analytics
-              </Link>
-              <Link
                 className={navItemClass(pathname.startsWith("/extension-auth"))}
                 href="/extension-auth"
               >
@@ -107,13 +101,6 @@ export default function Navbar() {
                   onClick={closeMobileMenu}
                 >
                   Dashboard
-                </Link>
-                <Link
-                  className={navItemClass(pathname === "/analytics")}
-                  href="/analytics"
-                  onClick={closeMobileMenu}
-                >
-                  Analytics
                 </Link>
                 <Link
                   className={navItemClass(

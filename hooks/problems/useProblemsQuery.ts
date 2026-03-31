@@ -14,9 +14,15 @@ async function fetchProblems() {
   return { problems: data.problems, timezone: data.timezone };
 }
 
+/**
+ * refetches after window focus (including tabs).
+ */
 export function useProblemsQuery() {
   return useQuery({
     queryKey: queryKeys.problems,
     queryFn: fetchProblems,
+    // 5 mins stale time
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: "always",
   });
 }
