@@ -16,10 +16,11 @@ export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   if (path.startsWith("/api/extension")) {
-    const origin = req.headers.get("origin");
-    if (origin !== extensionOrigin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    // TODO: after extension gets updated in web store, uncomment
+    // const origin = req.headers.get("origin");
+    // if (origin !== extensionOrigin) {
+    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // }
     return NextResponse.next();
   }
 

@@ -2,10 +2,11 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 
-export const extensionOrigin =
-  process.env.NODE_ENV === "development"
-    ? "chrome-extension://dmlmlnablbjnmlblnffnlgplnjecjhdo"
-    : "chrome-extension://ojpjlobnleonmgehlhoibaicokoadcnm";
+export const extensionOrigin = "chrome-extension://*";
+// export const extensionOrigin =
+//   process.env.NODE_ENV === "development"
+//     ? "chrome-extension://dmlmlnablbjnmlblnffnlgplnjecjhdo"
+//     : "chrome-extension://ojpjlobnleonmgehlhoibaicokoadcnm";
 
 export const authBaseURL =
   process.env.NODE_ENV !== "production"
