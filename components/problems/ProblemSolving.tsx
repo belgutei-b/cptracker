@@ -3,7 +3,7 @@
 import Markdown from "markdown-to-jsx";
 import Link from "next/link";
 import localFont from "next/font/local";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ExternalLink, CheckCircle, X } from "lucide-react";
 
 import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
@@ -142,7 +142,7 @@ function ProblemSolvingContent({
   const isFinishing = finishMutation.isPending;
   const isSaving = saveMutation.isPending;
 
-  async function handleClose() {
+  const handleClose = useCallback(async () => {
     if (isSaving || isFinishing) return;
 
     if (hasChanges) {
@@ -156,7 +156,17 @@ function ProblemSolvingContent({
     }
 
     onCloseAction();
-  }
+  }, [
+    hasChanges,
+    isFinishing,
+    isSaving,
+    note,
+    onCloseAction,
+    problem.id,
+    saveMutation,
+    spaceComplexity,
+    timeComplexity,
+  ]);
 
   useEffect(() => {
     if (noteMode !== "edit") return;
@@ -185,17 +195,7 @@ function ProblemSolvingContent({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [
-    hasChanges,
-    isFinishing,
-    isSaving,
-    note,
-    onCloseAction,
-    problem.id,
-    saveMutation,
-    spaceComplexity,
-    timeComplexity,
-  ]);
+  }, [handleClose]);
 
   return (
     <div
