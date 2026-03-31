@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth, authBaseURL, extensionOrigin } from "@/lib/auth";
+import { auth, authBaseURL } from "@/lib/auth";
 
 const protectedRoutes = [
   "/profile",

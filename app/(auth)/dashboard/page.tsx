@@ -35,7 +35,11 @@ export default function Page() {
   }, []);
 
   if (isError) {
-    return <div>Error fetching problems</div>;
+    return (
+      <div className="text-lg text-white pl-3 pt-3">
+        Error fetching problems
+      </div>
+    );
   }
 
   return (
