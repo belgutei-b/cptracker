@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
-import TotalSolveDuration from "@/components/analytics/TotalSolveDuration";
+import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";
 import Extension from "@/components/no-auth/Extension";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 import type { BarChartData } from "@/types/stat";
@@ -268,7 +268,7 @@ export default async function Page() {
         <p className="landing-section-title-desc">Analytics</p>
         <h2 className="landing-section-title">Your time, at a glance.</h2>
 
-        <TotalSolveDuration
+        <TotalTimeBarChart
           numberOfDays={7}
           chartData={landingChartData}
           isLoading={false}
