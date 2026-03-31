@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth, authBaseURL, extensionOrigin } from "@/lib/auth";
 
-const protectedRoutes = ["/profile", "/dashboard"];
+const protectedRoutes = [
+  "/profile",
+  "/dashboard",
+  "/analytics",
+  "/extension-auth",
+  "/extension-auth/privacy-policy",
+];
 const authRoutes = ["/auth"];
 const ALLOWED_WEB_ORIGIN = new URL(authBaseURL).origin;
 
@@ -33,7 +39,7 @@ export default async function proxy(req: NextRequest) {
     headers: await headers(),
   });
 
-  // 4. Redirect to /login if the user is not authenticated
+  // Redirect to /login if the user is not authenticated
   if (isProtectedRoute && !session?.session) {
     return NextResponse.redirect(new URL("/auth", req.nextUrl));
   }

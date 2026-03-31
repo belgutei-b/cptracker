@@ -76,7 +76,7 @@ body {
 }
 
 .landing-section-title {
-  @apply mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px];
+  @apply mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px] text-white;
 }
 
 .landing-section-outer {

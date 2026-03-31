@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle, ExternalLink, Clock, Play } from "lucide-react";
+import {
+  MoveUpRight,
+  CheckCircle,
+  ExternalLink,
+  Clock,
+  Play,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 import ProblemSolving from "@/components/problems/ProblemSolving";
@@ -75,6 +81,30 @@ export default function ProblemList({
     if (existing?.status === "SOLVED") return;
 
     startMutation.mutate(userProblemId);
+  }
+
+  if (filteredProblems.length === 0) {
+    if (problems.length === 0) {
+      return (
+        <div className="relative flex justify-center min-h-screen border border-dashed border-stone-500">
+          <MoveUpRight
+            className="hidden md:block absolute top-2 right-2 text-gray-300 rotate-10"
+            size={160}
+          />
+          <div className="flex flex-col mt-40">
+            <p className="text-xl text-white font-bold">Welcome to CPTracker</p>
+            <p className="text-gray-300 text-sm relative z-10">
+              Add problems and they&apos;ll show up here.
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center justify-center min-h-50">
+        <p className="text-gray-500 text-sm">No problems match your filters</p>
+      </div>
+    );
   }
 
   return (

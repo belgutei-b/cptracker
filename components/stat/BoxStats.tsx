@@ -19,7 +19,7 @@ export default function BoxStats({
 
   return (
     <div>
-      <div className="text-lg text-white font-bold mb-4">
+      <div className="text-lg text-white font-bold mb-2">
         Solved problems stat
       </div>
       <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-5 w-80">
