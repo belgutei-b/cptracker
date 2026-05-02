@@ -44,6 +44,12 @@ export default function Navbar() {
               >
                 Extension
               </Link>
+              <Link
+                className={navItemClass(pathname.startsWith("/analytics"))}
+                href="/analytics"
+              >
+                Analytics
+              </Link>
             </div>
 
             {/* right side */}
@@ -101,6 +107,13 @@ export default function Navbar() {
                   onClick={closeMobileMenu}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  className={navItemClass(pathname === "/analytics")}
+                  href="/analytics"
+                  onClick={closeMobileMenu}
+                >
+                  Analytics
                 </Link>
                 <Link
                   className={navItemClass(

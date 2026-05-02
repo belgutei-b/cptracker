@@ -73,6 +73,7 @@ export default function TotalTimeBarChart({
   variant = "dark",
 }: Props) {
   const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 16 : 10;
+  const xTickInterval = numberOfDays === 7 ? 0 : numberOfDays === 14 ? 1 : 3;
   const overviewLabel = `past ${numberOfDays} days · tried + solved`;
   const yAxisTicks = getYAxisTicks(chartData);
   const maxYAxisTick = yAxisTicks[yAxisTicks.length - 1] ?? 0;
@@ -154,6 +155,7 @@ export default function TotalTimeBarChart({
             />
             <XAxis
               dataKey="date"
+              interval={xTickInterval}
               tick={{
                 fill: variant === "card" ? "#d1d5db" : "#555",
                 fontSize: 11,
