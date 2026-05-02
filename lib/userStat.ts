@@ -2,127 +2,13 @@
 
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
-import type { BarChartData } from "@/types/stat";
 import { DateTime } from "luxon";
-import { Prisma, UserProblem } from "@/prisma/generated/prisma/client";
-import { Diff } from "lucide-react";
-
-type DifficultyKey = keyof Pick<BarChartData, "easy" | "medium" | "hard">;
-
-const difficultyToKey: Record<Difficulty, DifficultyKey> = {
-  [Difficulty.Easy]: "easy",
-  [Difficulty.Medium]: "medium",
-  [Difficulty.Hard]: "hard",
-};
+import { Prisma } from "@/prisma/generated/prisma/client";
 
 function difficultyToIndex(difficulty: Difficulty) {
   if (difficulty === "Easy") return 0;
   if (difficulty === "Medium") return 1;
   else return 2;
-}
-
-/**
- * @returns {Promise<Array<{
- *   date: string;
- *   easy: number; // seconds solving easy problems
- *   medium: number;
- *   hard: number;
- *   problemCount: number;
- * }>>}
- */
-export async function getBarChartData({
-  numberOfDays,
-  userId,
-  timezone,
-}: {
-  numberOfDays: number;
-  userId: string;
-  timezone: string;
-}): Promise<BarChartData[]> {
-  /* computing the start time in user timezone and then converting to UTC */
-  const start = DateTime.now()
-    .setZone(timezone)
-    .minus({ days: numberOfDays - 1 })
-    .startOf("day")
-    .toJSDate();
-
-  const solvedProblems = await prisma.userProblem.findMany({
-    where: {
-      userId,
-      solvedAt: { gte: start },
-    },
-    select: { solvedAt: true },
-  });
-
-  const rows = await prisma.solveSession.findMany({
-    where: {
-      userProblem: {
-        userId: userId,
-      },
-      OR: [
-        { finishedAt: null },
-        {
-          finishedAt: {
-            gte: start,
-          },
-        },
-      ],
-    },
-    include: {
-      userProblem: {
-        include: {
-          problem: true,
-        },
-      },
-    },
-  });
-
-  const ret: BarChartData[] = [];
-
-  const now = DateTime.now().setZone(timezone);
-  for (let i = numberOfDays - 1; i >= 0; i--) {
-    const idx = numberOfDays - 1 - i;
-
-    // between start and end of the day
-    const day = now.minus({ days: i });
-    const startOfDayJs = day.startOf("day").toJSDate();
-    const endOfDayJS = day.endOf("day").toJSDate();
-
-    ret.push({
-      date: day.toFormat("yyyy LLL dd"),
-      easy: 0,
-      medium: 0,
-      hard: 0,
-      problemCount: 0,
-    });
-
-    // number of solved problems
-    ret[idx].problemCount = solvedProblems.filter(
-      (p) => p.solvedAt! >= startOfDayJs && p.solvedAt! < endOfDayJS,
-    ).length;
-
-    // sessions
-    for (const row of rows) {
-      const difficulty: Difficulty = row.userProblem.problem.difficulty;
-      const key = difficultyToKey[difficulty];
-
-      const finishedAt = row.finishedAt ?? new Date();
-
-      // on day, start and beginning
-      const newStart =
-        row.startedAt > startOfDayJs ? row.startedAt : startOfDayJs;
-      const newEnd = finishedAt < endOfDayJS ? finishedAt : endOfDayJS;
-
-      // adding number of seconds between [newStart, newEnd]
-      if (newEnd > newStart) {
-        ret[idx][key] += Math.floor(
-          (newEnd.getTime() - newStart.getTime()) / 1000,
-        );
-      }
-    }
-  }
-
-  return ret;
 }
 
 export type AvgSolveTime = {
@@ -166,12 +52,12 @@ function tagsData({ problems }: { problems: UserProblemWithProblem[] }) {
   const topicsMap = new Map<string, TopicRadarEntry>();
 
   // TODO: use only solved problems
-  for (let problem of problems) {
+  for (const problem of problems) {
     // TODO: the below if statment should be removed
     // once it iterates in solved problems
     if (problem.status !== "SOLVED") continue;
 
-    for (let topic of problem.problem.tags) {
+    for (const topic of problem.problem.tags) {
       let topicEntry = topicsMap.get(topic);
       if (!topicEntry) {
         // new entry — each topic gets its own entries array
@@ -236,7 +122,7 @@ export async function getBarChartDataV2({
   });
 
   const avgSolveTime = new Array<AvgSolveTime>();
-  for (let difficulty of Object.values(Difficulty)) {
+  for (const difficulty of Object.values(Difficulty)) {
     const difficultyStat: AvgSolveTime = {
       difficulty,
       duration: 0,
@@ -244,7 +130,7 @@ export async function getBarChartDataV2({
       comparisonToLastWeek: 0,
     };
 
-    for (let solvedProblem of solvedProblems) {
+    for (const solvedProblem of solvedProblems) {
       if (solvedProblem.problem.difficulty === difficulty) {
         difficultyStat.duration += solvedProblem.duration;
         difficultyStat.numberOfSolved += 1;
@@ -287,15 +173,13 @@ export async function getBarChartDataV2({
 
   const dailyBarChart = new Array<BarChartColumn>();
   for (let i = query.numberOfDays - 1; i >= 0; i--) {
-    const idx = query.numberOfDays - 1 - i;
-
     // between start and end of the day
     const day = now.minus({ days: i });
     const startOfDayJs = day.startOf("day").toJSDate();
     const endOfDayJS = day.endOf("day").toJSDate();
 
     const dayStats = new Array<StatEntry>();
-    for (let difficulty of Object.values(Difficulty)) {
+    for (const difficulty of Object.values(Difficulty)) {
       dayStats.push({
         difficulty,
         duration: 0,
@@ -305,7 +189,7 @@ export async function getBarChartDataV2({
     }
 
     // updating numberOfSolved
-    for (let problem of problems) {
+    for (const problem of problems) {
       if (
         problem.solvedAt &&
         startOfDayJs <= problem.solvedAt &&
@@ -319,7 +203,7 @@ export async function getBarChartDataV2({
     }
 
     // updating duration
-    for (let session of sessions) {
+    for (const session of sessions) {
       // Either has finishedAt or currently running
       const finishedAt = session.finishedAt ?? new Date();
 
