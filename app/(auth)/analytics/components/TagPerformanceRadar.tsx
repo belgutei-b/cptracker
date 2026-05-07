@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { TopicRadarEntry } from "@/lib/userStat";
+import type { TopicRadarEntry } from "@/types/analytics";
 
 const ACCENT = "#ffa116";
 

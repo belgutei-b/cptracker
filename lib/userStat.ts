@@ -3,46 +3,19 @@
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 import { DateTime } from "luxon";
-import { Prisma } from "@/prisma/generated/prisma/client";
+import type {
+  AvgSolveTime,
+  StatEntry,
+  BarChartColumn,
+  TopicRadarEntry,
+  UserProblemWithProblem,
+} from "@/types/analytics";
 
 function difficultyToIndex(difficulty: Difficulty) {
   if (difficulty === "Easy") return 0;
   if (difficulty === "Medium") return 1;
   else return 2;
 }
-
-export type AvgSolveTime = {
-  difficulty: Difficulty;
-  duration: number;
-  numberOfSolved: number;
-  // x% up compared to last week
-  comparisonToLastWeek: number;
-};
-
-export type StatEntry = {
-  difficulty: Difficulty;
-  duration: number;
-  numberOfSolved: number;
-  durationPercentageComparison: number;
-};
-
-export type BarChartColumn = {
-  date: string;
-  entries: StatEntry[];
-};
-
-export type TopicRadarEntry = {
-  topic: string;
-  numberOfSolved: number;
-  durationPercentageComparison: number;
-  entries: StatEntry[];
-};
-
-type UserProblemWithProblem = Prisma.UserProblemGetPayload<{
-  include: {
-    problem: true;
-  };
-}>;
 
 // return top 8 topics for charts
 
@@ -94,6 +67,34 @@ function tagsData({ problems }: { problems: UserProblemWithProblem[] }) {
   return topics.slice(0, 8);
 }
 
+function getAvgSolveTime({
+  solvedProblemsThisWeek,
+  solvedProblemsLastWeek,
+}: {
+  solvedProblemsThisWeek: UserProblemWithProblem[];
+  solvedProblemsLastWeek: UserProblemWithProblem[];
+}): AvgSolveTime[] {
+  const avgSolveTime = new Array<AvgSolveTime>();
+  for (const difficulty of Object.values(Difficulty)) {
+    const difficultyStat: AvgSolveTime = {
+      difficulty,
+      duration: 0,
+      numberOfSolved: 0,
+      comparisonToPreviousTimeline: 0,
+    };
+
+    for (const solvedProblem of solvedProblemsThisWeek) {
+      if (solvedProblem.problem.difficulty === difficulty) {
+        difficultyStat.duration += solvedProblem.duration;
+        difficultyStat.numberOfSolved += 1;
+      }
+    }
+    avgSolveTime.push(difficultyStat);
+  }
+
+  return avgSolveTime;
+}
+
 export async function getBarChartDataV2({
   query,
 }: {
@@ -111,7 +112,13 @@ export async function getBarChartDataV2({
     .startOf("day")
     .toJSDate();
 
-  const solvedProblems = await prisma.userProblem.findMany({
+  // used for speed comparison to previous timeline
+  const previousTimelineStart = now
+    .minus({ days: query.numberOfDays * 2 - 1 })
+    .startOf("day")
+    .toJSDate();
+
+  const solvedProblemsThisWeek = await prisma.userProblem.findMany({
     where: {
       userId: query.userId,
       solvedAt: { gte: start },
@@ -121,23 +128,24 @@ export async function getBarChartDataV2({
     },
   });
 
-  const avgSolveTime = new Array<AvgSolveTime>();
-  for (const difficulty of Object.values(Difficulty)) {
-    const difficultyStat: AvgSolveTime = {
-      difficulty,
-      duration: 0,
-      numberOfSolved: 0,
-      comparisonToLastWeek: 0,
-    };
+  const solvedProblemsLastWeek = await prisma.userProblem.findMany({
+    where: {
+      userId: query.userId,
+      solvedAt: {
+        gte: previousTimelineStart,
+        lt: start,
+      },
+    },
+    include: {
+      problem: true,
+    },
+  });
 
-    for (const solvedProblem of solvedProblems) {
-      if (solvedProblem.problem.difficulty === difficulty) {
-        difficultyStat.duration += solvedProblem.duration;
-        difficultyStat.numberOfSolved += 1;
-      }
-    }
-    avgSolveTime.push(difficultyStat);
-  }
+  // 1. Average solve time of each difficulty
+  const avgSolveTime = getAvgSolveTime({
+    solvedProblemsThisWeek,
+    solvedProblemsLastWeek,
+  });
 
   // 2. current total time on each day bar chart
   // return [{

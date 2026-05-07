@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { TopicRadarEntry } from "@/lib/userStat";
+import type { TopicRadarEntry } from "@/types/analytics";
 
 type Props = {
   data: TopicRadarEntry[];
@@ -52,9 +52,7 @@ function buildRows(data: TopicRadarEntry[]): Row[] {
       const totalSolved = entries.reduce((s, e) => s + e.numberOfSolved, 0);
       const totalDurationSec = entries.reduce((s, e) => s + e.duration, 0);
       const avgMin =
-        totalSolved > 0
-          ? Math.round(totalDurationSec / totalSolved / 60)
-          : 0;
+        totalSolved > 0 ? Math.round(totalDurationSec / totalSolved / 60) : 0;
       const sumAvgMin = segments.reduce((s, seg) => s + seg.avgMin, 0);
       return { topic: t.topic, segments, totalSolved, avgMin, sumAvgMin };
     })

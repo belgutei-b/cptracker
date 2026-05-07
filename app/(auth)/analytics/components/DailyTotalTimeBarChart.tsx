@@ -1,5 +1,5 @@
 import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { BarChartColumn } from "@/lib/userStat";
+import type { BarChartColumn } from "@/types/analytics";
 import type { BarChartData } from "@/types/stat";
 import type { AnalyticsRangeDays } from "@/constants/analytics";
 import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";

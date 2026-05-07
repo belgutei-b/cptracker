@@ -1,6 +1,6 @@
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { AvgSolveTime } from "@/lib/userStat";
+import type { AvgSolveTime } from "@/types/analytics";
 
 type Props = {
   data: AvgSolveTime[];
