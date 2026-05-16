@@ -8,7 +8,7 @@ type LegalPageProps = {
 
 export default function LegalPage({ content }: LegalPageProps) {
   return (
-    <main className="min-h-dvh bg-neutral-950 text-white">
+    <main className="min-h-dvh text-white">
       <div className="mx-auto max-w-3xl px-6 py-8 md:py-12">
         <header className="mb-16">
           <div className="mb-12 flex items-center justify-between gap-4">
