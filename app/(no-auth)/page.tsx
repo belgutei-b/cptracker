@@ -4,7 +4,6 @@ import { Inter, Share_Tech_Mono } from "next/font/google";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";
 import Extension from "@/components/no-auth/Extension";
@@ -109,9 +108,8 @@ export default async function Page() {
 
   return (
     <main
-      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white`}
+      className={`${inter.className} overflow-hidden text-white`}
     >
-      <Background />
 
       {/* Nav */}
       <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">

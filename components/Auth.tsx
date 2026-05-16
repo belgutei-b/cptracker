@@ -16,14 +16,14 @@ export default function Auth() {
   };
 
   return (
-    <div className="bg-neutral-900 flex flex-col items-center justify-center p-6 text-center mt-20">
-      <div className="mb-8 p-4 bg-neutral-800 rounded-full shadow-[0_0_50px_-12px_rgba(255,161,22,0.5)]">
+    <div className="flex flex-col items-center justify-center p-6 text-center mt-20">
+      <div className="mb-8 rounded-full bg-neutral-900/70 p-4 shadow-[0_0_50px_-12px_rgba(255,161,22,0.5)] backdrop-blur">
         <Brain size={64} className="text-amber-500" />
       </div>
       <h1 className="text-5xl font-bold mb-8 tracking-tight text-white">
         CP <span className="text-amber-500">Tracker</span>
       </h1>
-      <div className="bg-neutral-800 p-8 rounded-2xl border border-neutral-600 w-full max-w-md shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-neutral-600 bg-neutral-900/70 p-8 shadow-2xl backdrop-blur">
         <h2 className="text-lg font-semibold mb-6 text-white">
           Start Tracking Your Progress
         </h2>

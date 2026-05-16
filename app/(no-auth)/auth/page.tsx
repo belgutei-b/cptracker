@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default async function Page() {
   return (
-    <>
+    <div className="min-h-screen">
       <div className="mx-auto max-w-6xl px-6 pt-6 pb-4">
         <Link
           href="/"
@@ -15,6 +15,6 @@ export default async function Page() {
       </div>
       <div className="w-full border-b border-neutral-700" />
       <Auth />
-    </>
+    </div>
   );
 }
