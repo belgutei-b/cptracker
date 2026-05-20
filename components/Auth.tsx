@@ -1,6 +1,7 @@
 "use client";
 import { Brain } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { githubSignIn, googleSignIn } from "@/lib/auth-client";
 import styles from "./Auth.module.css";
 
@@ -17,9 +18,6 @@ export default function Auth() {
 
   return (
     <div className="flex flex-col items-center justify-center p-6 text-center mt-20">
-      <div className="mb-8 rounded-full bg-neutral-900/70 p-4 shadow-[0_0_50px_-12px_rgba(255,161,22,0.5)] backdrop-blur">
-        <Brain size={64} className="text-amber-500" />
-      </div>
       <h1 className="text-5xl font-bold mb-8 tracking-tight text-white">
         CP <span className="text-amber-500">Tracker</span>
       </h1>
@@ -92,6 +90,24 @@ export default function Auth() {
             </div>
           </button>
         </div>
+        <p className="mt-5 text-xs leading-5 text-neutral-400 font-medium">
+          By continuing, you agree to CPTracker&rsquo;s{" "}
+          <Link
+            href="/terms"
+            className="font-medium text-amber-500 hover:text-amber-400"
+          >
+            Terms of Service
+          </Link>{" "}
+          <br />
+          and{" "}
+          <Link
+            href="/privacy"
+            className="font-medium text-amber-500 hover:text-amber-400"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );
