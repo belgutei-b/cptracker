@@ -1,7 +1,4 @@
-import Logo from "@/components/no-auth/Logo";
-import Link from "next/link";
 import type { LegalPageContent } from "./legal-content";
-import { ArrowRight } from "lucide-react";
 
 type LegalPageProps = {
   content: LegalPageContent;
