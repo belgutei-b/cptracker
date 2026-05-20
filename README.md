@@ -26,6 +26,14 @@ The [CPTracker Chrome extension](https://github.com/belgutei-b/cptracker-extensi
 
 CPTracker is built with Next.js and TailwindCSS, with a PostgreSQL database. Deployed on [Vercel](https://vercel.com) and database hosted on [Supabase](https://supabase.com).
 
+## Tests
+
+To apply migrations in test db, use
+
+```
+SUPABASE_PROD_DIRECT="postgresql://cp_user:cp_pass@localhost:5432/cp?schema=public" npx prisma migrate deploy
+```
+
 ## License
 
 Licensed under the [MIT License](./LICENSE).

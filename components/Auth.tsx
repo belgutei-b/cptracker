@@ -1,6 +1,6 @@
 "use client";
-import { Brain } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { githubSignIn, googleSignIn } from "@/lib/auth-client";
 import styles from "./Auth.module.css";
 
@@ -16,14 +16,11 @@ export default function Auth() {
   };
 
   return (
-    <div className="bg-neutral-900 flex flex-col items-center justify-center p-6 text-center mt-20">
-      <div className="mb-8 p-4 bg-neutral-800 rounded-full shadow-[0_0_50px_-12px_rgba(255,161,22,0.5)]">
-        <Brain size={64} className="text-amber-500" />
-      </div>
+    <div className="flex flex-col items-center justify-center p-6 text-center mt-20">
       <h1 className="text-5xl font-bold mb-8 tracking-tight text-white">
         CP <span className="text-amber-500">Tracker</span>
       </h1>
-      <div className="bg-neutral-800 p-8 rounded-2xl border border-neutral-600 w-full max-w-md shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-neutral-600 bg-neutral-900/70 p-8 shadow-2xl backdrop-blur">
         <h2 className="text-lg font-semibold mb-6 text-white">
           Start Tracking Your Progress
         </h2>
@@ -92,6 +89,24 @@ export default function Auth() {
             </div>
           </button>
         </div>
+        <p className="mt-5 text-xs leading-5 text-neutral-400 font-medium">
+          By continuing, you agree to CPTracker&rsquo;s{" "}
+          <Link
+            href="/terms"
+            className="font-medium text-amber-500 hover:text-amber-400"
+          >
+            Terms of Service
+          </Link>{" "}
+          <br />
+          and{" "}
+          <Link
+            href="/privacy"
+            className="font-medium text-amber-500 hover:text-amber-400"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );

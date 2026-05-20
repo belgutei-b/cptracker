@@ -2,26 +2,29 @@ import "dotenv/config";
 import { PrismaClient } from "@/prisma/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const currEnv = process.env.NODE_ENV;
+function getDatabaseUrl() {
+  const currEnv = process.env.NODE_ENV;
+  let url = "";
+  if (currEnv === "production") url = process.env.SUPABASE_PROD_URL ?? "";
+  else if (currEnv === "development") url = process.env.DB_URL_DEV ?? "";
+  else url = process.env.DB_URL_TEST ?? "";
 
-const url =
-  currEnv === "production"
-    ? process.env.SUPABASE_PROD_URL
-    : currEnv === "test"
-      ? process.env.DB_URL_TEST
-      : process.env.DB_URL_DEV;
+  if (!url) {
+    throw new Error(`Missing database URL for NODE_ENV=${currEnv}`);
+  }
+
+  return url;
+}
 
 const globalForPrisma = global as unknown as {
-  prisma: PrismaClient;
+  prisma?: PrismaClient;
 };
 
 const adapter = new PrismaPg({
-  connectionString: url,
+  connectionString: getDatabaseUrl(),
 });
 
-const prisma = new PrismaClient({
-  adapter,
-});
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 

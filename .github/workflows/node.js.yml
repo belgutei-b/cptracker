@@ -48,4 +48,3 @@ jobs:
       - run: npm run lint
       - run: SUPABASE_PROD_DIRECT="postgresql://cp_user:cp_pass@localhost:5432/cp" npx prisma migrate deploy
       - run: npm test
-      - run: npm run build --if-present

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Inter } from "next/font/google";
-import Background from "@/components/no-auth/Background";
 import Logo from "@/components/no-auth/Logo";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 
@@ -19,11 +18,7 @@ const upcomingFeatures = [
 
 export default function Page() {
   return (
-    <main
-      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white min-h-dvh`}
-    >
-      <Background />
-
+    <main className={`${inter.className} overflow-hidden text-white min-h-dvh`}>
       {/* Nav */}
       <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
         <Logo className="mb-0!" />
