@@ -24,7 +24,7 @@ export default function Navbar() {
       <nav className="hidden md:block bg-[#1a1a1a]/80 border-b border-neutral-700">
         <div className="mx-auto flex items-center gap-6 px-6 pt-6 pb-4">
           <Link
-            href="/dashboard"
+            href="/"
             className="text-xl font-bold text-amber-500 flex items-center gap-2 cursor-pointer"
           >
             <Brain size={24} /> CPTracker

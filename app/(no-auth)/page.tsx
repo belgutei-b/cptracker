@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Inter, Share_Tech_Mono } from "next/font/google";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import Background from "@/components/no-auth/Background";
-import Logo from "@/components/no-auth/Logo";
 import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";
 import Extension from "@/components/no-auth/Extension";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
@@ -99,33 +94,8 @@ function formatHours(hours: number): string {
 }
 
 export default async function Page() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (session) {
-    redirect("/dashboard");
-  }
-
   return (
-    <main
-      className={`${inter.className} relative isolate overflow-hidden bg-neutral-950 text-white`}
-    >
-      <Background />
-
-      {/* Nav */}
-      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
-        <Logo className="mb-0!" />
-
-        <Link
-          href="/auth"
-          className="landing-button landing-button-orange whitespace-nowrap"
-        >
-          Get Started
-          <ArrowRight size={14} />
-        </Link>
-      </nav>
-
+    <main className={`${inter.className} overflow-hidden text-white`}>
       {/* Hero */}
       <section className="landing-section-outer border-t-0!">
         <RoundedBoxedTitle title="Competitive programming tracker" />
