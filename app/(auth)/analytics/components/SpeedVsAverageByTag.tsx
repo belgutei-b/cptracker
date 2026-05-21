@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
+import SectionHeader from "./SectionHeader";
 
 // Static placeholder data — backend not yet implemented.
 const TAG_DIFF_AVG: Record<
@@ -52,7 +53,8 @@ export default function SpeedVsAverageByTag() {
     const tags = Object.keys(TAG_DIFF_AVG);
     return tags
       .map((tag) => {
-        const avg = mode === "all" ? getTagAllAvg(tag) : TAG_DIFF_AVG[tag][mode];
+        const avg =
+          mode === "all" ? getTagAllAvg(tag) : TAG_DIFF_AVG[tag][mode];
         const baseline = OVERALL_AVG[mode];
         const value = Math.round(((avg - baseline) / baseline) * 100);
         return { tag, value };
@@ -68,14 +70,10 @@ export default function SpeedVsAverageByTag() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Speed vs. Average by Tag
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            % faster or slower than your overall average · static sample data
-          </p>
-        </div>
+        <SectionHeader
+          title="Speed vs. Average by Tag"
+          description="% faster or slower than your overall average · static sample data"
+        />
 
         <div className="flex items-center gap-1 rounded-lg border border-[#1e1e1e] bg-[#0c0c0e] p-1">
           {MODES.map((m) => (

@@ -1,6 +1,7 @@
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { AvgSolveTime } from "@/types/analytics";
+import SectionHeader from "./SectionHeader";
 
 type Props = {
   data: AvgSolveTime[];
@@ -49,14 +50,10 @@ export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Average Solve Time
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            past {numberOfDays} days · per difficulty
-          </p>
-        </div>
+        <SectionHeader
+          title="Average Solve Time"
+          description={`past ${numberOfDays} day · per difficulty`}
+        />
 
         <div className="flex items-center gap-4">
           {ORDER.map((label) => (
@@ -103,11 +100,11 @@ export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
                     className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: color }}
                   />
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-stone-300">
                     {difficulty}
                   </span>
                 </div>
-                <span className="font-mono text-[10px] text-neutral-600">
+                <span className="font-mono text-stone-300 font-semibold text-sm">
                   {entry?.numberOfSolved ?? 0} solved
                 </span>
               </div>
@@ -120,7 +117,7 @@ export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
               </p>
 
               <p
-                className={`mt-2 font-mono text-[11px] tracking-tight ${toneClass}`}
+                className={`mt-2 font-mono text-xs tracking-tight font-medium ${toneClass}`}
               >
                 {comparison.label}
               </p>

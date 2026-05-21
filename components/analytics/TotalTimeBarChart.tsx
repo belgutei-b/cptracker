@@ -13,6 +13,7 @@ import {
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import type { AnalyticsRangeDays } from "@/constants/analytics";
 import type { BarChartData } from "@/types/stat";
+import SectionHeader from "@/app/(auth)/analytics/components/SectionHeader";
 
 type Props = {
   numberOfDays: AnalyticsRangeDays;
@@ -89,14 +90,7 @@ export default function TotalTimeBarChart({
 
       {/* Header */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Total Time
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            {overviewLabel}
-          </p>
-        </div>
+        <SectionHeader title="Total Time" description={overviewLabel} />
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">

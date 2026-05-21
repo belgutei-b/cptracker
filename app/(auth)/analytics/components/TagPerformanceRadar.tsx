@@ -12,6 +12,7 @@ import {
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
+import SectionHeader from "./SectionHeader";
 
 const ACCENT = "#ffa116";
 
@@ -53,14 +54,10 @@ export default function TagPerformanceRadar({ data }: Props) {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Tag Performance Radar
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            problems solved per tag
-          </p>
-        </div>
+        <SectionHeader
+          title="Tag Performance Radar"
+          description="problems solved per tag"
+        />
 
         <div className="flex items-center gap-1.5">
           <span

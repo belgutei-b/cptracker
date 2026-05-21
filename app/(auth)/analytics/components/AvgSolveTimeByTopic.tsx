@@ -4,6 +4,7 @@ import { useState } from "react";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
+import SectionHeader from "./SectionHeader";
 
 type Props = {
   data: TopicRadarEntry[];
@@ -72,14 +73,10 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Avg Solve Time by Topic
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            time spent per topic · split by difficulty
-          </p>
-        </div>
+        <SectionHeader
+          title="Avg Solve Time by Topic"
+          description="time spent per topic · split by difficulty"
+        />
 
         <div className="flex items-center gap-4">
           {ORDER.map((label) => (
