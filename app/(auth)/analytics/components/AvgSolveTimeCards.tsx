@@ -81,7 +81,10 @@ export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
             entry && entry.numberOfSolved > 0
               ? entry.duration / entry.numberOfSolved
               : 0;
-          const comparison = formatComparison(entry?.comparisonToLastWeek ?? 0);
+
+          // todo: add comparisonToLastWeek
+          // const comparison = formatComparison(entry?.comparisonToLastWeek ?? 0);
+          const comparison = formatComparison(0);
           const toneClass =
             comparison.tone === "up"
               ? "text-rose-400"
