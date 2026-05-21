@@ -76,15 +76,18 @@ export default function TagPerformanceRadar({ data }: Props) {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.4fr_1fr]">
-          <div className="relative h-80">
+          <div className="relative h-100">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} outerRadius="75%">
-                <PolarGrid stroke="#1e1e1e" />
+                <PolarGrid
+                  stroke="#57534d" // text-stone-600
+                />
                 <PolarAngleAxis
                   dataKey="topic"
                   tick={{
-                    fill: "#7e829e",
-                    fontSize: 10.5,
+                    fill: "#e7e5e4", // text-stone-200
+                    fontSize: 12,
+                    fontWeight: 600,
                     fontFamily: "monospace",
                   }}
                 />
@@ -135,12 +138,10 @@ export default function TagPerformanceRadar({ data }: Props) {
                 <Radar
                   name="Solved"
                   dataKey="totalSolved"
-                  stroke={ACCENT}
-                  fill={ACCENT}
+                  stroke="#e7e5e4"
+                  fill="#d4d4d8"
                   fillOpacity={0.2}
                   strokeWidth={2}
-                  dot={{ r: 3, fill: ACCENT, stroke: ACCENT }}
-                  activeDot={{ r: 5, fill: ACCENT, strokeWidth: 0 }}
                 />
               </RadarChart>
             </ResponsiveContainer>
@@ -154,7 +155,7 @@ export default function TagPerformanceRadar({ data }: Props) {
                   key={row.topic}
                   className="flex items-center gap-3 rounded-lg border border-[#1e1e1e] bg-[#141414] px-3 py-2"
                 >
-                  <span className="min-w-0 flex-1 truncate text-xs font-medium text-neutral-200">
+                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-200">
                     {row.topic}
                   </span>
                   <span className="relative h-px w-24 bg-[#2a2a2a]">
@@ -163,7 +164,7 @@ export default function TagPerformanceRadar({ data }: Props) {
                       style={{ width: `${ratio * 100}%` }}
                     />
                   </span>
-                  <span className="font-mono text-xs tabular-nums text-neutral-300">
+                  <span className="font-mono text-xs font-semibold tabular-nums text-neutral-300">
                     {row.totalSolved}
                   </span>
                 </li>
