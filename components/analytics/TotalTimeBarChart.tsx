@@ -151,7 +151,7 @@ export default function TotalTimeBarChart({
               dataKey="date"
               interval={xTickInterval}
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
+                fill: "var(--color-zinc-300)",
                 fontSize: 11,
                 fontWeight: 600,
                 fontFamily: "monospace",
@@ -168,7 +168,7 @@ export default function TotalTimeBarChart({
               allowDecimals={false}
               tickFormatter={formatYAxis}
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
+                fill: "var(--color-zinc-300)",
                 fontSize: 11,
                 fontWeight: 600,
                 fontFamily: "monospace",
@@ -181,7 +181,7 @@ export default function TotalTimeBarChart({
               yAxisId="right"
               orientation="right"
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
+                fill: "var(--color-zinc-300)",
                 fontSize: 10,
                 fontFamily: "monospace",
               }}
@@ -288,18 +288,22 @@ export default function TotalTimeBarChart({
 
             <Line
               yAxisId="right"
-              type="monotone"
+              type="linear"
               dataKey="problemCount"
               name="Total Solved"
-              stroke="#ffa116"
-              strokeWidth={2.5}
+              stroke="var(--color-zinc-300)"
+              strokeWidth={2}
               dot={{
                 r: 3.5,
-                fill: "#ffa116",
+                fill: "var(--color-zinc-300)",
                 strokeWidth: 2,
-                stroke: "#09090b",
+                stroke: "var(--color-zinc-300)",
               }}
-              activeDot={{ r: 5, fill: "#ffa116", strokeWidth: 0 }}
+              activeDot={{
+                r: 5,
+                fill: "var(--color-zinc-300)",
+                strokeWidth: 0,
+              }}
             />
           </ComposedChart>
         </ResponsiveContainer>

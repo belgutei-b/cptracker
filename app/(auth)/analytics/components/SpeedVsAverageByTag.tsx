@@ -110,8 +110,9 @@ export default function SpeedVsAverageByTag() {
               domain={[-domainPad, domainPad]}
               tickFormatter={(v) => `${v > 0 ? "+" : ""}${v}%`}
               tick={{
-                fill: "#7e829e",
-                fontSize: 10.5,
+                fill: "var(--color-zinc-300)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -122,8 +123,9 @@ export default function SpeedVsAverageByTag() {
               dataKey="tag"
               width={130}
               tick={{
-                fill: "#d1d5db",
-                fontSize: 11,
+                fill: "var(--color-zinc-300)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -144,15 +146,9 @@ export default function SpeedVsAverageByTag() {
                       ? "slower than avg"
                       : "faster than avg";
                 return (
-                  <div className="rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2 font-mono text-[11px] shadow-xl">
-                    <p className="mb-0.5 text-xs font-medium text-zinc-300">
-                      {tag}
-                    </p>
-                    <p
-                      style={{
-                        color: v > 0 ? COLORS.Hard : COLORS.Easy,
-                      }}
-                    >
+                  <div className="rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2 font-mono text-xs shadow-xl font-semibold">
+                    <p className="mb-0.5 text-xs text-zinc-300">{tag}</p>
+                    <p className="text-stone-400">
                       {sign}
                       {v}% — {verdict}
                     </p>
@@ -160,11 +156,15 @@ export default function SpeedVsAverageByTag() {
                 );
               }}
             />
-            <Bar dataKey="value" radius={[3, 3, 3, 3]} barSize={14}>
+            <Bar dataKey="value" radius={[3, 3, 3, 3]} barSize={4}>
               {rows.map((r) => (
                 <Cell
                   key={r.tag}
-                  fill={r.value > 0 ? COLORS.Hard : COLORS.Easy}
+                  fill={
+                    r.value > 0
+                      ? "var(--color-neutral-500)"
+                      : "var(--color-stone-300)"
+                  }
                 />
               ))}
             </Bar>

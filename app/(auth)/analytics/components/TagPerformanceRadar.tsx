@@ -58,16 +58,6 @@ export default function TagPerformanceRadar({ data }: Props) {
           title="Tag Performance Radar"
           description="problems solved per tag"
         />
-
-        <div className="flex items-center gap-1.5">
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: ACCENT }}
-          />
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-            Solved
-          </span>
-        </div>
       </div>
 
       {radarData.length === 0 ? (
@@ -147,6 +137,7 @@ export default function TagPerformanceRadar({ data }: Props) {
             </ResponsiveContainer>
           </div>
 
+          {/* Topics | number of solved problems */}
           <ul className="flex flex-col gap-2">
             {sortedList.map((row) => {
               const ratio = maxSolved > 0 ? row.totalSolved / maxSolved : 0;
@@ -158,9 +149,9 @@ export default function TagPerformanceRadar({ data }: Props) {
                   <span className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-200">
                     {row.topic}
                   </span>
-                  <span className="relative h-px w-24 bg-[#2a2a2a]">
+                  <span className="relative h-0.5 w-24 bg-neutral-600">
                     <span
-                      className="absolute inset-y-0 left-0 bg-neutral-500"
+                      className="absolute inset-y-0 left-0 bg-stone-200"
                       style={{ width: `${ratio * 100}%` }}
                     />
                   </span>

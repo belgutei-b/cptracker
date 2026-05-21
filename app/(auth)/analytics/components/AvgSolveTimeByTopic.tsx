@@ -105,16 +105,16 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
             return (
               <div
                 key={row.topic}
-                className={`grid items-center gap-4 py-2.5 ${
+                className={`grid items-center gap-4 py-3 ${
                   ri < rows.length - 1 ? "border-b border-[#1a1a1a]" : ""
                 }`}
                 style={{ gridTemplateColumns: "140px 1fr 110px" }}
               >
-                <div className="truncate text-right text-[12.5px] font-medium text-neutral-300">
+                <div className="truncate text-right text-xs font-semibold text-stone-300">
                   {row.topic}
                 </div>
 
-                <div className="relative h-5">
+                <div className="relative h-1">
                   <div className="absolute inset-0 rounded bg-[#1a1a1a]" />
                   <div
                     className="absolute inset-y-0 left-0 flex overflow-hidden rounded"
@@ -146,7 +146,8 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
                           }
                           onMouseLeave={() => setHovered(null)}
                         >
-                          {isHov && (
+                          {/* TODO: fix this hover issue */}
+                          {/* {isHov && (
                             <div className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#2e2e2e] bg-[#141414] px-2.5 py-1.5 font-mono text-[11px] shadow-xl">
                               <span
                                 className="font-semibold"
@@ -159,18 +160,16 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
                                 {seg.avgMin}m avg · {seg.numberOfSolved} solved
                               </span>
                             </div>
-                          )}
+                          )} */}
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="whitespace-nowrap text-right font-mono text-[11.5px] text-neutral-500">
-                  <span className="font-medium text-neutral-300">
-                    {row.avgMin} min
-                  </span>
-                  <span className="mx-1 text-neutral-700">·</span>
+                <div className="whitespace-nowrap text-right font-mono text-xs font-semibold text-stone-300">
+                  <span className="">{row.avgMin} min</span>
+                  <span className="mx-1">·</span>
                   {row.totalSolved}
                 </div>
               </div>
