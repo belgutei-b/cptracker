@@ -42,7 +42,10 @@ export default async function Page({
       </div>
 
       <AvgSolveTimeCards data={avgSolveTime} numberOfDays={numberOfDays} />
-      <DailyTotalTimeBarChart data={dailyBarChart} numberOfDays={numberOfDays} />
+      <DailyTotalTimeBarChart
+        data={dailyBarChart}
+        numberOfDays={numberOfDays}
+      />
       <TagPerformanceRadar data={tagsReceivedData} />
       <AvgSolveTimeByTopic data={tagsReceivedData} />
       <SpeedVsAverageByTag />

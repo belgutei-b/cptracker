@@ -12,7 +12,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import SectionHeader from "./SectionHeader";
 
 // Static placeholder data — backend not yet implemented.
@@ -66,7 +65,7 @@ export default function SpeedVsAverageByTag() {
   const domainPad = Math.ceil(maxAbs / 5) * 5 + 5;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
+    <div className="relative min-w-0 w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -93,8 +92,8 @@ export default function SpeedVsAverageByTag() {
         </div>
       </div>
 
-      <div className="relative h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="relative h-72 min-w-0">
+        <ResponsiveContainer width="100%" height={288} minWidth={0}>
           <BarChart
             data={rows}
             layout="vertical"

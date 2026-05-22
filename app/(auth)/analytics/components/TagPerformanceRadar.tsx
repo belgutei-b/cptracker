@@ -50,7 +50,7 @@ export default function TagPerformanceRadar({ data }: Props) {
   const maxSolved = sortedList[0]?.totalSolved ?? 0;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
+    <div className="relative min-w-0 w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -65,9 +65,9 @@ export default function TagPerformanceRadar({ data }: Props) {
           No tag data yet
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.4fr_1fr]">
-          <div className="relative h-100">
-            <ResponsiveContainer width="100%" height="100%">
+        <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="relative h-100 min-w-0">
+            <ResponsiveContainer width="100%" height={400} minWidth={0}>
               <RadarChart data={radarData} outerRadius="75%">
                 <PolarGrid
                   stroke="#57534d" // text-stone-600

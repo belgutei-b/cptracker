@@ -81,8 +81,8 @@ export default function TotalTimeBarChart({
 
   const containerClass =
     variant === "card"
-      ? "relative w-full overflow-hidden border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
-      : "relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5";
+      ? "relative min-w-0 w-full overflow-hidden border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
+      : "relative min-w-0 w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5";
 
   return (
     <div className={containerClass}>
@@ -133,8 +133,8 @@ export default function TotalTimeBarChart({
       </div>
 
       {/* Chart */}
-      <div className="relative h-60">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="relative h-60 min-w-0">
+        <ResponsiveContainer width="100%" height={240} minWidth={0}>
           <ComposedChart
             data={chartData}
             margin={{ top: 6, right: 12, bottom: 0, left: 0 }}
