@@ -11,14 +11,9 @@ type Props = {
 
 function toBarChartData(columns: BarChartColumn[]): BarChartData[] {
   return columns.map((col) => {
-    const get = (d: Difficulty) =>
-      col.entries.find((e) => e.difficulty === d) ?? {
-        duration: 0,
-        numberOfSolved: 0,
-      };
-    const easy = get(Difficulty.Easy);
-    const medium = get(Difficulty.Medium);
-    const hard = get(Difficulty.Hard);
+    const easy = col.difficultyEntries[Difficulty.Easy];
+    const medium = col.difficultyEntries[Difficulty.Medium];
+    const hard = col.difficultyEntries[Difficulty.Hard];
 
     return {
       date: col.date,

@@ -48,7 +48,7 @@ export default async function Page({
       />
       <TagPerformanceRadar data={tagsReceivedData} />
       <AvgSolveTimeByTopic data={tagsReceivedData} />
-      <SpeedVsAverageByTag />
+      <SpeedVsAverageByTag data={tagsReceivedData} />
     </main>
   );
 }

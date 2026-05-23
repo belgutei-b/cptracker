@@ -4,209 +4,179 @@ import { Difficulty } from "@/prisma/generated/prisma/enums";
 import prisma from "@/lib/prisma";
 import { DateTime } from "luxon";
 import type {
-  AvgSolveTime,
-  StatEntry,
+  DifficultyEntries,
   BarChartColumn,
   TopicRadarEntry,
   UserProblemWithProblem,
+  SessionWithProblem,
 } from "@/types/analytics";
 
-function difficultyToIndex(difficulty: Difficulty) {
-  if (difficulty === "Easy") return 0;
-  if (difficulty === "Medium") return 1;
-  else return 2;
+function createEmptyDifficultyEntries(): DifficultyEntries {
+  const difficultyEntries: Partial<DifficultyEntries> = {};
+
+  for (const difficulty of Object.values(Difficulty)) {
+    difficultyEntries[difficulty] = {
+      difficulty,
+      duration: 0,
+      numberOfSolved: 0,
+      durationPercentageComparison: 0,
+    };
+  }
+
+  return difficultyEntries as DifficultyEntries;
 }
 
-// return top 8 topics for charts
-
-function tagsData({ problems }: { problems: UserProblemWithProblem[] }) {
+// return top 10 topics for charts
+function tagsData({
+  solvedProblemsCurrent,
+  avgSolveTime,
+}: {
+  solvedProblemsCurrent: UserProblemWithProblem[];
+  avgSolveTime: DifficultyEntries;
+}) {
   const topics: TopicRadarEntry[] = [];
 
   const topicsMap = new Map<string, TopicRadarEntry>();
 
-  // TODO: use only solved problems
-  for (const problem of problems) {
-    // TODO: the below if statment should be removed
-    // once it iterates in solved problems
-    if (problem.status !== "SOLVED") continue;
-
+  for (const problem of solvedProblemsCurrent) {
     for (const topic of problem.problem.tags) {
       let topicEntry = topicsMap.get(topic);
       if (!topicEntry) {
-        // new entry — each topic gets its own entries array
-        const entries: StatEntry[] = Object.values(Difficulty).map(
-          (difficulty) => ({
-            difficulty,
-            duration: 0,
-            numberOfSolved: 0,
-            durationPercentageComparison: 0,
-          }),
-        );
         topicEntry = {
           topic,
-          numberOfSolved: 0,
-          durationPercentageComparison: 0,
-          entries,
+          difficultyEntries: createEmptyDifficultyEntries(),
         };
         topicsMap.set(topic, topicEntry);
       }
-      topicEntry.entries[
-        difficultyToIndex(problem.problem.difficulty)
-      ].duration += problem.duration;
-      topicEntry.entries[
-        difficultyToIndex(problem.problem.difficulty)
-      ].numberOfSolved += 1;
-      topicEntry.numberOfSolved += 1;
+
+      // duration for difficulty
+      topicEntry.difficultyEntries[problem.problem.difficulty].duration +=
+        problem.duration;
+
+      // number of solved for difficulty
+      topicEntry.difficultyEntries[problem.problem.difficulty].numberOfSolved +=
+        1;
+
+      topicEntry.difficultyEntries.All.duration += problem.duration;
+      topicEntry.difficultyEntries.All.numberOfSolved += 1;
     }
   }
 
-  // select the top 8 by the number of solved problems
+  // select the top 10 by the number of solved problems
   topicsMap.forEach((value) => topics.push(value));
-  topics.sort((a, b) => b.numberOfSolved - a.numberOfSolved);
+  topics.sort(
+    (a, b) =>
+      b.difficultyEntries.All.numberOfSolved -
+      a.difficultyEntries.All.numberOfSolved,
+  );
 
-  return topics.slice(0, 8);
+  const topTopics = topics.slice(0, 10);
+
+  for (const topic of topTopics) {
+    for (const difficulty of Object.values(Difficulty)) {
+      const topicDifficultyEntry = topic.difficultyEntries[difficulty];
+      const averageDifficultyEntry = avgSolveTime[difficulty];
+
+      if (
+        topicDifficultyEntry.numberOfSolved === 0 ||
+        averageDifficultyEntry.numberOfSolved === 0
+      ) {
+        continue;
+      }
+
+      const topicAvg =
+        topicDifficultyEntry.duration / topicDifficultyEntry.numberOfSolved;
+      const overallAvg =
+        averageDifficultyEntry.duration / averageDifficultyEntry.numberOfSolved;
+
+      if (overallAvg !== 0) {
+        topicDifficultyEntry.durationPercentageComparison =
+          ((topicAvg - overallAvg) / overallAvg) * 100;
+      }
+    }
+  }
+
+  return topTopics;
 }
 
 function getAvgSolveTime({
-  solvedProblemsThisWeek,
-  solvedProblemsLastWeek,
+  currentSolvedProblems,
+  previousSolvedProblems,
 }: {
-  solvedProblemsThisWeek: UserProblemWithProblem[];
-  solvedProblemsLastWeek: UserProblemWithProblem[];
-}): AvgSolveTime[] {
-  const avgSolveTime = new Array<AvgSolveTime>();
-  for (const difficulty of Object.values(Difficulty)) {
-    const difficultyStat: AvgSolveTime = {
-      difficulty,
-      duration: 0,
-      numberOfSolved: 0,
-      comparisonToPreviousTimeline: 0,
-    };
+  currentSolvedProblems: UserProblemWithProblem[];
+  previousSolvedProblems: UserProblemWithProblem[];
+}): DifficultyEntries {
+  const avgSolveTime = createEmptyDifficultyEntries();
+  const previousSolveTime = createEmptyDifficultyEntries();
 
-    for (const solvedProblem of solvedProblemsThisWeek) {
-      if (solvedProblem.problem.difficulty === difficulty) {
-        difficultyStat.duration += solvedProblem.duration;
-        difficultyStat.numberOfSolved += 1;
-      }
+  for (const problem of currentSolvedProblems) {
+    avgSolveTime[problem.problem.difficulty].numberOfSolved += 1;
+    avgSolveTime[problem.problem.difficulty].duration += problem.duration;
+    avgSolveTime.All.numberOfSolved += 1;
+    avgSolveTime.All.duration += problem.duration;
+  }
+
+  for (const problem of previousSolvedProblems) {
+    previousSolveTime[problem.problem.difficulty].numberOfSolved += 1;
+    previousSolveTime[problem.problem.difficulty].duration += problem.duration;
+    previousSolveTime.All.numberOfSolved += 1;
+    previousSolveTime.All.duration += problem.duration;
+  }
+
+  for (const difficulty of Object.values(Difficulty)) {
+    // average solve time for
+    // this timeline and previous timeline
+    const previous = previousSolveTime[difficulty];
+    const previousAvg =
+      previous.numberOfSolved === 0
+        ? 0
+        : previous.duration / previous.numberOfSolved;
+    const currentAvg =
+      avgSolveTime[difficulty].numberOfSolved === 0
+        ? 0
+        : avgSolveTime[difficulty].duration /
+          avgSolveTime[difficulty].numberOfSolved;
+
+    // only shows the change if there is solved problem in
+    // this timeline & previous timeline
+    if (currentAvg !== 0 && previousAvg !== 0) {
+      avgSolveTime[difficulty].durationPercentageComparison =
+        ((currentAvg - previousAvg) / previousAvg) * 100;
     }
-    avgSolveTime.push(difficultyStat);
   }
 
   return avgSolveTime;
 }
 
-export async function getBarChartDataV2({
-  query,
+async function getDailyTotalTimeBarChart({
+  sessions,
+  solvedProblemsCurrent,
+  numberOfDays,
+  now,
 }: {
-  query: {
-    numberOfDays: number;
-    userId: string;
-    timezone: string;
-  };
+  sessions: SessionWithProblem[];
+  solvedProblemsCurrent: UserProblemWithProblem[];
+  numberOfDays: number;
+  now: DateTime<true> | DateTime<false>;
 }) {
-  // 1. avg solve time this week for easy, medium and hard (this week)
-  // return  [{difficulty, comparisonToLastWeek: number}]
-  const now = DateTime.now().setZone(query.timezone);
-  const start = now
-    .minus({ days: query.numberOfDays - 1 })
-    .startOf("day")
-    .toJSDate();
-
-  // used for speed comparison to previous timeline
-  const previousTimelineStart = now
-    .minus({ days: query.numberOfDays * 2 - 1 })
-    .startOf("day")
-    .toJSDate();
-
-  const solvedProblemsThisWeek = await prisma.userProblem.findMany({
-    where: {
-      userId: query.userId,
-      solvedAt: { gte: start },
-    },
-    include: {
-      problem: true,
-    },
-  });
-
-  const solvedProblemsLastWeek = await prisma.userProblem.findMany({
-    where: {
-      userId: query.userId,
-      solvedAt: {
-        gte: previousTimelineStart,
-        lt: start,
-      },
-    },
-    include: {
-      problem: true,
-    },
-  });
-
-  // 1. Average solve time of each difficulty
-  const avgSolveTime = getAvgSolveTime({
-    solvedProblemsThisWeek,
-    solvedProblemsLastWeek,
-  });
-
-  // 2. current total time on each day bar chart
-  // return [{
-  //    date,
-  //    dayStat: [{difficulty, duration, numberOfSolved}]
-  // }]
-  const sessions = await prisma.solveSession.findMany({
-    where: {
-      userProblem: {
-        userId: query.userId,
-      },
-      OR: [{ finishedAt: null }, { finishedAt: { gte: start } }],
-    },
-    include: {
-      userProblem: {
-        include: {
-          problem: true,
-        },
-      },
-    },
-  });
-
-  const problems = await prisma.userProblem.findMany({
-    where: {
-      userId: query.userId,
-      status: "SOLVED",
-      solvedAt: { gte: start },
-    },
-    include: {
-      problem: true,
-    },
-  });
-
   const dailyBarChart = new Array<BarChartColumn>();
-  for (let i = query.numberOfDays - 1; i >= 0; i--) {
+  for (let i = numberOfDays - 1; i >= 0; i--) {
     // between start and end of the day
     const day = now.minus({ days: i });
     const startOfDayJs = day.startOf("day").toJSDate();
     const endOfDayJS = day.endOf("day").toJSDate();
 
-    const dayStats = new Array<StatEntry>();
-    for (const difficulty of Object.values(Difficulty)) {
-      dayStats.push({
-        difficulty,
-        duration: 0,
-        numberOfSolved: 0,
-        durationPercentageComparison: 0,
-      });
-    }
+    const dayStats = createEmptyDifficultyEntries();
 
     // updating numberOfSolved
-    for (const problem of problems) {
+    for (const problem of solvedProblemsCurrent) {
       if (
         problem.solvedAt &&
         startOfDayJs <= problem.solvedAt &&
         problem.solvedAt <= endOfDayJS
       ) {
-        const target = dayStats.find(
-          (s) => s.difficulty === problem.problem.difficulty,
-        );
-        if (target) target.numberOfSolved += 1;
+        dayStats[problem.problem.difficulty].numberOfSolved += 1;
+        dayStats.All.numberOfSolved += 1;
       }
     }
 
@@ -221,27 +191,111 @@ export async function getBarChartDataV2({
 
       // on i-th day the session is from newStart -> newEnd
       if (newEnd > newStart) {
-        const target = dayStats.find(
-          (s) => s.difficulty === session.userProblem.problem.difficulty,
+        const duration = Math.floor(
+          (newEnd.getTime() - newStart.getTime()) / 1000,
         );
-        if (target) {
-          target.duration += Math.floor(
-            (newEnd.getTime() - newStart.getTime()) / 1000,
-          );
-        }
+        dayStats[session.userProblem.problem.difficulty].duration += duration;
+        dayStats.All.duration += duration;
       }
     }
 
     dailyBarChart.push({
       date: day.toFormat("yyyy LLL dd"),
-      entries: dayStats,
+      difficultyEntries: dayStats,
     });
   }
 
-  // 3. number of solved problems in most common 8 topics
-  // return [{topic, numberOfSolved}]
+  return dailyBarChart;
+}
 
-  const tagsReceivedData = tagsData({ problems });
+export async function getBarChartDataV2({
+  query,
+}: {
+  query: {
+    numberOfDays: number;
+    userId: string;
+    timezone: string;
+  };
+}) {
+  // 1. avg solve time this week for easy, medium and hard (this week)
+  // return  [{difficulty, comparisonToLastWeek: number}]
+  const now = DateTime.now().setZone(query.timezone);
+  const currentTimelineStart = now
+    .minus({ days: query.numberOfDays - 1 })
+    .startOf("day")
+    .toJSDate();
+
+  // used for speed comparison to previous timeline
+  const previousTimelineStart = now
+    .minus({ days: query.numberOfDays * 2 - 1 })
+    .startOf("day")
+    .toJSDate();
+
+  const solvedProblemsCurrent = await prisma.userProblem.findMany({
+    where: {
+      userId: query.userId,
+      status: "SOLVED",
+      solvedAt: { gte: currentTimelineStart },
+    },
+    include: {
+      problem: true,
+    },
+  });
+
+  const solvedProblemsPrevious = await prisma.userProblem.findMany({
+    where: {
+      userId: query.userId,
+      status: "SOLVED",
+      solvedAt: {
+        gte: previousTimelineStart,
+        lt: currentTimelineStart,
+      },
+    },
+    include: {
+      problem: true,
+    },
+  });
+
+  // 1. Average solve time of each difficulty
+  const avgSolveTime = getAvgSolveTime({
+    currentSolvedProblems: solvedProblemsCurrent,
+    previousSolvedProblems: solvedProblemsPrevious,
+  });
+
+  // 2. current total time on each day bar chart
+  // return [{
+  //    date,
+  //    dayStat: [{difficulty, duration, numberOfSolved}]
+  // }]
+  const sessions = await prisma.solveSession.findMany({
+    where: {
+      userProblem: {
+        userId: query.userId,
+      },
+      OR: [{ finishedAt: null }, { finishedAt: { gte: currentTimelineStart } }],
+    },
+    include: {
+      userProblem: {
+        include: {
+          problem: true,
+        },
+      },
+    },
+  });
+
+  const dailyBarChart = await getDailyTotalTimeBarChart({
+    sessions,
+    solvedProblemsCurrent,
+    numberOfDays: query.numberOfDays,
+    now,
+  });
+
+  // 3. number of solved problems in most common 10 topics
+  // return [{topic, numberOfSolved}]
+  const tagsReceivedData: TopicRadarEntry[] = tagsData({
+    solvedProblemsCurrent,
+    avgSolveTime,
+  });
 
   return {
     avgSolveTime,

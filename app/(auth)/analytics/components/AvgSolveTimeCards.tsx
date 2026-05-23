@@ -1,14 +1,16 @@
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { AvgSolveTime } from "@/types/analytics";
+import type { DifficultyEntries } from "@/types/analytics";
 import SectionHeader from "./SectionHeader";
 
 type Props = {
-  data: AvgSolveTime[];
+  data: DifficultyEntries;
   numberOfDays?: number;
 };
 
-const ORDER: Difficulty[] = [
+type DisplayDifficulty = Exclude<Difficulty, "All">;
+
+const ORDER: DisplayDifficulty[] = [
   Difficulty.Easy,
   Difficulty.Medium,
   Difficulty.Hard,
@@ -27,23 +29,43 @@ function formatSeconds(seconds: number): string {
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
-function formatComparison(pct: number): {
+function getRangeLabel(numberOfDays: number): string {
+  if (numberOfDays === 7) return "previous 7 days";
+  if (numberOfDays === 14) return "previous 2 weeks";
+  if (numberOfDays === 30) return "previous month";
+  return `previous ${numberOfDays} days`;
+}
+
+function formatComparison({
+  pct,
+  numberOfSolved,
+  rangeLabel,
+}: {
+  pct: number;
+  numberOfSolved: number;
+  rangeLabel: string;
+}): {
   label: string;
   tone: "up" | "down" | "flat";
 } {
+  if (numberOfSolved === 0) {
+    return { label: "no solves this period", tone: "flat" };
+  }
+
   if (!Number.isFinite(pct) || pct === 0) {
-    return { label: "no change vs last week", tone: "flat" };
+    return { label: `no change vs ${rangeLabel}`, tone: "flat" };
   }
   const arrow = pct > 0 ? "▲" : "▼";
   const tone = pct > 0 ? "up" : "down";
+  const direction = pct > 0 ? "slower" : "faster";
   return {
-    label: `${arrow} ${Math.abs(pct).toFixed(1)}% vs last week`,
+    label: `${arrow} ${Math.abs(pct).toFixed(1)}% ${direction} vs ${rangeLabel}`,
     tone,
   };
 }
 
 export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
-  const byDifficulty = new Map(data.map((d) => [d.difficulty, d]));
+  const rangeLabel = getRangeLabel(numberOfDays);
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
@@ -72,16 +94,18 @@ export default function AvgSolveTimeCards({ data, numberOfDays = 7 }: Props) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {ORDER.map((difficulty) => {
-          const entry = byDifficulty.get(difficulty);
+          const entry = data[difficulty];
           const color = DIFFICULTY_COLORS[difficulty];
           const avg =
             entry && entry.numberOfSolved > 0
               ? entry.duration / entry.numberOfSolved
               : 0;
 
-          // todo: add comparisonToLastWeek
-          // const comparison = formatComparison(entry?.comparisonToLastWeek ?? 0);
-          const comparison = formatComparison(0);
+          const comparison = formatComparison({
+            pct: entry?.durationPercentageComparison ?? 0,
+            numberOfSolved: entry?.numberOfSolved ?? 0,
+            rangeLabel,
+          });
           const toneClass =
             comparison.tone === "up"
               ? "text-rose-400"

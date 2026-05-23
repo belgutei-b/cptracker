@@ -28,15 +28,13 @@ type RadarRow = {
 
 function toRadarData(topics: TopicRadarEntry[]): RadarRow[] {
   return topics.map((t) => {
-    const get = (d: Difficulty) =>
-      t.entries.find((e) => e.difficulty === d) ?? { numberOfSolved: 0 };
     return {
       topic: t.topic,
-      totalSolved: t.numberOfSolved,
+      totalSolved: t.difficultyEntries[Difficulty.All].numberOfSolved,
       byDifficulty: {
-        Easy: get(Difficulty.Easy).numberOfSolved,
-        Medium: get(Difficulty.Medium).numberOfSolved,
-        Hard: get(Difficulty.Hard).numberOfSolved,
+        Easy: t.difficultyEntries[Difficulty.Easy].numberOfSolved,
+        Medium: t.difficultyEntries[Difficulty.Medium].numberOfSolved,
+        Hard: t.difficultyEntries[Difficulty.Hard].numberOfSolved,
       },
     };
   });

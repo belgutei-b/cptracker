@@ -1,17 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
+import DifficultyModeSelector, {
+  DIFFICULTY_MODE_TO_DIFFICULTY,
+  type DifficultyMode,
+} from "./DifficultyModeSelector";
 import SectionHeader from "./SectionHeader";
 
 type Props = {
   data: TopicRadarEntry[];
 };
 
+type DisplayDifficulty = Exclude<Difficulty, "All">;
+
 type DifficultySegment = {
-  difficulty: Difficulty;
+  difficulty: DisplayDifficulty;
   avgMin: number;
   numberOfSolved: number;
 };
@@ -22,50 +28,65 @@ type Row = {
   totalSolved: number;
   avgMin: number;
   sumAvgMin: number;
+  barWidthMin: number;
 };
 
-const ORDER: Difficulty[] = [
+const ORDER: DisplayDifficulty[] = [
   Difficulty.Easy,
   Difficulty.Medium,
   Difficulty.Hard,
 ];
 
-function buildRows(data: TopicRadarEntry[]): Row[] {
+function getAvgMin({
+  duration,
+  numberOfSolved,
+}: {
+  duration: number;
+  numberOfSolved: number;
+}): number {
+  return numberOfSolved > 0 ? Math.round(duration / numberOfSolved / 60) : 0;
+}
+
+function buildRows(data: TopicRadarEntry[], mode: DifficultyMode): Row[] {
+  const selectedDifficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
+
   return data
     .map((t) => {
-      const entries = ORDER.map(
-        (d) =>
-          t.entries.find((e) => e.difficulty === d) ?? {
-            difficulty: d,
-            duration: 0,
-            numberOfSolved: 0,
-            durationPercentageComparison: 0,
-          },
-      );
-      const segments: DifficultySegment[] = entries.map((e) => ({
-        difficulty: e.difficulty,
-        avgMin:
-          e.numberOfSolved > 0
-            ? Math.round(e.duration / e.numberOfSolved / 60)
-            : 0,
+      const entries =
+        selectedDifficulty === Difficulty.All
+          ? ORDER.map((d) => t.difficultyEntries[d])
+          : [t.difficultyEntries[selectedDifficulty as DisplayDifficulty]];
+
+      const segments: DifficultySegment[] = entries.map((e, index) => ({
+        difficulty:
+          selectedDifficulty === Difficulty.All
+            ? ORDER[index]
+            : (selectedDifficulty as DisplayDifficulty),
+        avgMin: getAvgMin(e),
         numberOfSolved: e.numberOfSolved,
       }));
-      const totalSolved = entries.reduce((s, e) => s + e.numberOfSolved, 0);
-      const totalDurationSec = entries.reduce((s, e) => s + e.duration, 0);
-      const avgMin =
-        totalSolved > 0 ? Math.round(totalDurationSec / totalSolved / 60) : 0;
+      const totalEntry = t.difficultyEntries[selectedDifficulty];
+      const avgMin = getAvgMin(totalEntry);
       const sumAvgMin = segments.reduce((s, seg) => s + seg.avgMin, 0);
-      return { topic: t.topic, segments, totalSolved, avgMin, sumAvgMin };
+      return {
+        topic: t.topic,
+        segments,
+        totalSolved: totalEntry.numberOfSolved,
+        avgMin,
+        sumAvgMin,
+        barWidthMin: avgMin,
+      };
     })
-    .sort((a, b) => b.sumAvgMin - a.sumAvgMin);
+    .sort((a, b) => b.barWidthMin - a.barWidthMin);
 }
 
 export default function AvgSolveTimeByTopic({ data }: Props) {
-  const rows = buildRows(data);
-  const maxSumAvg = Math.max(...rows.map((r) => r.sumAvgMin), 0);
+  const [mode, setMode] = useState<DifficultyMode>("all");
+  const rows = useMemo(() => buildRows(data, mode), [data, mode]);
+  const maxAvg = Math.max(...rows.map((r) => r.barWidthMin), 0);
   const [hovered, setHovered] = useState<{
     topic: string;
-    difficulty: Difficulty;
+    difficulty: DisplayDifficulty;
   } | null>(null);
 
   return (
@@ -75,22 +96,10 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <SectionHeader
           title="Avg Solve Time by Topic"
-          description="time spent per topic · split by difficulty"
+          description="time spent per topic"
         />
 
-        <div className="flex items-center gap-4">
-          {ORDER.map((label) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: COLORS[label] }}
-              />
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
+        <DifficultyModeSelector value={mode} onChange={setMode} />
       </div>
 
       {rows.length === 0 ? (
@@ -101,7 +110,7 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
         <div className="flex flex-col">
           {rows.map((row, ri) => {
             const barWidthPct =
-              maxSumAvg > 0 ? (row.sumAvgMin / maxSumAvg) * 100 : 0;
+              maxAvg > 0 ? (row.barWidthMin / maxAvg) * 100 : 0;
             return (
               <div
                 key={row.topic}
