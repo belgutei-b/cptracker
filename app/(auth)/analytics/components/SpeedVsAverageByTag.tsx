@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -12,12 +13,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { DIFFICULTY_COLORS } from "@/constants/difficulty";
+import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
+import AnalyticsCard from "@/components/analytics/AnalyticsCard";
+import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
+import AnalyticsEmptyState from "./AnalyticsEmptyState";
 import DifficultyModeSelector, {
   DIFFICULTY_MODE_TO_DIFFICULTY,
   type DifficultyMode,
 } from "./DifficultyModeSelector";
-import SectionHeader from "./SectionHeader";
 
 type Props = {
   data: TopicRadarEntry[];
@@ -25,7 +30,57 @@ type Props = {
 
 function formatPercent(value: number): string {
   const rounded = Math.round(value);
-  return `${rounded > 0 ? "+" : ""}${rounded}%`;
+  return `${Math.abs(rounded)}%`;
+}
+
+function PaceComparisonValue({
+  value,
+  numberOfSolved,
+}: {
+  value: number;
+  numberOfSolved: number;
+}) {
+  if (numberOfSolved === 0) return <span>-</span>;
+
+  const rounded = Math.round(value);
+
+  if (!Number.isFinite(value) || rounded === 0) {
+    return (
+      <span className="inline-flex items-center justify-end gap-1 text-zinc-400">
+        -
+      </span>
+    );
+  }
+
+  if (value > 0) {
+    return (
+      <span
+        className="inline-flex items-center justify-end gap-1"
+        style={{ color: DIFFICULTY_COLORS.Hard }}
+      >
+        <ArrowUp size={12} strokeWidth={2.5} />
+        {formatPercent(value)}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="inline-flex items-center justify-end gap-1"
+      style={{ color: DIFFICULTY_COLORS.Easy }}
+    >
+      <ArrowDown size={12} strokeWidth={2.5} />
+      {formatPercent(value)}
+    </span>
+  );
+}
+
+function getTooltipDifficulties(mode: DifficultyMode): Difficulty[] {
+  const difficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
+
+  return difficulty === Difficulty.All
+    ? Object.values(Difficulty)
+    : [difficulty];
 }
 
 export default function SpeedVsAverageByTag({ data }: Props) {
@@ -41,6 +96,7 @@ export default function SpeedVsAverageByTag({ data }: Props) {
           tag: topic.topic,
           value: entry.durationPercentageComparison,
           numberOfSolved: entry.numberOfSolved,
+          difficultyEntries: topic.difficultyEntries,
         };
       })
       .sort((a, b) => b.value - a.value);
@@ -51,22 +107,13 @@ export default function SpeedVsAverageByTag({ data }: Props) {
   const chartHeight = Math.max(rows.length * 36, 144);
 
   return (
-    <div className="relative min-w-0 w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
-
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <SectionHeader
-          title="Speed vs. Average by Tag"
-          description="% faster or slower than your overall average"
-        />
-
-        <DifficultyModeSelector value={mode} onChange={setMode} />
-      </div>
-
+    <AnalyticsCard
+      title="Speed vs. Average by Tag"
+      description="% faster or slower than your overall average"
+      actions={<DifficultyModeSelector value={mode} onChange={setMode} />}
+    >
       {rows.length === 0 ? (
-        <div className="flex h-40 items-center justify-center text-xs font-semibold text-neutral-600">
-          No tag speed data yet
-        </div>
+        <AnalyticsEmptyState>No tag speed data yet</AnalyticsEmptyState>
       ) : (
         <div
           className="relative min-w-0"
@@ -114,29 +161,28 @@ export default function SpeedVsAverageByTag({ data }: Props) {
                 cursor={{ fill: "rgba(255,255,255,0.03)" }}
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null;
-                  const v = Number(payload[0]?.value ?? 0);
                   const row = payload[0]?.payload as
                     | {
                         tag?: string;
-                        numberOfSolved?: number;
+                        difficultyEntries?: TopicRadarEntry["difficultyEntries"];
                       }
                     | undefined;
                   const tag = String(row?.tag ?? "");
-                  let verdict = "matches average";
-                  if (row?.numberOfSolved === 0) {
-                    verdict = "no solves for this mode";
-                  } else if (v > 0) {
-                    verdict = "slower than avg";
-                  } else if (v < 0) {
-                    verdict = "faster than avg";
-                  }
+                  if (!row?.difficultyEntries) return null;
+
                   return (
-                    <div className="rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2 font-mono text-xs shadow-xl font-semibold">
-                      <p className="mb-0.5 text-zinc-300">{tag}</p>
-                      <p className="text-stone-400">
-                        {formatPercent(v)} - {verdict}
-                      </p>
-                    </div>
+                    <DifficultyStatsTooltip
+                      title={tag}
+                      difficultyEntries={row.difficultyEntries}
+                      difficulties={getTooltipDifficulties(mode)}
+                      valueLabel="Vs Avg"
+                      formatValue={(entry) => (
+                        <PaceComparisonValue
+                          value={entry.durationPercentageComparison}
+                          numberOfSolved={entry.numberOfSolved}
+                        />
+                      )}
+                    />
                   );
                 }}
               />
@@ -156,6 +202,6 @@ export default function SpeedVsAverageByTag({ data }: Props) {
           </ResponsiveContainer>
         </div>
       )}
-    </div>
+    </AnalyticsCard>
   );
 }

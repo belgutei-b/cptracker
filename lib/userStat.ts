@@ -18,12 +18,21 @@ function createEmptyDifficultyEntries(): DifficultyEntries {
     difficultyEntries[difficulty] = {
       difficulty,
       duration: 0,
+      avgSolveDuration: 0,
       numberOfSolved: 0,
       durationPercentageComparison: 0,
     };
   }
 
   return difficultyEntries as DifficultyEntries;
+}
+
+function updateAverageSolveDurations(difficultyEntries: DifficultyEntries) {
+  for (const difficulty of Object.values(Difficulty)) {
+    const entry = difficultyEntries[difficulty];
+    entry.avgSolveDuration =
+      entry.numberOfSolved > 0 ? entry.duration / entry.numberOfSolved : 0;
+  }
 }
 
 // return top 10 topics for charts
@@ -73,6 +82,8 @@ function tagsData({
   const topTopics = topics.slice(0, 10);
 
   for (const topic of topTopics) {
+    updateAverageSolveDurations(topic.difficultyEntries);
+
     for (const difficulty of Object.values(Difficulty)) {
       const topicDifficultyEntry = topic.difficultyEntries[difficulty];
       const averageDifficultyEntry = avgSolveTime[difficulty];
@@ -147,6 +158,8 @@ function getAvgSolveTime({
     }
   }
 
+  updateAverageSolveDurations(avgSolveTime);
+
   return avgSolveTime;
 }
 
@@ -200,6 +213,8 @@ async function getDailyTotalTimeBarChart({
         dayStats.All.duration += duration;
       }
     }
+
+    updateAverageSolveDurations(dayStats);
 
     dailyBarChart.push({
       date: day.toFormat("yyyy LLL dd"),

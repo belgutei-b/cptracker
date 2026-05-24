@@ -4,6 +4,7 @@ import { Prisma } from "@/prisma/generated/prisma/client";
 export type DifficultyEntry = {
   difficulty: Difficulty;
   duration: number;
+  avgSolveDuration: number;
   numberOfSolved: number;
   // (avg solve time of topic / avg solve time of all)
   // in specified difficulty

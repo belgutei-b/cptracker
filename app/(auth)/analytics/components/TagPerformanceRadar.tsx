@@ -9,71 +9,37 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
+import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
-import SectionHeader from "./SectionHeader";
-
-const ACCENT = "#ffa116";
+import AnalyticsCard from "@/components/analytics/AnalyticsCard";
+import AnalyticsEmptyState from "./AnalyticsEmptyState";
 
 type Props = {
   data: TopicRadarEntry[];
 };
 
-type RadarRow = {
-  topic: string;
-  totalSolved: number;
-  byDifficulty: Record<"Easy" | "Medium" | "Hard", number>;
-};
-
-function toRadarData(topics: TopicRadarEntry[]): RadarRow[] {
-  return topics.map((t) => {
-    return {
-      topic: t.topic,
-      totalSolved: t.difficultyEntries[Difficulty.All].numberOfSolved,
-      byDifficulty: {
-        Easy: t.difficultyEntries[Difficulty.Easy].numberOfSolved,
-        Medium: t.difficultyEntries[Difficulty.Medium].numberOfSolved,
-        Hard: t.difficultyEntries[Difficulty.Hard].numberOfSolved,
-      },
-    };
-  });
-}
-
 export default function TagPerformanceRadar({ data }: Props) {
-  const radarData = toRadarData(data);
-  const sortedList = [...radarData].sort(
-    (a, b) => b.totalSolved - a.totalSolved,
-  );
-  const maxSolved = sortedList[0]?.totalSolved ?? 0;
+  const maxSolved =
+    data[0]?.difficultyEntries[Difficulty.All].numberOfSolved ?? 0;
 
   return (
-    <div className="relative min-w-0 w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
-
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <SectionHeader
-          title="Tag Performance Radar"
-          description="problems solved per tag"
-        />
-      </div>
-
-      {radarData.length === 0 ? (
-        <div className="flex h-80 items-center justify-center text-xs font-semibold text-neutral-600">
-          No tag data yet
-        </div>
+    <AnalyticsCard
+      title="Tag Performance Radar"
+      description="problems solved per tag"
+    >
+      {data.length === 0 ? (
+        <AnalyticsEmptyState className="h-80">No tag data yet</AnalyticsEmptyState>
       ) : (
         <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div className="relative h-100 min-w-0">
             <ResponsiveContainer width="100%" height={400} minWidth={0}>
-              <RadarChart data={radarData} outerRadius="75%">
-                <PolarGrid
-                  stroke="#57534d" // text-stone-600
-                />
+              <RadarChart data={data} outerRadius="75%">
+                <PolarGrid stroke="var(--color-stone-600)" />
                 <PolarAngleAxis
                   dataKey="topic"
                   tick={{
-                    fill: "#e7e5e4", // text-stone-200
+                    fill: "var(--color-stone-200)",
                     fontSize: 12,
                     fontWeight: 600,
                     fontFamily: "monospace",
@@ -87,46 +53,24 @@ export default function TagPerformanceRadar({ data }: Props) {
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (!active || !payload?.length) return null;
-                    const row = payload[0]?.payload as RadarRow | undefined;
+                    const row = payload[0]?.payload as
+                      | TopicRadarEntry
+                      | undefined;
                     if (!row) return null;
-                    const breakdown: Array<{
-                      name: "Easy" | "Medium" | "Hard";
-                      color: string;
-                    }> = [
-                      { name: "Easy", color: COLORS.Easy },
-                      { name: "Medium", color: COLORS.Medium },
-                      { name: "Hard", color: COLORS.Hard },
-                    ];
                     return (
-                      <div className="min-w-44 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-xs shadow-xl">
-                        <div className="mb-1.5 flex items-baseline justify-between gap-3">
-                          <p className="text-xs font-medium text-zinc-300">
-                            {String(label)}
-                          </p>
-                          <p className="text-[10px] font-semibold text-zinc-300">
-                            {row.totalSolved} solved
-                          </p>
-                        </div>
-                        {breakdown.map((b) => (
-                          <div
-                            key={b.name}
-                            className="flex leading-[1.7] font-semibold"
-                          >
-                            <p className="" style={{ color: b.color }}>
-                              {b.name}
-                            </p>
-                            <p className="text-zinc-300">
-                              : {row.byDifficulty[b.name]} solved
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                      <DifficultyStatsTooltip
+                        title={String(label)}
+                        difficultyEntries={row.difficultyEntries}
+                        difficulties={Object.values(Difficulty)}
+                      />
                     );
                   }}
                 />
                 <Radar
                   name="Solved"
-                  dataKey="totalSolved"
+                  dataKey={(topic: TopicRadarEntry) =>
+                    topic.difficultyEntries[Difficulty.All].numberOfSolved
+                  }
                   stroke="#e7e5e4"
                   fill="#d4d4d8"
                   fillOpacity={0.2}
@@ -138,8 +82,10 @@ export default function TagPerformanceRadar({ data }: Props) {
 
           {/* Topics | number of solved problems */}
           <ul className="flex flex-col gap-2">
-            {sortedList.map((row) => {
-              const ratio = maxSolved > 0 ? row.totalSolved / maxSolved : 0;
+            {data.map((row) => {
+              const totalSolved =
+                row.difficultyEntries[Difficulty.All].numberOfSolved;
+              const ratio = maxSolved > 0 ? totalSolved / maxSolved : 0;
               return (
                 <li
                   key={row.topic}
@@ -155,7 +101,7 @@ export default function TagPerformanceRadar({ data }: Props) {
                     />
                   </span>
                   <span className="font-mono text-xs font-semibold tabular-nums text-neutral-300">
-                    {row.totalSolved}
+                    {totalSolved}
                   </span>
                 </li>
               );
@@ -163,6 +109,6 @@ export default function TagPerformanceRadar({ data }: Props) {
           </ul>
         </div>
       )}
-    </div>
+    </AnalyticsCard>
   );
 }

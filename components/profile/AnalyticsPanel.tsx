@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import {
   ANALYTICS_RANGE_OPTIONS,
@@ -72,13 +71,6 @@ export default function AnalyticsPanel({
           ))}
         </div>
       </div>
-
-      <TotalTimeBarChart
-        numberOfDays={currentRange}
-        chartData={chartData}
-        isLoading={false}
-        variant="card"
-      />
 
       <div className="bg-[#282828] border border-[#3e3e3e] text-white flex">
         {/* Total */}
