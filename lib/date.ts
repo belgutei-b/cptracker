@@ -44,11 +44,27 @@ export function formatDayMonthYear(
 }
 
 export function formatDuration(totalSeconds: number) {
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return "0s";
+
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const seconds = Math.round(totalSeconds % 60);
 
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  if (hours > 0) return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
+  if (minutes > 0) return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`;
   return `${seconds}s`;
+}
+
+export function formatDurationMinutes(totalSeconds: number) {
+  return `${toRoundedMinutes(totalSeconds)} min`;
+}
+
+export function toRoundedMinutes(totalSeconds: number) {
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return 0;
+
+  return Math.round(totalSeconds / 60);
+}
+
+export function formatAverageDuration(totalSeconds: number) {
+  return `${formatDurationMinutes(totalSeconds)} avg`;
 }

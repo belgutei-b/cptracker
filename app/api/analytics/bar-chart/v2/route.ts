@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import { getCurrentUserId, getUserTimezone } from "@/lib/user";
-import { getBarChartData } from "@/lib/userStat";
-import { type NextRequest } from "next/server";
+import { getBarChartDataV2 } from "@/lib/userStat";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,11 +23,12 @@ export async function GET(request: NextRequest) {
       if (rawNumberOfDays === "28") numberOfDays = 28;
     }
 
-    // call library function
-    const ret = await getBarChartData({
-      numberOfDays,
-      userId,
-      timezone,
+    const ret = await getBarChartDataV2({
+      query: {
+        numberOfDays,
+        userId: userId,
+        timezone,
+      },
     });
 
     return NextResponse.json({ data: ret }, { status: 200 });

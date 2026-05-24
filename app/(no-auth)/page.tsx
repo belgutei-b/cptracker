@@ -1,23 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Inter, Share_Tech_Mono } from "next/font/google";
-import TotalTimeBarChart from "@/components/analytics/TotalTimeBarChart";
 import Extension from "@/components/no-auth/Extension";
+import LandingTotalTimeBarChart from "@/components/no-auth/LandingTotalTimeBarChart";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
-import type { BarChartData } from "@/types/stat";
 
 const inter = Inter({ subsets: ["latin"] });
 const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
-
-const landingChartData: BarChartData[] = [
-  { date: "Mon", easy: 0, medium: 0, hard: 0, problemCount: 0 },
-  { date: "Tue", easy: 1800, medium: 2700, hard: 0, problemCount: 3 },
-  { date: "Wed", easy: 900, medium: 0, hard: 4500, problemCount: 2 },
-  { date: "Thu", easy: 1200, medium: 3600, hard: 0, problemCount: 4 },
-  { date: "Fri", easy: 600, medium: 1800, hard: 5400, problemCount: 3 },
-  { date: "Sat", easy: 2400, medium: 4200, hard: 3600, problemCount: 6 },
-  { date: "Sun", easy: 1500, medium: 2100, hard: 0, problemCount: 3 },
-];
 
 const goals = [
   {
@@ -59,39 +48,6 @@ const setupSteps = [
     desc: "Your total time grows every session. Check your weekly breakdown anytime.",
   },
 ];
-
-const weeklyDifficultyTotals = landingChartData.reduce(
-  (totals, day) => ({
-    easy: totals.easy + day.easy,
-    medium: totals.medium + day.medium,
-    hard: totals.hard + day.hard,
-  }),
-  { easy: 0, medium: 0, hard: 0 },
-);
-
-const xpBars = [
-  {
-    label: "Easy",
-    hours: weeklyDifficultyTotals.easy / 3600,
-    color: "#00b8a3",
-  },
-  {
-    label: "Medium",
-    hours: weeklyDifficultyTotals.medium / 3600,
-    color: "#ffc01e",
-  },
-  {
-    label: "Hard",
-    hours: weeklyDifficultyTotals.hard / 3600,
-    color: "#ff375f",
-  },
-];
-
-const maxXpHours = Math.max(...xpBars.map((bar) => bar.hours), 1);
-
-function formatHours(hours: number): string {
-  return `${hours.toFixed(1)}h`;
-}
 
 export default async function Page() {
   return (
@@ -238,71 +194,7 @@ export default async function Page() {
         <p className="landing-section-title-desc">Analytics</p>
         <h2 className="landing-section-title">Your time, at a glance.</h2>
 
-        <TotalTimeBarChart
-          numberOfDays={7}
-          chartData={landingChartData}
-          isLoading={false}
-        />
-
-        <div className="relative overflow-hidden mt-10 rounded-2xl border border-[#1e1e1e] bg-[#111113] p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(245,158,11,0.12),transparent_42%)]" />
-
-          <div className="flex flex-col md:flex-row w-full space-y-5 md:space-x-20">
-            <div className="w-80">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                Time always moves
-              </div>
-
-              <h2 className="mt-4 max-w-sm text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
-                If you practiced,
-                <br />
-                it should show up.
-              </h2>
-
-              <p className="mt-3 max-w-sm text-sm leading-relaxed text-neutral-400">
-                Solve count only sees submissions. This sees the hours. Easy,
-                Medium, Hard. Tried or solved.
-              </p>
-
-              <p
-                className={`${shareTechMono.className} mt-3 max-w-sm text-[12px] leading-relaxed text-neutral-600`}
-              >
-                Think of it like XP. The bar should move when the work happens.
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-4 flex-1">
-              {xpBars.map((bar) => (
-                <div key={bar.label} className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-semibold text-zinc-300">
-                      {bar.label}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`${shareTechMono.className} text-xs`}
-                        style={{ color: bar.color }}
-                      >
-                        {formatHours(bar.hours)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="h-2 overflow-hidden rounded-full bg-[#1a1a1a]">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${(bar.hours / maxXpHours) * 100}%`,
-                        background: bar.color,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <LandingTotalTimeBarChart />
       </section>
 
       {/* Goal */}

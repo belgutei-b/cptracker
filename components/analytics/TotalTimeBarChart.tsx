@@ -10,37 +10,47 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import AnalyticsCard from "@/components/analytics/AnalyticsCard";
+import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
 import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
 import type { AnalyticsRangeDays } from "@/constants/analytics";
-import type { BarChartData } from "@/types/stat";
+import { formatDuration, formatDurationMinutes } from "@/lib/date";
+import { Difficulty } from "@/prisma/generated/prisma/enums";
+import type { BarChartColumn } from "@/types/analytics";
 
 type Props = {
   numberOfDays: AnalyticsRangeDays;
-  chartData: BarChartData[];
+  chartData: BarChartColumn[];
   isLoading: boolean;
   variant?: "dark" | "card";
 };
 
-function formatSeconds(seconds: number): string {
-  if (seconds < 3600) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    if (m === 0) return `${s}s`;
-    return s === 0 ? `${m}m` : `${m}m ${s}s`;
-  }
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
-}
-
 function formatYAxis(seconds: number): string {
-  const minutes = Math.round(seconds / 60);
-  return `${minutes}m`;
+  return formatDurationMinutes(seconds).replace(" min", "m");
 }
 
-function getYAxisTicks(chartData: BarChartData[]): number[] {
+function getDuration(
+  data: BarChartColumn,
+  difficulty: Exclude<Difficulty, "All">,
+) {
+  return data.difficultyEntries[difficulty].duration;
+}
+
+function getTotalDuration(data: BarChartColumn) {
+  return (
+    getDuration(data, Difficulty.Easy) +
+    getDuration(data, Difficulty.Medium) +
+    getDuration(data, Difficulty.Hard)
+  );
+}
+
+function getProblemCount(data: BarChartColumn) {
+  return data.difficultyEntries[Difficulty.All].numberOfSolved;
+}
+
+function getYAxisTicks(chartData: BarChartColumn[]): number[] {
   const maxDuration = Math.max(
-    ...chartData.map((data) => data.easy + data.medium + data.hard),
+    ...chartData.map((data) => getTotalDuration(data)),
     0,
   );
 
@@ -73,30 +83,19 @@ export default function TotalTimeBarChart({
   variant = "dark",
 }: Props) {
   const barSize = numberOfDays === 7 ? 24 : numberOfDays === 14 ? 16 : 10;
+  const xTickInterval = numberOfDays === 7 ? 0 : numberOfDays === 14 ? 1 : 3;
   const overviewLabel = `past ${numberOfDays} days · tried + solved`;
   const yAxisTicks = getYAxisTicks(chartData);
   const maxYAxisTick = yAxisTicks[yAxisTicks.length - 1] ?? 0;
 
-  const containerClass =
-    variant === "card"
-      ? "relative w-full overflow-hidden border border-[#3e3e3e] bg-[#282828] p-6 shadow-xl"
-      : "relative w-full overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111113] p-5";
-
   return (
-    <div className={containerClass}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
-
-      {/* Header */}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Total Time
-          </p>
-          <p className="mt-0.5 font-mono text-xs text-neutral-600">
-            {overviewLabel}
-          </p>
-        </div>
-
+    <AnalyticsCard
+      title="Total Time"
+      description={overviewLabel}
+      className={
+        variant === "card" ? "border-[#3e3e3e] bg-[#282828] p-6 shadow-xl" : ""
+      }
+      actions={
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div
@@ -135,11 +134,10 @@ export default function TotalTimeBarChart({
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Chart */}
-      <div className="relative h-60">
-        <ResponsiveContainer width="100%" height="100%">
+      }
+    >
+      <div className="relative h-60 min-w-0">
+        <ResponsiveContainer width="100%" height={240} minWidth={0}>
           <ComposedChart
             data={chartData}
             margin={{ top: 6, right: 12, bottom: 0, left: 0 }}
@@ -154,11 +152,12 @@ export default function TotalTimeBarChart({
             />
             <XAxis
               dataKey="date"
+              interval={xTickInterval}
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
-                fontSize: 11,
-                fontWeight: 600,
+                fill: "var(--color-zinc-300)",
                 fontFamily: "monospace",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
               }}
               axisLine={false}
               tickLine={false}
@@ -172,9 +171,9 @@ export default function TotalTimeBarChart({
               allowDecimals={false}
               tickFormatter={formatYAxis}
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
-                fontSize: 11,
-                fontWeight: 600,
+                fill: "var(--color-zinc-300)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -185,8 +184,9 @@ export default function TotalTimeBarChart({
               yAxisId="right"
               orientation="right"
               tick={{
-                fill: variant === "card" ? "#d1d5db" : "#555",
-                fontSize: 10,
+                fill: "var(--color-zinc-300)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -197,74 +197,26 @@ export default function TotalTimeBarChart({
               cursor={{ fill: "rgba(255,255,255,0.03)" }}
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
-
-                const byName = new Map(
-                  payload.map((item) => [String(item.name), item]),
-                );
-
-                const easy = Number(byName.get("Easy")?.value ?? 0);
-                const medium = Number(byName.get("Medium")?.value ?? 0);
-                const hard = Number(byName.get("Hard")?.value ?? 0);
-                const solved = Number(byName.get("Total Solved")?.value ?? 0);
-
-                const rows = [
-                  {
-                    label: "Easy",
-                    value: easy,
-                    color: COLORS.Easy,
-                    hide: true,
-                  },
-                  {
-                    label: "Medium",
-                    value: medium,
-                    color: COLORS.Medium,
-                    hide: true,
-                  },
-                  {
-                    label: "Hard",
-                    value: hard,
-                    color: COLORS.Hard,
-                    hide: true,
-                  },
-                  {
-                    label: "Total Solved",
-                    value: solved,
-                    color: "#ffa116",
-                    hide: false,
-                  },
-                ].filter((row) => !(row.hide && row.value === 0));
+                const row = payload[0]?.payload as BarChartColumn | undefined;
+                if (!row) return null;
 
                 return (
-                  <div className="min-w-36 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-[11px] shadow-xl">
-                    <p className="mb-1.5 text-xs font-medium text-zinc-300">
-                      {String(label)}
-                    </p>
-                    {rows.length === 0 ? (
-                      <p className="leading-[1.7] text-zinc-600">No sessions</p>
-                    ) : (
-                      <div>
-                        {rows.map((row) => (
-                          <p
-                            key={row.label}
-                            className="leading-[1.7]"
-                            style={{ color: row.color }}
-                          >
-                            {row.label}:{" "}
-                            {row.label === "Total Solved"
-                              ? row.value
-                              : formatSeconds(row.value)}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <DifficultyStatsTooltip
+                    title={String(label)}
+                    difficultyEntries={row.difficultyEntries}
+                    difficulties={Object.values(Difficulty)}
+                    valueLabel="Time"
+                    formatValue={(entry) => formatDuration(entry.duration)}
+                  />
                 );
               }}
             />
 
             <Bar
               yAxisId="left"
-              dataKey="easy"
+              dataKey={(data: BarChartColumn) =>
+                getDuration(data, Difficulty.Easy)
+              }
               name="Easy"
               stackId="a"
               fill={COLORS.Easy}
@@ -273,7 +225,9 @@ export default function TotalTimeBarChart({
             />
             <Bar
               yAxisId="left"
-              dataKey="medium"
+              dataKey={(data: BarChartColumn) =>
+                getDuration(data, Difficulty.Medium)
+              }
               name="Medium"
               stackId="a"
               fill={COLORS.Medium}
@@ -282,7 +236,9 @@ export default function TotalTimeBarChart({
             />
             <Bar
               yAxisId="left"
-              dataKey="hard"
+              dataKey={(data: BarChartColumn) =>
+                getDuration(data, Difficulty.Hard)
+              }
               name="Hard"
               stackId="a"
               fill={COLORS.Hard}
@@ -292,18 +248,22 @@ export default function TotalTimeBarChart({
 
             <Line
               yAxisId="right"
-              type="monotone"
-              dataKey="problemCount"
+              type="linear"
+              dataKey={getProblemCount}
               name="Total Solved"
-              stroke="#ffa116"
-              strokeWidth={2.5}
+              stroke="var(--color-zinc-300)"
+              strokeWidth={2}
               dot={{
                 r: 3.5,
-                fill: "#ffa116",
+                fill: "var(--color-zinc-300)",
                 strokeWidth: 2,
-                stroke: "#09090b",
+                stroke: "var(--color-zinc-300)",
               }}
-              activeDot={{ r: 5, fill: "#ffa116", strokeWidth: 0 }}
+              activeDot={{
+                r: 5,
+                fill: "var(--color-zinc-300)",
+                strokeWidth: 0,
+              }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -313,6 +273,6 @@ export default function TotalTimeBarChart({
           </div>
         )}
       </div>
-    </div>
+    </AnalyticsCard>
   );
 }

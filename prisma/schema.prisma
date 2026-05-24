@@ -17,6 +17,7 @@ enum Difficulty {
   Easy
   Medium
   Hard
+  All // for analytics page
 }
 
 enum Status {
