@@ -88,8 +88,13 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
       {data.length === 0 ? (
         <AnalyticsEmptyState>No topic data yet</AnalyticsEmptyState>
       ) : (
-        <div className="min-w-0" style={{ height: chartHeight }}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+        <div className="relative min-w-0 w-full" style={{ height: chartHeight }}>
+          <ResponsiveContainer
+            width="100%"
+            height={chartHeight}
+            minWidth={0}
+            minHeight={0}
+          >
             <BarChart
               data={data}
               layout="vertical"

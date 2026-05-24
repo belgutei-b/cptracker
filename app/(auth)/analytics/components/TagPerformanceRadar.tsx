@@ -29,7 +29,9 @@ export default function TagPerformanceRadar({ data }: Props) {
       description="problems solved per tag"
     >
       {data.length === 0 ? (
-        <AnalyticsEmptyState className="h-80">No tag data yet</AnalyticsEmptyState>
+        <AnalyticsEmptyState className="h-80">
+          No tag data yet
+        </AnalyticsEmptyState>
       ) : (
         <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div className="relative h-100 min-w-0">
@@ -89,9 +91,9 @@ export default function TagPerformanceRadar({ data }: Props) {
               return (
                 <li
                   key={row.topic}
-                  className="flex items-center gap-3 rounded-lg border border-[#1e1e1e] bg-[#141414] px-3 py-2"
+                  className="flex items-center gap-3 rounded-lg text-xs border border-[#1e1e1e] bg-[#141414] px-3 py-2"
                 >
-                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-200">
+                  <span className="min-w-0 flex-1 truncate font-semibold text-neutral-200">
                     {row.topic}
                   </span>
                   <span className="relative h-0.5 w-24 bg-neutral-600">
@@ -100,7 +102,7 @@ export default function TagPerformanceRadar({ data }: Props) {
                       style={{ width: `${ratio * 100}%` }}
                     />
                   </span>
-                  <span className="font-mono text-xs font-semibold tabular-nums text-neutral-300">
+                  <span className="font-mono font-semibold tabular-nums text-neutral-300">
                     {totalSolved}
                   </span>
                 </li>

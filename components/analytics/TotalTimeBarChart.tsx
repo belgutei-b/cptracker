@@ -155,9 +155,9 @@ export default function TotalTimeBarChart({
               interval={xTickInterval}
               tick={{
                 fill: "var(--color-zinc-300)",
-                fontSize: 11,
-                fontWeight: 600,
                 fontFamily: "monospace",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
               }}
               axisLine={false}
               tickLine={false}
@@ -172,8 +172,8 @@ export default function TotalTimeBarChart({
               tickFormatter={formatYAxis}
               tick={{
                 fill: "var(--color-zinc-300)",
-                fontSize: 11,
-                fontWeight: 600,
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
@@ -185,7 +185,8 @@ export default function TotalTimeBarChart({
               orientation="right"
               tick={{
                 fill: "var(--color-zinc-300)",
-                fontSize: 10,
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-semibold)",
                 fontFamily: "monospace",
               }}
               axisLine={false}
