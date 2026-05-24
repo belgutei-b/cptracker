@@ -99,6 +99,8 @@ function tagsData({
   return topTopics;
 }
 
+// average solve time on each difficulty
+// during this timeline
 function getAvgSolveTime({
   currentSolvedProblems,
   previousSolvedProblems,
@@ -217,8 +219,6 @@ export async function getBarChartDataV2({
     timezone: string;
   };
 }) {
-  // 1. avg solve time this week for easy, medium and hard (this week)
-  // return  [{difficulty, comparisonToLastWeek: number}]
   const now = DateTime.now().setZone(query.timezone);
   const currentTimelineStart = now
     .minus({ days: query.numberOfDays - 1 })
@@ -256,17 +256,6 @@ export async function getBarChartDataV2({
     },
   });
 
-  // 1. Average solve time of each difficulty
-  const avgSolveTime = getAvgSolveTime({
-    currentSolvedProblems: solvedProblemsCurrent,
-    previousSolvedProblems: solvedProblemsPrevious,
-  });
-
-  // 2. current total time on each day bar chart
-  // return [{
-  //    date,
-  //    dayStat: [{difficulty, duration, numberOfSolved}]
-  // }]
   const sessions = await prisma.solveSession.findMany({
     where: {
       userProblem: {
@@ -283,6 +272,18 @@ export async function getBarChartDataV2({
     },
   });
 
+  // 1. Average solve time of each difficulty
+  // return DifficultyEntries = Record<Difficulty, DifficultyEntry>
+  const avgSolveTime = getAvgSolveTime({
+    currentSolvedProblems: solvedProblemsCurrent,
+    previousSolvedProblems: solvedProblemsPrevious,
+  });
+
+  // 2. total time on each day bar chart
+  // return [BarChartColumn] =  [{
+  //    date,
+  //    difficultyEntries
+  // }]
   const dailyBarChart = await getDailyTotalTimeBarChart({
     sessions,
     solvedProblemsCurrent,
@@ -291,7 +292,7 @@ export async function getBarChartDataV2({
   });
 
   // 3. number of solved problems in most common 10 topics
-  // return [{topic, numberOfSolved}]
+  // return [{topic, DifficultyEntries}]
   const tagsReceivedData: TopicRadarEntry[] = tagsData({
     solvedProblemsCurrent,
     avgSolveTime,

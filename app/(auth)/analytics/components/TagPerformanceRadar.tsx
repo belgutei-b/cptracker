@@ -98,26 +98,27 @@ export default function TagPerformanceRadar({ data }: Props) {
                       { name: "Hard", color: COLORS.Hard },
                     ];
                     return (
-                      <div className="min-w-44 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-[11px] shadow-xl">
+                      <div className="min-w-44 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-xs shadow-xl">
                         <div className="mb-1.5 flex items-baseline justify-between gap-3">
                           <p className="text-xs font-medium text-zinc-300">
                             {String(label)}
                           </p>
-                          <p
-                            className="text-[10px] font-semibold"
-                            style={{ color: ACCENT }}
-                          >
+                          <p className="text-[10px] font-semibold text-zinc-300">
                             {row.totalSolved} solved
                           </p>
                         </div>
                         {breakdown.map((b) => (
-                          <p
+                          <div
                             key={b.name}
-                            className="leading-[1.7]"
-                            style={{ color: b.color }}
+                            className="flex leading-[1.7] font-semibold"
                           >
-                            {b.name}: {row.byDifficulty[b.name]} solved
-                          </p>
+                            <p className="" style={{ color: b.color }}>
+                              {b.name}
+                            </p>
+                            <p className="text-zinc-300">
+                              : {row.byDifficulty[b.name]} solved
+                            </p>
+                          </div>
                         ))}
                       </div>
                     );

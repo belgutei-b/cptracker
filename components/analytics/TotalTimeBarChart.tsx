@@ -231,25 +231,24 @@ export default function TotalTimeBarChart({
                 ].filter((row) => !(row.hide && row.value === 0));
 
                 return (
-                  <div className="min-w-36 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-[11px] shadow-xl">
-                    <p className="mb-1.5 text-xs font-medium text-zinc-300">
-                      {String(label)}
-                    </p>
+                  <div className="min-w-36 rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2.5 font-mono text-xs text-stone-300 shadow-xl font-semibold">
+                    <p className="mb-1.5">{String(label)}</p>
                     {rows.length === 0 ? (
                       <p className="leading-[1.7] text-zinc-600">No sessions</p>
                     ) : (
                       <div>
                         {rows.map((row) => (
-                          <p
+                          <div
                             key={row.label}
-                            className="leading-[1.7]"
-                            style={{ color: row.color }}
+                            className="flex leading-[1.7] space-x-2"
                           >
-                            {row.label}:{" "}
-                            {row.label === "Total Solved"
-                              ? row.value
-                              : formatSeconds(row.value)}
-                          </p>
+                            <p style={{ color: row.color }}>{row.label}: </p>
+                            <p>
+                              {row.label === "Total Solved"
+                                ? row.value
+                                : formatSeconds(row.value)}
+                            </p>
+                          </div>
                         ))}
                       </div>
                     )}

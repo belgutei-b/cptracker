@@ -119,7 +119,7 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
                 }`}
                 style={{ gridTemplateColumns: "140px 1fr 110px" }}
               >
-                <div className="truncate text-right text-xs font-semibold text-stone-300">
+                <div className="truncate text-right text-xs font-semibold text-stone-300 font-mono">
                   {row.topic}
                 </div>
 

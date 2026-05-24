@@ -132,7 +132,7 @@ export default function SpeedVsAverageByTag({ data }: Props) {
                   }
                   return (
                     <div className="rounded-xl border border-[#2e2e2e] bg-[#141414] px-3 py-2 font-mono text-xs shadow-xl font-semibold">
-                      <p className="mb-0.5 text-xs text-zinc-300">{tag}</p>
+                      <p className="mb-0.5 text-zinc-300">{tag}</p>
                       <p className="text-stone-400">
                         {formatPercent(v)} - {verdict}
                       </p>
