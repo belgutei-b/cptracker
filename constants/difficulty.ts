@@ -4,5 +4,6 @@ export const DIFFICULTY_COLORS = {
   Medium: "#ffb800",
   // Hard: "#ff2d55",
   Hard: "#ff002b",
-  Total: "#00000",
+  Total: "#000000",
+  All: "#000000",
 } as const;
