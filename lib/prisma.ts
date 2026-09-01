@@ -6,7 +6,7 @@ function getDatabaseUrl() {
   const currEnv = process.env.NODE_ENV;
   let url = "";
   if (currEnv === "production") url = process.env.SUPABASE_PROD_URL ?? "";
-  else if (currEnv === "development") url = process.env.DB_URL_DEV ?? "";
+  else if (currEnv === "development") url = process.env.SUPABASE_DEV_URL ?? "";
   else url = process.env.DB_URL_TEST ?? "";
 
   if (!url) {
