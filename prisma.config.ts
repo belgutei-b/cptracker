@@ -8,8 +8,9 @@ import "dotenv/config";
  */
 
 // Prisma CLI/migrations should use a direct DB URL, not the Supabase pooler.
+// npx prisma migrate deploy
 const url = process.env.SUPABASE_PROD_DIRECT;
-// const url = process.env.DB_URL_DEV;
+// const url = process.env.SUPABASE_DEV_DIRECT;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

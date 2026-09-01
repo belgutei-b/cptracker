@@ -4,13 +4,14 @@ import Markdown from "markdown-to-jsx";
 import Link from "next/link";
 import localFont from "next/font/local";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { ExternalLink, CheckCircle, X } from "lucide-react";
+import { ExternalLink, CheckCircle, X, Trash2 } from "lucide-react";
 
 import { getDisplayedMilliseconds, useNowTick } from "@/lib/timer";
 import { DIFFICULTY_COLORS } from "@/constants/difficulty";
 import type { UserProblemFullClient } from "@/types/client";
 import { useFinishProblemMutation } from "@/hooks/problems/useFinishProblemMutation";
 import { useSaveProblemMutation } from "@/hooks/problems/useSaveProblemMutation";
+import { useDeleteProblemMutation } from "@/hooks/problems/useDeleteProblemMutation";
 
 const timerFont = localFont({
   src: [
@@ -101,9 +102,11 @@ function ProblemSolvingContent({
     timeComplexity: problem.timeComplexity ?? "",
     spaceComplexity: problem.spaceComplexity ?? "",
   });
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const noteTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const finishMutation = useFinishProblemMutation();
   const saveMutation = useSaveProblemMutation();
+  const deleteMutation = useDeleteProblemMutation();
 
   const hasChanges =
     note !== savedValues.note ||
@@ -118,6 +121,19 @@ function ProblemSolvingContent({
       timeComplexity,
       spaceComplexity,
     });
+  }
+
+  async function handleDelete() {
+    try {
+      await deleteMutation.mutateAsync({ userProblemId: problem.id });
+    } catch {
+      // the mutation already toasts; keep the dialog open so the user can retry
+      return;
+    }
+
+    // the problem no longer exists, so the modal cannot stay open
+    setIsConfirmingDelete(false);
+    onCloseAction();
   }
 
   async function handleSave() {
@@ -141,9 +157,11 @@ function ProblemSolvingContent({
   const canSave = problem.status === "SOLVED";
   const isFinishing = finishMutation.isPending;
   const isSaving = saveMutation.isPending;
+  const isDeleting = deleteMutation.isPending;
+  const isBusy = isFinishing || isSaving || isDeleting;
 
   const handleClose = useCallback(async () => {
-    if (isSaving || isFinishing) return;
+    if (isSaving || isFinishing || isDeleting) return;
 
     if (hasChanges) {
       // if mutation fails, the notes will be lost
@@ -160,6 +178,7 @@ function ProblemSolvingContent({
     hasChanges,
     isFinishing,
     isSaving,
+    isDeleting,
     note,
     onCloseAction,
     problem.id,
@@ -188,14 +207,20 @@ function ProblemSolvingContent({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        void handleClose();
+      if (e.key !== "Escape") return;
+
+      // the confirm dialog is on top, so it takes Escape first
+      if (isConfirmingDelete) {
+        if (!isDeleting) setIsConfirmingDelete(false);
+        return;
       }
+
+      void handleClose();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [handleClose]);
+  }, [handleClose, isConfirmingDelete, isDeleting]);
 
   return (
     <div
@@ -258,7 +283,7 @@ function ProblemSolvingContent({
 
           <button
             onClick={() => void handleClose()}
-            disabled={isSaving || isFinishing}
+            disabled={isBusy}
             className="text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors"
           >
             <X size={24} />
@@ -368,18 +393,30 @@ function ProblemSolvingContent({
 
         {(problem.status !== "SOLVED" || canSave) && (
           <div className="border-t border-[#3e3e3e] flex items-center justify-end gap-2 p-4">
+            {/* mr-auto pins delete to the far left, the rest stay right-aligned */}
+            <button
+              onClick={() => setIsConfirmingDelete(true)}
+              disabled={isBusy}
+              aria-label="Delete problem"
+              title="Delete problem"
+              className="mr-auto flex items-center gap-1.5 border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-400 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+
             {problem.status !== "SOLVED" && problem.status !== "TRIED" && (
               <>
                 <button
                   onClick={() => handleFinish({ isSolved: false })}
-                  disabled={isFinishing || isSaving}
+                  disabled={isBusy}
                   className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Tried
                 </button>
                 <button
                   onClick={() => handleFinish({ isSolved: true })}
-                  disabled={isFinishing || isSaving}
+                  disabled={isBusy}
                   className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-emerald-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Solved
@@ -389,7 +426,7 @@ function ProblemSolvingContent({
             {(canSave || problem.status === "TRIED") && (
               <button
                 onClick={handleSave}
-                disabled={isSaving || isFinishing || !hasChanges}
+                disabled={isBusy || !hasChanges}
                 className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? "Updating..." : "Update notes"}
@@ -398,6 +435,54 @@ function ProblemSolvingContent({
           </div>
         )}
       </div>
+
+      {isConfirmingDelete && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
+          <button
+            className="absolute inset-0 bg-black/70"
+            onClick={() => setIsConfirmingDelete(false)}
+            disabled={isDeleting}
+            aria-label="Cancel delete"
+          />
+
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-problem-heading"
+            className="relative z-10 w-full max-w-sm rounded-2xl border border-[#3e3e3e] bg-[#282828] p-5 shadow-xl"
+          >
+            <h2
+              id="delete-problem-heading"
+              className="text-lg font-semibold text-white"
+            >
+              Delete this problem?
+            </h2>
+            <p className="mt-2 text-sm leading-5 text-stone-300">
+              <span className="text-white">{problem.problem.title}</span> and
+              all of its solve sessions will be removed from your tracker. This
+              can&apos;t be undone.
+            </p>
+
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                onClick={() => setIsConfirmingDelete(false)}
+                disabled={isDeleting}
+                autoFocus
+                className="border border-[#3e3e3e] rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => void handleDelete()}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-500/90 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

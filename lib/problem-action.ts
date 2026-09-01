@@ -232,3 +232,48 @@ export async function serverFinishProblem({
     duration: newTotalDuration,
   };
 }
+
+/**
+ * User deleting a problem
+ *  1. Delete solve sessions
+ *  2. Delete UserProblem
+ * NOTE: it doesn't delete Problem entry in the database
+ *  as it could be used by other users
+ */
+export async function serverDeleteUserProblem({
+  userProblemId,
+  userId,
+}: {
+  userProblemId: string;
+  userId: string;
+}) {
+  if (!userId) {
+    throw new HttpError(400, "userId is missing");
+  }
+
+  if (!userProblemId) {
+    throw new HttpError(400, "problemId is missing");
+  }
+
+  // rollback if either query throws an error
+  await prisma.$transaction(async (tx) => {
+    // deleting all sessions of UserProblem
+    await tx.solveSession.deleteMany({
+      where: {
+        userProblemId,
+      },
+    });
+
+    // deleting UserProblem
+    await tx.userProblem.delete({
+      where: {
+        userId,
+        id: userProblemId,
+      },
+    });
+  });
+
+  return {
+    ok: true,
+  };
+}
