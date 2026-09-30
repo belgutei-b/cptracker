@@ -1,6 +1,7 @@
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { EXTENSION_STORE_URL } from "@/constants/extension";
 
 export default function Extension() {
   const extensionHighlights = [
@@ -40,7 +41,7 @@ export default function Extension() {
 
             <div className="flex flex-col md:flex-row items-start md:items-center gap-2 mt-7 md:mt-5">
               <Link
-                href="https://chromewebstore.google.com/detail/ojpjlobnleonmgehlhoibaicokoadcnm?utm_source=item-share-cb"
+                href={EXTENSION_STORE_URL}
                 className="landing-button landing-button-orange"
                 target="_blank"
                 rel="noreferrer"
