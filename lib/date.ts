@@ -64,7 +64,3 @@ export function toRoundedMinutes(totalSeconds: number) {
 
   return Math.round(totalSeconds / 60);
 }
-
-export function formatAverageDuration(totalSeconds: number) {
-  return `${formatDurationMinutes(totalSeconds)} avg`;
-}

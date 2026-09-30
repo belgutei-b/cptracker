@@ -1,9 +1,29 @@
 "use client";
-import DailyQuestionButton from "@/components/navbar/DailyQuestionButton";
-import { Brain, Menu, X } from "lucide-react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Menu, Terminal, User } from "lucide-react";
+
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import DailyQuestionButton from "@/components/navbar/DailyQuestionButton";
+import { cn } from "@/lib/utils";
+
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/analytics", label: "Analytics" },
+  { href: "/extension-auth", label: "Extension" },
+];
+
+function isActivePath(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 /**
  * Navbar for authenticated users
@@ -11,132 +31,120 @@ import { useState } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const closeMobileMenu = () => setMobileOpen(false);
-
-  const navItemClass = (isActive: boolean) =>
-    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-      isActive ? "bg-[#333] text-white" : "text-gray-400 hover:text-white"
-    }`;
 
   return (
-    <>
-      {/* desktop navbar */}
-      <nav className="hidden md:block bg-[#1a1a1a]/80 border-b border-neutral-700">
-        <div className="mx-auto flex items-center gap-6 px-6 pt-6 pb-4">
-          <Link
-            href="/"
-            className="text-xl font-bold text-amber-500 flex items-center gap-2 cursor-pointer"
-          >
-            <Brain size={24} /> CPTracker
-          </Link>
-          <div className="flex w-full justify-between">
-            {/* left side */}
-            <div className="flex items-center gap-2">
-              <Link
-                className={navItemClass(pathname === "/dashboard")}
-                href="/dashboard"
-              >
-                Dashboard
-              </Link>
-              <Link
-                className={navItemClass(pathname.startsWith("/extension-auth"))}
-                href="/extension-auth"
-              >
-                Extension
-              </Link>
-              <Link
-                className={navItemClass(pathname.startsWith("/analytics"))}
-                href="/analytics"
-              >
-                Analytics
-              </Link>
-            </div>
+    <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-7 px-4 md:px-12">
+        <AppLogo />
 
-            {/* right side */}
-            <div className="flex space-x-2">
-              <DailyQuestionButton />
-              <Link
-                className={navItemClass(pathname === "/profile")}
-                href="/profile"
-              >
-                Profile
-              </Link>
-            </div>
-          </div>
+        {/* desktop */}
+        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              active={isActivePath(pathname, item.href)}
+            />
+          ))}
+        </nav>
+        <div className="ml-auto hidden items-center gap-2.5 md:flex">
+          <DailyQuestionButton />
+          <ProfileLink active={isActivePath(pathname, "/profile")} />
         </div>
-      </nav>
 
-      {/* mobile navbar */}
-      <nav className="md:hidden bg-[#1a1a1a]/80 border-b border-neutral-700 px-4 py-4">
-        <div className="flex items-center justify-between gap-3">
-          <Link
-            href="/dashboard"
-            onClick={closeMobileMenu}
-            className="text-xl font-bold text-amber-500 flex items-center gap-2 cursor-pointer"
-          >
-            <Brain size={24} /> CPTracker
-          </Link>
-          <button
-            type="button"
-            aria-label={
-              mobileOpen ? "Close mobile navigation" : "Open mobile navigation"
-            }
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-navbar"
-            onClick={() => setMobileOpen((prev) => !prev)}
-            className="inline-flex items-center justify-center rounded-lg border border-neutral-700 p-2 text-gray-200 transition-colors hover:bg-[#333]"
-          >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+        {/* mobile */}
+        <div className="ml-auto flex items-center gap-1 md:hidden">
+          <DailyQuestionButton iconOnly />
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger
+              aria-label="Open menu"
+              className={buttonVariants({ variant: "ghost", size: "icon-lg" })}
+            >
+              <Menu />
+            </SheetTrigger>
+            <SheetContent className="gap-1 px-3 pt-14">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <nav aria-label="Main" className="flex flex-col gap-1">
+                {[...NAV_ITEMS, { href: "/profile", label: "Profile" }].map(
+                  (item) => (
+                    <NavLink
+                      key={item.href}
+                      href={item.href}
+                      label={item.label}
+                      active={isActivePath(pathname, item.href)}
+                      onClick={() => setMobileOpen(false)}
+                      className="h-11 text-base"
+                    />
+                  ),
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
-        <div
-          id="mobile-navbar"
-          aria-hidden={!mobileOpen}
-          className={`grid transition-all duration-300 ease-out ${
-            mobileOpen
-              ? "grid-rows-[1fr] opacity-100 mt-4"
-              : "grid-rows-[0fr] opacity-0 mt-0 pointer-events-none"
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="border-t border-neutral-700 pt-4">
-              <div className="flex flex-col gap-2">
-                <Link
-                  className={navItemClass(pathname === "/dashboard")}
-                  href="/dashboard"
-                  onClick={closeMobileMenu}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className={navItemClass(pathname === "/analytics")}
-                  href="/analytics"
-                  onClick={closeMobileMenu}
-                >
-                  Analytics
-                </Link>
-                <Link
-                  className={navItemClass(
-                    pathname.startsWith("/extension-auth"),
-                  )}
-                  href="/extension-auth"
-                  onClick={closeMobileMenu}
-                >
-                  Extension
-                </Link>
-                <DailyQuestionButton />
-                <Link
-                  className={navItemClass(pathname === "/profile")}
-                  href="/profile"
-                  onClick={closeMobileMenu}
-                >
-                  Profile
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </>
+      </div>
+    </header>
+  );
+}
+
+function AppLogo() {
+  return (
+    <Link
+      href="/dashboard"
+      className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight"
+    >
+      <span className="flex size-6.5 items-center justify-center rounded-md bg-primary text-primary-foreground">
+        <Terminal className="size-4" strokeWidth={2.5} />
+      </span>
+      CPTracker
+    </Link>
+  );
+}
+
+function NavLink({
+  href,
+  label,
+  active,
+  onClick,
+  className,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  onClick?: () => void;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+        active
+          ? "bg-muted text-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        className,
+      )}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function ProfileLink({ active }: { active: boolean }) {
+  return (
+    <Link
+      href="/profile"
+      aria-label="Profile"
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        buttonVariants({ variant: "outline", size: "icon-lg" }),
+        "rounded-full text-foreground/75",
+        active && "border-primary dark:border-primary",
+      )}
+    >
+      <User />
+    </Link>
   );
 }

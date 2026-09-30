@@ -29,5 +29,3 @@ export const githubSignIn = async () => {
 export const signOut = async () => {
   await authClient.signOut();
 };
-
-export const { useSession } = authClient;

@@ -1,69 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import ProblemFilters from "@/components/problems/ProblemFilters";
 import ProblemList from "@/components/problems/ProblemList";
 import ProblemListSkeleton from "@/components/problems/ProblemListSkeleton";
-import { UserProblemFullClient } from "@/types/client";
+import ProblemEmptyState from "@/components/problems/ProblemEmptyState";
+import ProblemSolving from "@/components/problems/ProblemSolving";
+import { useStartProblemMutation } from "@/hooks/problems/useStartProblemMutation";
+import { useNowTick } from "@/hooks/useNowTick";
+import { isTimerRunning } from "@/lib/timer";
+import {
+  EMPTY_FILTERS,
+  countByStatus,
+  filterProblems,
+} from "@/lib/problem-filters";
+import { STARTABLE_STATUSES } from "@/constants/status";
+import type { UserProblemFullClient } from "@/types/client";
 
+/**
+ * Filters + problems table + the solving sheet.
+ * Opening a Todo/Tried problem starts a new solve session.
+ */
 export default function DashboardMain({
   problems,
   timezone,
-  className,
   isLoading,
 }: {
   problems: UserProblemFullClient[];
   timezone: string;
-  className?: string;
   isLoading: boolean;
 }) {
-  const [difficulty, setDifficulty] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
+  const startMutation = useStartProblemMutation();
+
+  const visibleProblems = useMemo(
+    () => filterProblems(problems, filters),
+    [problems, filters],
+  );
+  const statusCounts = useMemo(() => countByStatus(problems), [problems]);
+
+  // looked up in the full list so filtering never closes the open sheet
+  const activeProblem = problems.find((p) => p.id === activeProblemId) ?? null;
+
+  const nowMs = useNowTick(problems.some(isTimerRunning));
+  const startingProblemId = startMutation.isPending
+    ? (startMutation.variables ?? null)
+    : null;
+
+  function openProblem(problem: UserProblemFullClient) {
+    setActiveProblemId(problem.id);
+
+    if (STARTABLE_STATUSES.includes(problem.status)) {
+      startMutation.mutate(problem.id);
+    }
+  }
+
+  if (isLoading) return <ProblemListSkeleton />;
+  if (problems.length === 0) return <ProblemEmptyState />;
+
   return (
-    <div className={["flex flex-col", className].filter(Boolean).join(" ")}>
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="text-xl text-white font-bold mb-1">My Dashboard</div>
-          <div className="text-gray-300 mb-5">
-            Keep track of your leetcode progress and efficiency.
-          </div>
+    <div className="flex flex-col gap-4">
+      <ProblemFilters
+        filters={filters}
+        onChange={setFilters}
+        statusCounts={statusCounts}
+        shownCount={visibleProblems.length}
+        totalCount={problems.length}
+      />
+
+      {visibleProblems.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-lg border bg-card py-16">
+          <p className="text-sm text-muted-foreground">
+            No problems match these filters.
+          </p>
+          <Button variant="outline" onClick={() => setFilters(EMPTY_FILTERS)}>
+            Clear filters
+          </Button>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex items-center gap-2">
-            <select
-              id="difficulty-filter"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="bg-[#1f1f1f] border border-[#3e3e3e] text-white text-sm rounded-lg px-3 py-2"
-            >
-              <option value="all">Difficulty</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-            <select
-              id="status-filter"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="bg-[#1f1f1f] border border-[#3e3e3e] text-white text-sm rounded-lg px-3 py-2"
-            >
-              <option value="all">Status</option>
-              <option value="todo">Todo</option>
-              <option value="in-progress">In Progress</option>
-              <option value="solved">Solved</option>
-              <option value="tried">Tried</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      {isLoading ? (
-        <ProblemListSkeleton />
       ) : (
         <ProblemList
-          problems={problems}
+          problems={visibleProblems}
           timezone={timezone}
-          filters={{ difficulty, status }}
+          nowMs={nowMs}
+          startingProblemId={startingProblemId}
+          onOpenProblem={openProblem}
         />
       )}
+
+      <ProblemSolving
+        problem={activeProblem}
+        onCloseAction={() => setActiveProblemId(null)}
+      />
     </div>
   );
 }

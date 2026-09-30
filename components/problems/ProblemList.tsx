@@ -1,24 +1,33 @@
 "use client";
 
-import Link from "next/link";
+import { ExternalLink, Lock, PanelRightOpen, Play } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
-  MoveUpRight,
-  CheckCircle,
-  ExternalLink,
-  Clock,
-  Play,
-} from "lucide-react";
-import { useMemo, useState } from "react";
-
-import ProblemSolving from "@/components/problems/ProblemSolving";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DifficultyText,
+  LiveDot,
+  StatusLabel,
+} from "@/components/problems/ProblemLabels";
+import { cn } from "@/lib/utils";
+import { formatDayMonthYear, formatDuration } from "@/lib/date";
+import { getDisplayedSeconds, isTimerRunning } from "@/lib/timer";
+import type { ProblemDifficulty } from "@/constants/difficulty";
+import { STATUS_ACTIONS, STATUS_LABELS } from "@/constants/status";
 import type { UserProblemFullClient } from "@/types/client";
-import { useNowTick, getDisplayedSeconds } from "@/lib/timer";
-import { formatDuration } from "@/lib/date";
-import { formatDayMonthYear } from "@/lib/date";
-import { DIFFICULTY_COLORS } from "@/constants/difficulty";
-import { useStartProblemMutation } from "@/hooks/problems/useStartProblemMutation";
 
-function getDisplayDate(problem: UserProblemFullClient) {
+// keeps the topics cell to roughly one line
+const MAX_TAGS = 2;
+const TAG_CHAR_BUDGET = 26;
+
+function getLastActivityDate(problem: UserProblemFullClient) {
   if (problem.status === "SOLVED") {
     return problem.solvedAt ?? problem.updatedAt ?? problem.createdAt;
   }
@@ -30,192 +39,213 @@ function getDisplayDate(problem: UserProblemFullClient) {
   return problem.createdAt;
 }
 
-export default function ProblemList({
-  filters = { difficulty: "all", status: "all" },
-  problems,
-  timezone,
-}: {
-  filters?: {
-    difficulty: string;
-    status: string;
-  };
-  problems: UserProblemFullClient[];
-  timezone: string;
-}) {
-  const startMutation = useStartProblemMutation();
-  const [activeProblemId, setActiveProblemId] = useState<string | null>(null);
+function fitTags(tags: string[]) {
+  const shown: string[] = [];
+  let usedChars = 0;
 
-  const activeProblem = useMemo(
-    () => problems.find((p) => p.problemId === activeProblemId) ?? null,
-    [problems, activeProblemId],
-  );
-
-  const difficultyFilter = filters.difficulty ?? "all";
-  const statusFilter = filters.status ?? "all";
-
-  const filteredProblems = useMemo(() => {
-    return problems.filter((p) => {
-      const matchesDifficulty =
-        difficultyFilter === "all" ||
-        p.problem.difficulty.toLowerCase() === difficultyFilter;
-      const normalizedStatus = p.status.toLowerCase().replace("_", "-");
-      const matchesStatus =
-        statusFilter === "all" || normalizedStatus === statusFilter;
-      return matchesDifficulty && matchesStatus;
-    });
-  }, [problems, difficultyFilter, statusFilter]);
-
-  const anyRunning = problems.some(
-    (p) => p.status === "IN_PROGRESS" && p.lastStartedAt,
-  );
-  const nowMs = useNowTick(anyRunning);
-
-  function startProblem(userProblemId: string, problemId: string) {
-    const existing = problems.find((p) => p.id === userProblemId);
-
-    // Always open the modal
-    setActiveProblemId(problemId);
-
-    // If already running, DO NOT call /start
-    if (existing?.status === "IN_PROGRESS" && existing.lastStartedAt) return;
-    if (existing?.status === "SOLVED") return;
-
-    startMutation.mutate(userProblemId);
+  for (const tag of tags) {
+    const overBudget = usedChars + tag.length > TAG_CHAR_BUDGET;
+    if (shown.length === MAX_TAGS || (shown.length > 0 && overBudget)) break;
+    shown.push(tag);
+    usedChars += tag.length;
   }
 
-  if (filteredProblems.length === 0) {
-    if (problems.length === 0) {
-      return (
-        <div className="relative flex justify-center min-h-screen border border-dashed border-stone-500">
-          <MoveUpRight
-            className="hidden md:block absolute top-2 right-2 text-gray-300 rotate-10"
-            size={160}
-          />
-          <div className="flex flex-col mt-40">
-            <p className="text-xl text-white font-bold">Welcome to CPTracker</p>
-            <p className="text-gray-300 text-sm relative z-10">
-              Add problems and they&apos;ll show up here.
-            </p>
-          </div>
+  return { shown, hiddenCount: tags.length - shown.length };
+}
+
+export default function ProblemList({
+  problems,
+  timezone,
+  nowMs,
+  startingProblemId,
+  onOpenProblem,
+}: {
+  problems: UserProblemFullClient[];
+  timezone: string;
+  nowMs: number;
+  startingProblemId: string | null;
+  onOpenProblem: (problem: UserProblemFullClient) => void;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg border bg-card">
+      <Table className="table-fixed">
+        <TableHeader>
+          <TableRow className="bg-muted/40 hover:bg-muted/40">
+            <TableHead className="hidden w-16 px-4 text-muted-foreground sm:table-cell">
+              #
+            </TableHead>
+            <TableHead className="px-4 text-muted-foreground">Problem</TableHead>
+            <TableHead className="hidden w-24 px-4 text-muted-foreground md:table-cell">
+              Difficulty
+            </TableHead>
+            <TableHead className="hidden w-32 px-4 text-muted-foreground md:table-cell">
+              Status
+            </TableHead>
+            <TableHead className="hidden w-64 px-4 text-muted-foreground xl:table-cell">
+              Topics
+            </TableHead>
+            <TableHead className="w-24 px-4 text-right text-muted-foreground">
+              Time
+            </TableHead>
+            <TableHead className="hidden w-32 px-4 text-muted-foreground lg:table-cell">
+              Last activity
+            </TableHead>
+            <TableHead className="w-14 sm:w-28">
+              <span className="sr-only">Actions</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {problems.map((problem) => (
+            <ProblemRow
+              key={problem.id}
+              problem={problem}
+              timezone={timezone}
+              nowMs={nowMs}
+              isStarting={startingProblemId === problem.id}
+              onOpen={() => onOpenProblem(problem)}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+function ProblemRow({
+  problem,
+  timezone,
+  nowMs,
+  isStarting,
+  onOpen,
+}: {
+  problem: UserProblemFullClient;
+  timezone: string;
+  nowMs: number;
+  isStarting: boolean;
+  onOpen: () => void;
+}) {
+  const { title, questionId, link } = problem.problem;
+  const difficulty = problem.problem.difficulty as ProblemDifficulty;
+  const running = isTimerRunning(problem);
+  const seconds = getDisplayedSeconds(problem, nowMs);
+
+  return (
+    <TableRow>
+      <TableCell className="hidden px-4 py-3 font-mono text-[13px] text-muted-foreground sm:table-cell">
+        {questionId}
+      </TableCell>
+
+      <TableCell className="px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="truncate font-medium">{title}</span>
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open ${title} on LeetCode`}
+            className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ExternalLink className="size-3.5" />
+          </a>
         </div>
-      );
-    }
+        {/* columns hidden on small screens are summarised under the title */}
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground md:hidden">
+          <span className="font-mono">#{questionId}</span>
+          <span aria-hidden>·</span>
+          <DifficultyText difficulty={difficulty} />
+          <span aria-hidden>·</span>
+          <span className={cn(running && "text-primary")}>
+            {STATUS_LABELS[problem.status]}
+          </span>
+        </div>
+      </TableCell>
+
+      <TableCell className="hidden px-4 py-3 text-[13px] md:table-cell">
+        <DifficultyText difficulty={difficulty} />
+      </TableCell>
+
+      <TableCell className="hidden px-4 py-3 text-[13px] md:table-cell">
+        <StatusLabel status={problem.status} />
+      </TableCell>
+
+      <TableCell className="hidden px-4 py-3 xl:table-cell">
+        <ProblemTopics problem={problem} />
+      </TableCell>
+
+      <TableCell className="px-4 py-3 text-right font-mono text-[13px]">
+        {running ? (
+          <span className="inline-flex items-center gap-2 text-primary">
+            <LiveDot />
+            {formatDuration(seconds)}
+          </span>
+        ) : (
+          <span className="text-foreground/75">
+            {seconds > 0 ? formatDuration(seconds) : "—"}
+          </span>
+        )}
+      </TableCell>
+
+      <TableCell className="hidden px-4 py-3 text-[13px] text-muted-foreground lg:table-cell">
+        {formatDayMonthYear(getLastActivityDate(problem), timezone)}
+      </TableCell>
+
+      <TableCell className="py-3 pr-3 pl-0 text-right sm:px-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onOpen}
+          disabled={isStarting}
+          aria-label={`${STATUS_ACTIONS[problem.status]} ${title}`}
+          className={cn(
+            running &&
+              "border-primary/45 text-primary hover:bg-primary/10 hover:text-primary dark:border-primary/45",
+          )}
+        >
+          {problem.status === "SOLVED" ? (
+            <PanelRightOpen />
+          ) : (
+            <Play className="size-3 fill-current" />
+          )}
+          {/* icon-only on phones */}
+          <span className="sr-only sm:not-sr-only">
+            {STATUS_ACTIONS[problem.status]}
+          </span>
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+/** topics stay hidden until the problem is solved so they don't give hints */
+function ProblemTopics({ problem }: { problem: UserProblemFullClient }) {
+  if (problem.status !== "SOLVED") {
     return (
-      <div className="flex items-center justify-center min-h-50">
-        <p className="text-gray-500 text-sm">No problems match your filters</p>
-      </div>
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Lock className="size-3" />
+        Hidden until solved
+      </span>
     );
   }
 
+  const { shown, hiddenCount } = fitTags(problem.problem.tags);
+
   return (
-    <>
-      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
-        {filteredProblems.map((problem) => {
-          const displayDate = formatDayMonthYear(
-            getDisplayDate(problem),
-            timezone,
-          );
-          const isStarting =
-            startMutation.isPending &&
-            startMutation.variables === problem.problemId;
-
-          return (
-            <div
-              key={problem.problemId}
-              className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full flex flex-col justify-between"
-            >
-              {/* UPPER PART  */}
-              <div>
-                {/* Difficulty | Duration */}
-                <div className="flex justify-between mb-2">
-                  {/* Difficulty | left side */}
-                  <div className="flex items-center gap-1.5">
-                    <p
-                      className="text-xs font-bold tracking-wider uppercase"
-                      style={{
-                        color: DIFFICULTY_COLORS[problem.problem.difficulty],
-                      }}
-                    >
-                      {problem.problem.difficulty}
-                    </p>
-                    <CheckCircle
-                      size={16}
-                      style={{
-                        color: DIFFICULTY_COLORS[problem.problem.difficulty],
-                      }}
-                    />
-                  </div>
-                  {/* Duration | right side */}
-                  <div className="flex items-center text-xs font-mono text-gray-400">
-                    <Clock size={12} className="mr-1.5" />
-                    <p className="tracking-tighter">
-                      {formatDuration(getDisplayedSeconds(problem, nowMs))}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Title & Problem link */}
-                <div className="text-base font-semibold flex gap-2 text-white">
-                  <p>
-                    {problem.problem.questionId}. {problem.problem.title}
-                  </p>
-                  <Link
-                    href={problem.problem.link}
-                    target="_blank"
-                    className="text-gray-500 hover:text-white transition-colors mt-1"
-                  >
-                    <ExternalLink size={16} />
-                  </Link>
-                </div>
-
-                {/* Topics */}
-                <div className="flex gap-2 flex-wrap my-3">
-                  {problem.status === "SOLVED" ? (
-                    problem.problem.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300"
-                      >
-                        {tag}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="px-2 py-0.5 rounded bg-[#3e3e3e] text-[10px] text-gray-300">
-                      topics hidden
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* BOTTOM PART */}
-              <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
-                <button
-                  onClick={() => startProblem(problem.id, problem.problemId)}
-                  disabled={isStarting}
-                  className="p-2 rounded-lg transition-all text-white bg-[#3e3e3e] hover:bg-[#4e4e4e] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Play size={18} />
-                </button>
-
-                <div className="flex flex-col items-end">
-                  <div className="text-xs text-white font-semibold uppercase">
-                    {problem.status}
-                  </div>
-                  {/* TODO: use timezone here */}
-                  <div className="text-[11px] text-gray-400">{displayDate}</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <ProblemSolving
-        open={activeProblem !== null}
-        onCloseAction={() => setActiveProblemId(null)}
-        problem={activeProblem}
-        nowMs={nowMs}
-      />
-    </>
+    <div className="flex items-center gap-1.5 overflow-hidden">
+      {shown.map((tag) => (
+        <span
+          key={tag}
+          className="rounded-md border bg-muted px-2 py-0.5 text-xs whitespace-nowrap text-foreground/80"
+        >
+          {tag}
+        </span>
+      ))}
+      {hiddenCount > 0 && (
+        <span className="font-mono text-xs text-muted-foreground">
+          +{hiddenCount}
+        </span>
+      )}
+    </div>
   );
 }

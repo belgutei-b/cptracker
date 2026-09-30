@@ -1,21 +1,12 @@
-import { useState, useEffect } from "react";
-
 type TimerDisplayInput = {
   duration: number;
   status: "TODO" | "IN_PROGRESS" | "TRIED" | "SOLVED";
   lastStartedAt?: string | Date | null;
 };
 
-export function useNowTick(enabled: boolean, intervalMs = 1000) {
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (!enabled) return;
-    const id = window.setInterval(() => setNow(Date.now()), intervalMs);
-    return () => window.clearInterval(id);
-  }, [enabled, intervalMs]);
-
-  return now;
+/** a problem's timer runs while it is in progress and has been started */
+export function isTimerRunning(p: TimerDisplayInput) {
+  return p.status === "IN_PROGRESS" && !!p.lastStartedAt;
 }
 
 export function getDisplayedMilliseconds(p: TimerDisplayInput, nowMs: number) {
