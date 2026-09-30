@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, Terminal, User } from "lucide-react";
+import { Menu, User } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import AppLogo from "@/components/AppLogo";
 import DailyQuestionButton from "@/components/navbar/DailyQuestionButton";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +36,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-7 px-4 md:px-12">
-        <AppLogo />
+        <AppLogo href="/dashboard" />
 
         {/* desktop */}
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
@@ -84,20 +85,6 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  );
-}
-
-function AppLogo() {
-  return (
-    <Link
-      href="/dashboard"
-      className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight"
-    >
-      <span className="flex size-6.5 items-center justify-center rounded-md bg-primary text-primary-foreground">
-        <Terminal className="size-4" strokeWidth={2.5} />
-      </span>
-      CPTracker
-    </Link>
   );
 }
 

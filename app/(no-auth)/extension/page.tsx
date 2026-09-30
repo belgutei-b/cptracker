@@ -12,7 +12,7 @@ export const metadata: Metadata = {
  */
 export default function Page() {
   return (
-    <main className="mx-auto max-w-6xl px-6 pt-10">
+    <main className="landing-container pt-10">
       <ExtensionBody isAuth={false} />
     </main>
   );

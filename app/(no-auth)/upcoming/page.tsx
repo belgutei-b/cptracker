@@ -1,10 +1,4 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Inter } from "next/font/google";
-import Logo from "@/components/no-auth/Logo";
 import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const upcomingFeatures = [
   {
@@ -18,20 +12,7 @@ const upcomingFeatures = [
 
 export default function Page() {
   return (
-    <main className={`${inter.className} overflow-hidden text-white min-h-dvh`}>
-      {/* Nav */}
-      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
-        <Logo className="mb-0!" />
-
-        <Link
-          href="/auth"
-          className="landing-button landing-button-orange whitespace-nowrap"
-        >
-          Get Started
-          <ArrowRight size={14} />
-        </Link>
-      </nav>
-
+    <main className="overflow-hidden text-white">
       <section className="landing-section-outer border-t-0!">
         <RoundedBoxedTitle title="Product roadmap" />
 

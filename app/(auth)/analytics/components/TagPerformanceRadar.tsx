@@ -1,64 +1,57 @@
 "use client";
 
 import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+
+import AnalyticsCard from "@/components/analytics/AnalyticsCard";
 import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
+import { CHART_COLORS } from "@/constants/analytics";
+import { DIFFICULTIES, DIFFICULTY_DOT_CLASS } from "@/constants/difficulty";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
-import AnalyticsCard from "@/components/analytics/AnalyticsCard";
 import AnalyticsEmptyState from "./AnalyticsEmptyState";
 
 type Props = {
   data: TopicRadarEntry[];
 };
 
+const RADAR_HEIGHT = 380;
+
+function getSolved(topic: TopicRadarEntry, difficulty: Difficulty = Difficulty.All) {
+  return topic.difficultyEntries[difficulty].numberOfSolved;
+}
+
+/** problems solved per topic: radar for the shape, list for the numbers */
 export default function TagPerformanceRadar({ data }: Props) {
-  const maxSolved =
-    data[0]?.difficultyEntries[Difficulty.All].numberOfSolved ?? 0;
+  // topics arrive sorted by solved count
+  const maxSolved = data[0] ? getSolved(data[0]) : 0;
 
   return (
-    <AnalyticsCard
-      title="Tag Performance Radar"
-      description="problems solved per tag"
-    >
+    <AnalyticsCard title="Problems solved per topic" description="Your 10 most-solved topics, by difficulty">
       {data.length === 0 ? (
-        <AnalyticsEmptyState className="h-80">
-          No tag data yet
-        </AnalyticsEmptyState>
+        <AnalyticsEmptyState className="h-80">No topic data yet</AnalyticsEmptyState>
       ) : (
-        <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <div className="relative h-100 min-w-0">
-            <ResponsiveContainer width="100%" height={400} minWidth={0}>
-              <RadarChart data={data} outerRadius="75%">
-                <PolarGrid stroke="var(--color-stone-600)" />
+        <div className="grid min-w-0 gap-6 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-center">
+          <div className="min-w-0" style={{ height: RADAR_HEIGHT }}>
+            <ResponsiveContainer width="100%" height={RADAR_HEIGHT} minWidth={0}>
+              <RadarChart data={data} outerRadius="72%">
+                <PolarGrid stroke={CHART_COLORS.grid} />
                 <PolarAngleAxis
                   dataKey="topic"
-                  tick={{
-                    fill: "var(--color-stone-200)",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    fontFamily: "monospace",
-                  }}
+                  tick={{ fill: CHART_COLORS.axis, fontSize: 12, fontFamily: "var(--font-geist-sans)" }}
                 />
-                <PolarRadiusAxis
-                  tick={false}
-                  axisLine={false}
-                  stroke="#1e1e1e"
-                />
+                <PolarRadiusAxis tick={false} axisLine={false} />
                 <Tooltip
                   content={({ active, payload, label }) => {
-                    if (!active || !payload?.length) return null;
-                    const row = payload[0]?.payload as
-                      | TopicRadarEntry
-                      | undefined;
-                    if (!row) return null;
+                    const row = payload?.[0]?.payload as TopicRadarEntry | undefined;
+                    if (!active || !row) return null;
                     return (
                       <DifficultyStatsTooltip
                         title={String(label)}
@@ -70,41 +63,43 @@ export default function TagPerformanceRadar({ data }: Props) {
                 />
                 <Radar
                   name="Solved"
-                  dataKey={(topic: TopicRadarEntry) =>
-                    topic.difficultyEntries[Difficulty.All].numberOfSolved
-                  }
-                  stroke="#e7e5e4"
-                  fill="#d4d4d8"
-                  fillOpacity={0.2}
+                  dataKey={(topic: TopicRadarEntry) => getSolved(topic)}
+                  stroke={CHART_COLORS.solvedLine}
+                  fill={CHART_COLORS.solvedLine}
+                  fillOpacity={0.15}
                   strokeWidth={2}
                 />
               </RadarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Topics | number of solved problems */}
-          <ul className="flex flex-col gap-2">
-            {data.map((row) => {
-              const totalSolved =
-                row.difficultyEntries[Difficulty.All].numberOfSolved;
-              const ratio = maxSolved > 0 ? totalSolved / maxSolved : 0;
+          <ul className="flex flex-col gap-3">
+            {data.map((topic) => {
+              const total = getSolved(topic);
               return (
-                <li
-                  key={row.topic}
-                  className="flex items-center gap-3 rounded-lg text-xs border border-[#1e1e1e] bg-[#141414] px-3 py-2"
-                >
-                  <span className="min-w-0 flex-1 truncate font-semibold text-neutral-200">
-                    {row.topic}
-                  </span>
-                  <span className="relative h-0.5 w-24 bg-neutral-600">
-                    <span
-                      className="absolute inset-y-0 left-0 bg-stone-200"
-                      style={{ width: `${ratio * 100}%` }}
-                    />
-                  </span>
-                  <span className="font-mono font-semibold tabular-nums text-neutral-300">
-                    {totalSolved}
-                  </span>
+                <li key={topic.topic} className="flex flex-col gap-1.5">
+                  <div className="flex justify-between text-sm">
+                    <span className="truncate">{topic.topic}</span>
+                    <span className="font-mono text-foreground/75">{total}</span>
+                  </div>
+                  {/* bar length is relative to the top topic, split by difficulty */}
+                  <div aria-hidden className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="flex h-full gap-px"
+                      style={{ width: `${maxSolved > 0 ? (total / maxSolved) * 100 : 0}%` }}
+                    >
+                      {DIFFICULTIES.map((difficulty) => {
+                        const solved = getSolved(topic, difficulty);
+                        return solved > 0 ? (
+                          <span
+                            key={difficulty}
+                            className={DIFFICULTY_DOT_CLASS[difficulty]}
+                            style={{ flexGrow: solved }}
+                          />
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
                 </li>
               );
             })}

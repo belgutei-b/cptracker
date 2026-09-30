@@ -44,3 +44,5 @@ next-env.d.ts
 /prisma/generated/
 
 /certs/
+# local notes on API changes for the new UI
+/Changes.md

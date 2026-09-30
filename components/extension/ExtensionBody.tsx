@@ -16,7 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import ExtensionSteps from "@/components/extension/ExtensionSteps";
-import { EXTENSION_STORE_URL } from "@/constants/extension";
+import { EXTENSION_STORE_URL } from "@/constants/links";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
