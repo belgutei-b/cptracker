@@ -1,6 +1,14 @@
 This favicon was generated using the following font:
 
-- Font Title: Leckerli One
-- Font Author: undefined
-- Font Source: https://fonts.gstatic.com/s/leckerlione/v21/V8mCoQH8VCsNttEnxnGQ-1itLZxcBtItFw.ttf
-- Font License: undefined)
+- Font Title: JetBrains Mono ExtraBold (800)
+- Font Author: JetBrains
+- Font Source: https://fonts.google.com/specimen/JetBrains+Mono
+- Font License: SIL Open Font License 1.1
+
+Design:
+
+- Text: "CP", letter-spacing -0.04em, centered on the cap height
+- Colors: tile #c6f36d (lime, theme `primary`), text #0b0d0e (theme `primary-foreground`)
+- Proportions: corner radius 22.9% and text size 45.8% of the tile
+- Small sizes use larger text to stay readable: 16px 60%, 32px 54%, 48px (in favicon.ico) 50%
+- apple-touch-icon.png is a full square (iOS rounds the corners itself)

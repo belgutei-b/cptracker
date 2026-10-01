@@ -49,3 +49,6 @@ next-env.d.ts
 
 # local guide for Claude / agents building the front-end
 /CLAUDE.md
+
+# logo source files (store listing, extension icons)
+/logo/
