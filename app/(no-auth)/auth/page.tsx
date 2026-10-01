@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Auth from "@/components/Auth";
 
-export default async function Page() {
+export const metadata: Metadata = {
+  title: "Sign in - CPTracker",
+  description:
+    "Sign in to CPTracker to time your LeetCode problems and see your solve time by difficulty and topic.",
+};
+
+export default function Page() {
   return (
-    <div className="min-h-screen mt-4">
-      <div className="w-full border-b border-neutral-700" />
+    <main className="landing-container flex justify-center py-16 md:py-26">
       <Auth />
-    </div>
+    </main>
   );
 }
