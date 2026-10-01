@@ -46,3 +46,6 @@ next-env.d.ts
 /certs/
 # local notes on API changes for the new UI
 /Changes.md
+
+# local guide for Claude / agents building the front-end
+/CLAUDE.md

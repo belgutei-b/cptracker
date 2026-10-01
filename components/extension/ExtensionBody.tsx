@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -23,7 +22,7 @@ const FEATURES = [
   {
     icon: MousePointerClick,
     title: "One click to add",
-    body: "Open the panel on a problem and it’s added to your tracker. No copying links.",
+    body: "Open the extention on a LeetCode problem and it’s added to your tracker.",
   },
   {
     icon: Timer,
@@ -52,7 +51,7 @@ const FAQS = [
   {
     question: "What does it read from my browser?",
     answer:
-      "Only the address of the current tab, to check that you’re on a LeetCode problem.",
+      "Only the address of the current tab, to add the problem to your CPTracker account.",
   },
   {
     question: "Where does my data go?",
@@ -73,7 +72,7 @@ export default function ExtensionBody({ isAuth }: { isAuth: boolean }) {
     <div className="flex flex-col">
       <Hero privacyHref={privacyHref} />
 
-      <Section eyebrow="Why use it" title="Less tab switching. More honest numbers.">
+      <Section eyebrow="Why use it" title="No tab switching between CPTracker and LeetCode.">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map(({ icon: Icon, title, body }) => (
             <article key={title} className="flex flex-col gap-3.5 rounded-xl border bg-card p-5.5">
@@ -170,31 +169,11 @@ function Hero({ privacyHref }: { privacyHref: string }) {
           </Button>
         </div>
 
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-          {["Free", "Works on leetcode.com", "Uses your CPTracker sign-in"].map((item) => (
-            <li key={item} className="flex items-center gap-1.5">
-              <Check className="size-3.5 text-primary" strokeWidth={2.5} />
-              {item}
-            </li>
-          ))}
-        </ul>
         <p className="text-[13px] text-muted-foreground md:hidden">
           Works in Chrome on a computer. Open this page there to install.
         </p>
       </div>
-
-      <figure className="overflow-hidden rounded-xl border bg-card shadow-[0_40px_100px_rgba(0,0,0,0.55)]">
-        <Image
-          src="/extension/step-2-solving.png"
-          alt="The CPTracker panel open on a LeetCode problem with the timer running and notes filled in"
-          width={1280}
-          height={800}
-          sizes="(min-width: 1280px) 60vw, 100vw"
-          priority
-          className="h-auto w-full"
-        />
-      </figure>
-    </section>
+    </section >
   );
 }
 

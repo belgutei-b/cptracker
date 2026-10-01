@@ -42,31 +42,6 @@ export default function ProfileSettings({
       </SettingsSection>
 
       <SettingsSection
-        title="Sign-in methods"
-        description="The accounts you can use to sign in."
-      >
-        <ul className="divide-y rounded-lg border bg-card">
-          {SIGN_IN_PROVIDERS.map((provider) => {
-            const isConnected = providers.includes(provider);
-            return (
-              <li key={provider} className="flex items-center gap-3.5 px-4 py-3.5">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <ProviderIcon provider={provider} className="size-4" />
-                </span>
-                <span className="flex-1 text-sm font-medium">
-                  {getProviderLabel(provider)}
-                </span>
-                <span className={isConnected ? "text-sm text-primary" : "text-sm text-muted-foreground"}>
-                  {isConnected ? "Connected" : "Not connected"}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-        <ComingSoon>Connecting another account is coming soon.</ComingSoon>
-      </SettingsSection>
-
-      <SettingsSection
         title="Time zone"
         description="Dates, streaks and daily totals are counted in this zone."
       >
