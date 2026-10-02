@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils";
 
 export default function AnalyticsSection() {
   return (
-    <section id="analytics" aria-labelledby="analytics-title" className="scroll-mt-16 border-t">
+    <section
+      id="analytics"
+      aria-labelledby="analytics-title"
+      className="landing-band relative scroll-mt-16 border-t"
+    >
+      {/* lime highlight over the top border */}
+      <div aria-hidden className="landing-hairline absolute inset-x-0 -top-px h-px opacity-75" />
       <div className="landing-container flex flex-col gap-14 py-16 md:gap-18 md:py-26">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <SectionHeading

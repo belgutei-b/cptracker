@@ -114,6 +114,55 @@
   @apply mx-auto w-full max-w-[1248px] px-6;
 }
 
+/* ---------- landing page backgrounds ---------- */
+
+/*
+ * Landing page only: a faint line grid and low-opacity lime light behind the
+ * hero and final CTA (LandingBackdrop), the product preview and the analytics band.
+ * App pages stay flat.
+ */
+
+/* 64px grid of faint foreground lines; pair with a landing-fade-* mask */
+@utility landing-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+}
+
+@utility landing-fade-top {
+  mask-image: radial-gradient(ellipse 70% 62% at 50% 0%, #000 25%, transparent 78%);
+}
+
+@utility landing-fade-bottom {
+  mask-image: radial-gradient(ellipse 60% 90% at 50% 100%, #000 15%, transparent 75%);
+}
+
+/* soft lime light coming from the top or bottom edge */
+@utility landing-glow-top {
+  background-image: radial-gradient(ellipse 55% 42% at 50% 0%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
+}
+
+@utility landing-glow-bottom {
+  background-image: radial-gradient(ellipse 45% 70% at 50% 100%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
+}
+
+/* wide light the hero product preview sits on */
+@utility landing-horizon {
+  background-image: radial-gradient(ellipse 48% 50% at 50% 50%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 72%);
+}
+
+/* 1px lime line that fades out at both ends */
+@utility landing-hairline {
+  background-image: linear-gradient(90deg, transparent 15%, color-mix(in srgb, var(--primary) 55%, transparent), transparent 85%);
+}
+
+/* section background that steps from card down to the page background */
+@utility landing-band {
+  background-image: linear-gradient(to bottom, var(--card), var(--background) 560px);
+}
+
 /* ---------- roadmap page (old landing styles) ---------- */
 
 .landing-section-outer {

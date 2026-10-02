@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import LandingBackdrop from "@/components/landing/LandingBackdrop";
 import { Button } from "@/components/ui/button";
 
 export default function FinalCta({ isSignedIn }: { isSignedIn: boolean }) {
   return (
     <section aria-labelledby="final-cta-title" className="landing-container pb-16 md:pb-26">
-      <div className="flex flex-col items-center gap-5 rounded-3xl border bg-card px-6 py-14 text-center md:p-18">
+      <div className="relative isolate flex flex-col items-center gap-5 overflow-hidden rounded-3xl border bg-card px-6 py-14 text-center md:p-18">
+        <LandingBackdrop edge="bottom" />
         <h2
           id="final-cta-title"
           className="max-w-[760px] text-3xl leading-[1.08] font-semibold tracking-[-0.035em] md:text-[44px]"
