@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { DateTime } from "luxon";
 
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileOverview from "@/components/profile/ProfileOverview";
@@ -9,7 +8,6 @@ import ProfileSessions from "@/components/profile/ProfileSessions";
 import ProfileSettings from "@/components/profile/ProfileSettings";
 import ProfileTabs, { parseProfileTab } from "@/components/profile/ProfileTabs";
 import { ProfileTabSkeleton } from "@/components/profile/ProfileSkeleton";
-import type { Device } from "@/components/profile/DeviceList";
 import { auth } from "@/lib/auth";
 import { formatDayMonthYear } from "@/lib/date";
 import { getProblems } from "@/lib/problem";
@@ -22,7 +20,6 @@ import {
 } from "@/lib/profile-stats";
 import { getSolveSessions } from "@/lib/solveSessions";
 import { getProfileOverview, getUserTimezone } from "@/lib/user";
-import { describeUserAgent } from "@/lib/user-agent";
 
 const RECENT_SESSION_DAYS = 3;
 
@@ -67,12 +64,11 @@ export default async function Page({
           <SessionsTab userId={user.id} timezone={timezone} />
         )}
         {tab === "settings" && (
-          <SettingsTab
+          <ProfileSettings
             name={user.name}
             email={user.email}
             providers={overview.providers}
             timezone={timezone}
-            currentSessionToken={session.session.token}
           />
         )}
       </Suspense>
@@ -125,42 +121,4 @@ async function SessionsTab({
       sessionCount={sessions.length}
     />
   );
-}
-
-async function SettingsTab({
-  currentSessionToken,
-  ...profile
-}: {
-  name: string;
-  email: string;
-  providers: string[];
-  timezone: string;
-  currentSessionToken: string;
-}) {
-  const authSessions = await auth.api.listSessions({
-    headers: await headers(),
-  });
-
-  // this device first, then the most recently active
-  const devices: Device[] = authSessions
-    .toSorted(
-      (a, b) =>
-        Number(b.token === currentSessionToken) -
-          Number(a.token === currentSessionToken) ||
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    )
-    .map((authSession) => {
-      const isCurrent = authSession.token === currentSessionToken;
-      const lastActive = DateTime.fromJSDate(new Date(authSession.updatedAt));
-      return {
-        token: authSession.token,
-        ...describeUserAgent(authSession.userAgent),
-        isCurrent,
-        lastActive: isCurrent
-          ? "Active now"
-          : `Last active ${lastActive.toRelative()}`,
-      };
-    });
-
-  return <ProfileSettings {...profile} devices={devices} />;
 }

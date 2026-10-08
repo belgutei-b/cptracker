@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import DeviceList, { type Device } from "@/components/profile/DeviceList";
 import ProviderIcon, {
   SIGN_IN_PROVIDERS,
   getProviderLabel,
@@ -17,13 +16,11 @@ export default function ProfileSettings({
   email,
   providers,
   timezone,
-  devices,
 }: {
   name: string;
   email: string;
   providers: string[];
   timezone: string;
-  devices: Device[];
 }) {
   return (
     <div className="max-w-[1040px]">
@@ -48,13 +45,6 @@ export default function ProfileSettings({
         <p className="text-[13px] text-muted-foreground">
           Set automatically from your browser when you open the dashboard.
         </p>
-      </SettingsSection>
-
-      <SettingsSection
-        title="Signed-in devices"
-        description="Includes the browser extension. Signing a device out ends its session there."
-      >
-        <DeviceList devices={devices} />
       </SettingsSection>
 
       <SettingsSection title="Account" description="Sign out here.">
