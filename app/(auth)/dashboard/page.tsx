@@ -1,64 +1,44 @@
 "use client";
 
-import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
 import AddProblem from "@/components/problems/AddProblem";
 import DashboardMain from "@/components/problems/DashboardMain";
-import Stat from "@/components/stat/Stat";
-import { useEffect } from "react";
+import { useProblemsQuery } from "@/hooks/problems/useProblemsQuery";
+import { useSyncTimezone } from "@/hooks/useSyncTimezone";
+import { pluralize } from "@/lib/utils";
 
 export default function Page() {
   const { data, isLoading, isError } = useProblemsQuery();
   const { problems = [], timezone = "UTC" } = data ?? {};
 
-  useEffect(() => {
-    async function fetchRequest(timezone: string) {
-      const res = await fetch("/api/timezone", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          timezone,
-        }),
-      });
-
-      /* If request succeed, store the last time that timezone stored */
-      if (res.ok) {
-        localStorage.setItem("tz", timezone);
-      }
-    }
-
-    const storedTz = localStorage.getItem("tz");
-    const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (!storedTz || storedTz !== currentTz) {
-      // Source - https://stackoverflow.com/a/37512371
-      fetchRequest(currentTz);
-    }
-  }, []);
-
-  if (isError) {
-    return (
-      <div className="text-lg text-white pl-3 pt-3">
-        Error fetching problems
-      </div>
-    );
-  }
+  useSyncTimezone();
 
   return (
-    <div className="flex flex-col md:flex-row-reverse md:justify-between w-full px-4">
-      <div className="w-90 mt-5 md:mt-10 flex flex-col md:items-end space-y-5">
+    <main className="page-container flex flex-col gap-6">
+      <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-[28px]">
+            Problems
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {problems.length > 0
+              ? `${pluralize(problems.length, "problem")} tracked. Start a timer from any row.`
+              : "Keep track of your LeetCode progress and efficiency."}
+          </p>
+        </div>
         <AddProblem />
-        <Stat
+      </header>
+
+      {isError ? (
+        <p className="rounded-lg border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
+          Couldn&apos;t load your problems. Refresh the page to try again.
+        </p>
+      ) : (
+        <DashboardMain
           problems={problems}
           timezone={timezone}
           isLoading={isLoading}
-          className=""
         />
-      </div>
-      <DashboardMain
-        problems={problems}
-        timezone={timezone}
-        isLoading={isLoading}
-        className="mt-5 flex-1"
-      />
-    </div>
+      )}
+    </main>
   );
 }

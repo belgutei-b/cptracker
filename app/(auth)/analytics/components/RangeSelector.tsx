@@ -1,34 +1,33 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 import {
   ANALYTICS_RANGE_OPTIONS,
   type AnalyticsRangeDays,
 } from "@/constants/analytics";
 
-type Props = {
-  current: AnalyticsRangeDays;
-};
-
-export default function RangeSelector({ current }: Props) {
-  const router = useRouter();
-
+/** segmented control; the range lives in the URL (?range=7) */
+export default function RangeSelector({ current }: { current: AnalyticsRangeDays }) {
   return (
-    <div className="flex items-center rounded-lg border border-[#3e3e3e] bg-[#1a1a1a] p-1">
-      {ANALYTICS_RANGE_OPTIONS.map((range) => (
-        <button
-          key={range}
-          type="button"
-          onClick={() => router.push(`?range=${range}`)}
-          className={`rounded-md px-3 py-1 text-[10px] font-bold uppercase transition-all ${
-            current === range
-              ? "bg-[#ffa116] text-black shadow-lg shadow-[#ffa11633]"
-              : "text-gray-500 hover:text-white"
-          }`}
-        >
-          {range === 7 ? "7 Days" : range === 14 ? "2 Weeks" : "1 Month"}
-        </button>
-      ))}
-    </div>
+    <nav aria-label="Time range" className="inline-flex self-start rounded-lg bg-muted p-[3px] sm:self-auto">
+      {ANALYTICS_RANGE_OPTIONS.map((range) => {
+        const isActive = range === current;
+        return (
+          <Link
+            key={range}
+            href={`/analytics?range=${range}`}
+            scroll={false}
+            aria-current={isActive ? "page" : undefined}
+            className={cn(
+              "rounded-md border px-3 py-1 text-[13px] font-medium transition-colors",
+              isActive
+                ? "border-input bg-input/30 text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {range} days
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

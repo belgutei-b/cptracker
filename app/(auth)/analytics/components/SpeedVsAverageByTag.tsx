@@ -1,23 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { DIFFICULTY_COLORS } from "@/constants/difficulty";
-import { Difficulty } from "@/prisma/generated/prisma/enums";
-import type { TopicRadarEntry } from "@/types/analytics";
+import { useState } from "react";
+
 import AnalyticsCard from "@/components/analytics/AnalyticsCard";
-import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
+import { cn } from "@/lib/utils";
+import { formatDuration } from "@/lib/date";
+import type { TopicRadarEntry } from "@/types/analytics";
 import AnalyticsEmptyState from "./AnalyticsEmptyState";
 import DifficultyModeSelector, {
   DIFFICULTY_MODE_TO_DIFFICULTY,
@@ -28,178 +16,98 @@ type Props = {
   data: TopicRadarEntry[];
 };
 
-function formatPercent(value: number): string {
-  const rounded = Math.round(value);
-  return `${Math.abs(rounded)}%`;
-}
+// never scale bars to less than this, so small differences stay small
+const MIN_SCALE_PERCENT = 25;
 
-function PaceComparisonValue({
-  value,
-  numberOfSolved,
-}: {
-  value: number;
-  numberOfSolved: number;
-}) {
-  if (numberOfSolved === 0) return <span>-</span>;
+const COLUMNS =
+  "grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_88px] sm:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)_64px_120px]";
 
-  const rounded = Math.round(value);
-
-  if (!Number.isFinite(value) || rounded === 0) {
-    return (
-      <span className="inline-flex items-center justify-end gap-1 text-zinc-400">
-        -
-      </span>
-    );
-  }
-
-  if (value > 0) {
-    return (
-      <span
-        className="inline-flex items-center justify-end gap-1"
-        style={{ color: DIFFICULTY_COLORS.Hard }}
-      >
-        <ArrowUp size={12} strokeWidth={2.5} />
-        {formatPercent(value)}
-      </span>
-    );
-  }
-
-  return (
-    <span
-      className="inline-flex items-center justify-end gap-1"
-      style={{ color: DIFFICULTY_COLORS.Easy }}
-    >
-      <ArrowDown size={12} strokeWidth={2.5} />
-      {formatPercent(value)}
-    </span>
-  );
-}
-
-function getTooltipDifficulties(mode: DifficultyMode): Difficulty[] {
-  const difficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
-
-  return difficulty === Difficulty.All
-    ? Object.values(Difficulty)
-    : [difficulty];
-}
-
+/**
+ * Each topic's average solve time compared with your overall average
+ * for the same difficulty: faster topics grow left, slower ones right.
+ */
 export default function SpeedVsAverageByTag({ data }: Props) {
   const [mode, setMode] = useState<DifficultyMode>("all");
+  const difficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
 
-  const rows = useMemo(() => {
-    const difficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
+  const rows = data
+    .map((topic) => {
+      const entry = topic.difficultyEntries[difficulty];
+      return {
+        topic: topic.topic,
+        percent: Math.round(entry.durationPercentageComparison),
+        average: entry.avgSolveDuration,
+        solved: entry.numberOfSolved,
+      };
+    })
+    // fastest first, topics without solves at the end
+    .sort((a, b) => Number(a.solved === 0) - Number(b.solved === 0) || a.percent - b.percent);
 
-    return data
-      .map((topic) => {
-        const entry = topic.difficultyEntries[difficulty];
-        return {
-          tag: topic.topic,
-          value: entry.durationPercentageComparison,
-          numberOfSolved: entry.numberOfSolved,
-          difficultyEntries: topic.difficultyEntries,
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-  }, [data, mode]);
-
-  const maxAbs = Math.max(...rows.map((r) => Math.abs(r.value)), 10);
-  const domainPad = Math.ceil(maxAbs / 5) * 5 + 5;
-  const chartHeight = Math.max(rows.length * 36, 144);
+  const scale = Math.max(MIN_SCALE_PERCENT, ...rows.map((row) => Math.abs(row.percent)));
 
   return (
     <AnalyticsCard
-      title="Speed vs. Average by Tag"
-      description="% faster or slower than your overall average"
-      actions={<DifficultyModeSelector value={mode} onChange={setMode} />}
+      title="Strong and weak topics"
+      description="Each topic's average solve time vs your overall average"
+      actions={
+        data.length > 0 && <DifficultyModeSelector value={mode} onChange={setMode} />
+      }
     >
       {rows.length === 0 ? (
-        <AnalyticsEmptyState>No tag speed data yet</AnalyticsEmptyState>
+        <AnalyticsEmptyState>Solve a few problems to compare topics</AnalyticsEmptyState>
       ) : (
-        <div
-          className="relative min-w-0"
-          style={{ height: `${chartHeight}px` }}
-        >
-          <ResponsiveContainer width="100%" height={chartHeight} minWidth={0}>
-            <BarChart
-              data={rows}
-              layout="vertical"
-              margin={{ top: 4, right: 24, bottom: 4, left: 8 }}
-            >
-              <CartesianGrid
-                horizontal={false}
-                stroke="#1d1d1d"
-                strokeDasharray="3 3"
-              />
-              <XAxis
-                type="number"
-                domain={[-domainPad, domainPad]}
-                tickFormatter={(v) => formatPercent(Number(v))}
-                tick={{
-                  fill: "var(--color-zinc-300)",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: "var(--font-weight-semibold)",
-                  fontFamily: "monospace",
-                }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                type="category"
-                dataKey="tag"
-                width={130}
-                tick={{
-                  fill: "var(--color-zinc-300)",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: "var(--font-weight-semibold)",
-                  fontFamily: "monospace",
-                }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <ReferenceLine x={0} stroke="#404460" />
-              <Tooltip
-                cursor={{ fill: "rgba(255,255,255,0.03)" }}
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const row = payload[0]?.payload as
-                    | {
-                        tag?: string;
-                        difficultyEntries?: TopicRadarEntry["difficultyEntries"];
-                      }
-                    | undefined;
-                  const tag = String(row?.tag ?? "");
-                  if (!row?.difficultyEntries) return null;
+        <div className="flex flex-col text-sm">
+          <div aria-hidden className={cn("grid border-b pb-1.5 text-xs text-muted-foreground", COLUMNS)}>
+            <span className="max-sm:hidden">Topic</span>
+            <span className="text-right max-sm:col-start-2 sm:pr-2.5">faster</span>
+            <span className="pl-2.5">slower</span>
+            <span className="hidden text-right sm:block">avg</span>
+            <span className="text-right">vs average</span>
+          </div>
 
-                  return (
-                    <DifficultyStatsTooltip
-                      title={tag}
-                      difficultyEntries={row.difficultyEntries}
-                      difficulties={getTooltipDifficulties(mode)}
-                      valueLabel="Vs Avg"
-                      formatValue={(entry) => (
-                        <PaceComparisonValue
-                          value={entry.durationPercentageComparison}
-                          numberOfSolved={entry.numberOfSolved}
-                        />
-                      )}
-                    />
-                  );
-                }}
-              />
-              <Bar dataKey="value" radius={[3, 3, 3, 3]} barSize={4}>
-                {rows.map((r) => (
-                  <Cell
-                    key={r.tag}
-                    fill={
-                      r.value > 0
-                        ? "var(--color-neutral-500)"
-                        : "var(--color-stone-300)"
-                    }
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <ul>
+            {rows.map((row) => {
+              const width = `${(Math.abs(row.percent) / scale) * 100}%`;
+              const hasSolves = row.solved > 0;
+              const isFaster = hasSolves && row.percent < 0;
+              const isSlower = hasSolves && row.percent > 0;
+
+              return (
+                <li
+                  key={row.topic}
+                  className={cn(
+                    "grid items-center gap-y-1 py-2 max-sm:border-b max-sm:last:border-b-0 sm:h-10 sm:py-0",
+                    COLUMNS,
+                  )}
+                >
+                  <span className="truncate max-sm:col-span-full">{row.topic}</span>
+                  <span aria-hidden className="flex h-3.5 justify-end max-sm:col-start-2">
+                    {isFaster && <span className="rounded-l-[3px] bg-primary" style={{ width }} />}
+                  </span>
+                  <span aria-hidden className="flex h-3.5 border-l border-foreground/20">
+                    {isSlower && <span className="rounded-r-[3px] bg-hard" style={{ width }} />}
+                  </span>
+                  <span className="hidden text-right font-mono text-[13px] text-foreground/75 sm:block">
+                    {hasSolves ? formatDuration(Math.round(row.average)) : "—"}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-right font-mono text-[13px]",
+                      isFaster && "text-primary",
+                      isSlower && "text-hard",
+                      !isFaster && !isSlower && "text-muted-foreground",
+                    )}
+                  >
+                    {!hasSolves
+                      ? "no solves"
+                      : row.percent === 0
+                        ? "on average"
+                        : `${Math.abs(row.percent)}% ${isFaster ? "faster" : "slower"}`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
     </AnalyticsCard>

@@ -1,17 +1,21 @@
 import Link from "next/link";
 
-const footerSections = [
+import AppLogo from "@/components/AppLogo";
+import { EXTENSION_STORE_URL } from "@/constants/links";
+
+const FOOTER_SECTIONS = [
   {
-    title: "CPTracker",
+    title: "Product",
     links: [
-      { href: "/", label: "Home" },
       { href: "/auth", label: "Sign in" },
+      { href: "/#analytics", label: "Analytics" },
     ],
   },
   {
     title: "Extension",
     links: [
       { href: "/extension", label: "Overview" },
+      { href: EXTENSION_STORE_URL, label: "Chrome Web Store" },
       { href: "/extension/privacy-policy", label: "Privacy details" },
     ],
   },
@@ -26,32 +30,37 @@ const footerSections = [
 
 export default function Footer() {
   return (
-    <footer className="relative isolate overflow-hidden">
-      <div className="mx-auto grid max-w-6xl gap-8 border-t border-white/10 px-6 py-8 text-sm sm:grid-cols-3">
-        {footerSections.map((section) => (
-          <nav key={section.title} aria-label={section.title}>
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-200">
-              {section.title}
-            </h2>
+    <footer className="border-t bg-[#090b0c]">
+      <div className="landing-container grid gap-10 pt-14 pb-10 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))] md:pt-16">
+        <div className="flex flex-col items-start gap-4">
+          <AppLogo className="text-base" />
+          <p className="max-w-[300px] text-sm leading-relaxed text-muted-foreground">
+            Time your LeetCode practice and see your solve time by difficulty
+            and topic.
+          </p>
+        </div>
 
-            <ul className="mt-4 space-y-3 text-stone-400 font-medium">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:contents">
+          {FOOTER_SECTIONS.map((section) => (
+            <nav key={section.title} aria-label={section.title} className="flex flex-col gap-3 text-sm">
+              <h2 className="font-semibold">{section.title}</h2>
               {section.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="font-medium transition hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Link>
               ))}
-            </ul>
-          </nav>
-        ))}
+            </nav>
+          ))}
+        </div>
 
-        <p className="text-stone-500 sm:col-span-3">
-          © {new Date().getFullYear()} CPTracker
-        </p>
+        <div className="flex flex-col gap-1 border-t pt-6 text-[13px] text-muted-foreground sm:flex-row sm:justify-between md:col-span-full">
+          <span>© {new Date().getFullYear()} CPTracker</span>
+          <span>MIT licensed · Built for LeetCode practice</span>
+        </div>
       </div>
     </footer>
   );

@@ -46,9 +46,8 @@ export default function LegalPage({ content }: LegalPageProps) {
 
         <footer className="border-t border-white/10 py-8 text-sm text-stone-300 font-medium">
           <p>
-            These pages are provided for CPTracker users. For privacy questions
-            or data deletion requests, use the support contact made available on
-            cptracker.org.
+            These pages are provided for CPTracker users. For privacy questions,
+            use the support contact made available on cptracker.org.
           </p>
         </footer>
       </div>

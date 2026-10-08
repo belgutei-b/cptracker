@@ -1,108 +1,172 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Theme — the app is dark only (<html class="dark">).
+ * shadcn/ui components read these variables; app code uses the
+ * matching Tailwind colors (bg-background, text-muted-foreground, text-easy, ...).
+ * Lime (--primary) is the only accent: primary actions, running timers, activity.
+ */
 :root {
-  /* --background: #ffffff;
-  --foreground: #171717; */
-  @apply bg-neutral-900;
+  --background: #0b0d0e;
+  --foreground: #e8eaeb;
+  --card: #0e1112;
+  --card-foreground: #e8eaeb;
+  --popover: #0e1112;
+  --popover-foreground: #e8eaeb;
+  --primary: #c6f36d;
+  --primary-foreground: #0b0d0e;
+  --secondary: #161a1c;
+  --secondary-foreground: #e8eaeb;
+  --muted: #161a1c;
+  --muted-foreground: #8a9299;
+  --accent: #161a1c;
+  --accent-foreground: #e8eaeb;
+  --destructive: #f0716a;
+  --border: #23292d;
+  --input: #2a3035;
+  --ring: #c6f36d;
+  --radius: 0.625rem;
+
+  /* difficulty */
+  --easy: #4fc3b4;
+  --medium: #e9b44c;
+  --hard: #f0716a;
+
+  --chart-1: #c6f36d;
+  --chart-2: #4fc3b4;
+  --chart-3: #e9b44c;
+  --chart-4: #f0716a;
+  --chart-5: #8a9299;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-easy: var(--easy);
+  --color-medium: var(--medium);
+  --color-hard: var(--hard);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* --background: #0a0a0a; */
-    @apply bg-neutral-900;
-
-    /* --foreground: #ededed; */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- layout ---------- */
+
+/* width and padding shared by the signed-in pages */
+@utility page-container {
+  @apply mx-auto w-full max-w-[1440px] px-4 py-8 md:px-12 md:py-10;
 }
 
-.auth-input {
-  @apply w-full  border rounded-lg px-4 py-3 outline-none;
-  @apply text-white focus:border-amber-500 bg-neutral-900 border-neutral-700;
+/* 1200px content column (plus side padding) for the public pages */
+@utility landing-container {
+  @apply mx-auto w-full max-w-[1248px] px-6;
 }
 
-.auth-button {
-  @apply text-lg text-black font-medium w-full px-6 py-3 rounded-lg;
-  @apply transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
-  @apply bg-amber-500 hover:bg-amber-600;
+/* ---------- landing page backgrounds ---------- */
+
+/*
+ * Landing page only: a faint line grid and low-opacity lime light behind the
+ * hero and final CTA (LandingBackdrop), the product preview and the analytics band.
+ * App pages stay flat.
+ */
+
+/* 64px grid of faint foreground lines; pair with a landing-fade-* mask */
+@utility landing-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
 }
 
-.dashboard-stat-box {
-  @apply bg-[#282828] p-3 rounded-xl border border-[#3e3e3e];
+@utility landing-fade-top {
+  mask-image: radial-gradient(ellipse 70% 62% at 50% 0%, #000 25%, transparent 78%);
 }
 
-.dashboard-stat-title {
-  @apply text-xs font-semibold text-gray-400 uppercase;
+@utility landing-fade-bottom {
+  mask-image: radial-gradient(ellipse 60% 90% at 50% 100%, #000 15%, transparent 75%);
 }
 
-.dashboard-stat-text {
-  @apply font-bold mt-1 text-white;
+/* soft lime light coming from the top or bottom edge */
+@utility landing-glow-top {
+  background-image: radial-gradient(ellipse 55% 42% at 50% 0%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
 }
 
-.landing-button {
-  @apply inline-flex items-center gap-2 rounded-xl font-semibold;
-  @apply px-4 py-2.5 text-sm tracking-tight transition-all;
-  @apply disabled:cursor-not-allowed disabled:opacity-50;
+@utility landing-glow-bottom {
+  background-image: radial-gradient(ellipse 45% 70% at 50% 100%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
 }
 
-.landing-button-orange {
-  @apply bg-amber-500 hover:bg-amber-400 transition-colors text-black;
-  @apply shadow-[0_6px_28px_rgba(245,158,11,0.2)];
+/* wide light the hero product preview sits on */
+@utility landing-horizon {
+  background-image: radial-gradient(ellipse 48% 50% at 50% 50%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 72%);
 }
 
-.landing-button-transparent {
-  @apply border border-white/10 hover:border-white/20;
-  @apply transition-all text-neutral-300 hover:text-white;
+/* 1px lime line that fades out at both ends */
+@utility landing-hairline {
+  background-image: linear-gradient(90deg, transparent 15%, color-mix(in srgb, var(--primary) 55%, transparent), transparent 85%);
 }
 
-.section-title {
-  @apply text-3xl font-bold text-white mb-10;
+/* section background that steps from card down to the page background */
+@utility landing-band {
+  background-image: linear-gradient(to bottom, var(--card), var(--background) 560px);
 }
 
-.landing-section-title-desc {
-  @apply mb-2 text-[10px] font-semibold uppercase tracking-widest text-amber-400;
-}
-
-.landing-section-title {
-  @apply mb-8 text-3xl font-extrabold leading-[1.08] tracking-[-0.025em] md:text-[40px] text-white;
-}
-
-.landing-section-outer {
-  @apply relative z-10 mx-auto max-w-6xl px-5 py-16 border-t border-white/5;
-}
-
-.landing-box {
-  @apply rounded-2xl bg-neutral-900/65 p-4 md:p-6;
-  @apply ring-1 ring-white/10 backdrop-blur transition duration-300;
-  @apply hover:-translate-y-1 hover:ring-amber-400/40;
-}
-
-.landing-box-number {
-  @apply mb-3 text-3xl md:text-4xl font-light text-amber-400;
-}
-
-.landing-box-title {
-  @apply text-base font-bold tracking-tight text-zinc-100;
-}
-
-.landing-box-desc {
-  @apply text-sm leading-relaxed text-zinc-500;
-}
+/* ---------- problem notes (rendered markdown) ---------- */
 
 .problem-note-markdown {
-  @apply rounded-xl border border-[#3e3e3e] bg-[#1f1f1f] p-2 text-xs leading-5 text-gray-200;
+  @apply rounded-lg border border-border px-4 py-3 text-sm leading-6 text-foreground/90;
 }
 
 .problem-note-markdown > :first-child {
@@ -114,15 +178,15 @@ body {
 }
 
 .problem-note-markdown h1 {
-  @apply mb-3 text-base font-semibold text-white;
+  @apply mb-3 text-base font-semibold text-foreground;
 }
 
 .problem-note-markdown h2 {
-  @apply mb-3 text-sm font-semibold text-white;
+  @apply mb-3 text-sm font-semibold text-foreground;
 }
 
 .problem-note-markdown h3 {
-  @apply mb-3 text-[13px] font-semibold text-white;
+  @apply mb-3 text-[13px] font-semibold text-foreground;
 }
 
 .problem-note-markdown h4,
@@ -150,23 +214,23 @@ body {
 }
 
 .problem-note-markdown li + li {
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .problem-note-markdown a {
-  @apply text-sky-300 hover:text-sky-200;
+  @apply text-foreground underline underline-offset-4 hover:text-primary;
 }
 
 .problem-note-markdown blockquote {
-  @apply border-l-2 border-stone-600 pl-3 text-stone-300;
+  @apply border-l-2 border-border pl-3 text-muted-foreground;
 }
 
 .problem-note-markdown code {
-  @apply rounded bg-[#2a2a2a] px-1 py-0.5 font-mono text-[11px] text-stone-100;
+  @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[12.5px];
 }
 
 .problem-note-markdown pre {
-  @apply overflow-x-auto rounded-lg border border-[#3e3e3e] bg-[#181818] p-3;
+  @apply overflow-x-auto rounded-lg border border-border bg-background p-3;
 }
 
 .problem-note-markdown pre code {
@@ -174,5 +238,5 @@ body {
 }
 
 .problem-note-markdown hr {
-  @apply my-3 border-0 border-t border-[#3e3e3e];
+  @apply my-3 border-0 border-t border-border;
 }

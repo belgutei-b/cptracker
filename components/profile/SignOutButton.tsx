@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-client";
 
 export default function SignOutButton() {
@@ -14,6 +17,7 @@ export default function SignOutButton() {
     setIsLoading(true);
     try {
       await signOut();
+      // forget the synced timezone so the next account syncs its own
       localStorage.removeItem("tz");
       router.replace("/auth");
       router.refresh();
@@ -23,13 +27,9 @@ export default function SignOutButton() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={onSignOut}
-      disabled={isLoading}
-      className="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-red-400 hover:text-red-500 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-red-400 border border-[#3e3e3e]"
-    >
+    <Button variant="outline" onClick={onSignOut} disabled={isLoading}>
+      <LogOut />
       {isLoading ? "Signing out..." : "Sign out"}
-    </button>
+    </Button>
   );
 }

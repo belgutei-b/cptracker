@@ -1,34 +1,33 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ROWS = 8;
+
+/** table-shaped placeholder while problems load */
 export default function ProblemListSkeleton() {
   return (
-    <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <div
-          key={index}
-          className="border border-[#3e3e3e] bg-[#282828] rounded-xl p-4 w-full animate-pulse"
-        >
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-60 space-y-2">
-              <div className="h-3 w-20 rounded bg-[#3e3e3e]" />
-              <div className="h-5 w-44 rounded bg-[#3e3e3e]" />
-            </div>
-            <div className="w-30 flex flex-col items-end gap-2">
-              <div className="h-3 w-20 rounded bg-[#3e3e3e]" />
-              <div className="h-4 w-14 rounded bg-[#3e3e3e]" />
-            </div>
-          </div>
+    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Loading problems">
+      <div className="flex flex-wrap items-center gap-3">
+        <Skeleton className="h-8 w-full sm:w-64" />
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-8 w-80" />
+      </div>
 
-          <div className="flex gap-2 flex-wrap my-3">
-            <div className="h-4 w-12 rounded bg-[#3e3e3e]" />
-            <div className="h-4 w-10 rounded bg-[#3e3e3e]" />
-            <div className="h-4 w-14 rounded bg-[#3e3e3e]" />
+      <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="h-10 border-b bg-muted/40" />
+        {Array.from({ length: ROWS }, (_, i) => (
+          <div
+            key={i}
+            className="flex h-[53px] items-center gap-6 border-b px-4 last:border-b-0"
+          >
+            <Skeleton className="hidden h-4 w-8 sm:block" />
+            <Skeleton className="h-4 flex-1 md:max-w-80" />
+            <Skeleton className="hidden h-4 w-16 md:block" />
+            <Skeleton className="hidden h-4 w-24 md:block" />
+            <Skeleton className="ml-auto h-4 w-14" />
+            <Skeleton className="h-7 w-20" />
           </div>
-
-          <div className="w-full items-center flex justify-between border-t pt-3 border-[#3e3e3e]">
-            <div className="h-8 w-8 rounded-lg bg-[#3e3e3e]" />
-            <div className="h-4 w-16 rounded bg-[#3e3e3e]" />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

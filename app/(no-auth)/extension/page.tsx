@@ -1,22 +1,18 @@
-import { Inter } from "next/font/google";
-import Logo from "@/components/no-auth/Logo";
+import type { Metadata } from "next";
 import ExtensionBody from "@/components/extension/ExtensionBody";
 
-const inter = Inter({ subsets: ["latin"] });
+export const metadata: Metadata = {
+  title: "Chrome Extension - CPTracker",
+  description:
+    "Track LeetCode problems without leaving LeetCode: a timer and notes on the problem page, synced to your CPTracker dashboard.",
+};
 
 /**
- * Extension page for unauthenticated users
- * This page is added to keep navbar consistency
+ * Extension page for signed-out visitors (inside the landing layout)
  */
 export default function Page() {
   return (
-    <main
-      className={`${inter.className} text-white min-h-dvh`}
-    >
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 pt-6">
-        <Logo className="mb-0!" />
-      </div>
-
+    <main className="landing-container pt-10">
       <ExtensionBody isAuth={false} />
     </main>
   );

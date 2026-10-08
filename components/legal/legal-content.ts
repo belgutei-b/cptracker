@@ -13,8 +13,8 @@ export type LegalPageContent = {
 export const privacyPolicyContent: LegalPageContent = {
   title: "Privacy Policy",
   description:
-    "This Privacy Policy explains what data CPTracker collects, why we collect it, how we use it, and how users can request deletion of their data.",
-  lastModified: "May 15, 2026",
+    "This Privacy Policy explains what data CPTracker collects, why we collect it, and how we use it.",
+  lastModified: "October 8, 2026",
   sections: [
     {
       title: "Data we collect",
@@ -70,15 +70,7 @@ export const privacyPolicyContent: LegalPageContent = {
       body: [
         "CPTracker stores user account data, problem tracking data, solve session data, and related records in its Supabase Postgres database.",
         "We keep your account and tracking data for as long as your account remains active or as long as needed to provide the service, maintain security, resolve issues, or meet legal obligations.",
-        "Shared LeetCode problem metadata may remain in the system even after a user deletes their account because that metadata is not specific to one user and may be used by other CPTracker users.",
-      ],
-    },
-    {
-      title: "Data deletion requests",
-      body: [
-        "You can request deletion of your CPTracker account and associated user-specific tracking data by contacting us at the support email listed on this website or from the account connected to your CPTracker profile.",
-        "After verifying the request, we will delete or anonymize user-specific account data, problem tracking data, notes, timer records, solve sessions, sessions, and connected account records where required.",
-        "Some limited records may be retained if needed for security, abuse prevention, legal compliance, backup restoration, or resolving disputes.",
+        "Shared LeetCode problem metadata is not specific to one user, so it may be kept and used by other CPTracker users.",
       ],
     },
     {
@@ -91,7 +83,7 @@ export const privacyPolicyContent: LegalPageContent = {
     {
       title: "Contact",
       body: [
-        "If you have questions about this Privacy Policy or want to request data deletion, contact CPTracker through the support contact made available on cptracker.org.",
+        "If you have questions about this Privacy Policy, contact CPTracker through the support contact made available on cptracker.org.",
       ],
     },
   ],
@@ -101,7 +93,7 @@ export const extensionPrivacyPolicyContent: LegalPageContent = {
   title: "Chrome Extension Privacy Policy",
   description:
     "This Privacy Policy explains what data categories are handled by the CPTracker Chrome extension and why each category is needed for LeetCode solving-session tracking.",
-  lastModified: "March 9, 2026",
+  lastModified: "October 8, 2026",
   sections: [
     {
       title: "Extension purpose",
@@ -149,7 +141,7 @@ export const extensionPrivacyPolicyContent: LegalPageContent = {
     {
       title: "Contact",
       body: [
-        "If you have questions about this Chrome Extension Privacy Policy or want to request data deletion, contact CPTracker through the support contact made available on cptracker.org.",
+        "If you have questions about this Chrome Extension Privacy Policy, contact CPTracker through the support contact made available on cptracker.org.",
       ],
     },
   ],
@@ -159,7 +151,7 @@ export const termsContent: LegalPageContent = {
   title: "Terms of Service",
   description:
     "These Terms of Service explain the rules for using CPTracker, including your responsibilities and how the service may change over time.",
-  lastModified: "May 15, 2026",
+  lastModified: "October 8, 2026",
   sections: [
     {
       title: "Using CPTracker",
@@ -214,7 +206,7 @@ export const termsContent: LegalPageContent = {
       title: "Suspension or termination",
       body: [
         "We may suspend or terminate access to CPTracker if we believe a user has violated these Terms, created risk for the service, or used the service in a harmful or unlawful way.",
-        "Users may stop using CPTracker at any time and may request deletion of their account data as described in the Privacy Policy.",
+        "Users may stop using CPTracker at any time.",
       ],
     },
     {

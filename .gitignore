@@ -44,3 +44,11 @@ next-env.d.ts
 /prisma/generated/
 
 /certs/
+# local notes on API changes for the new UI
+/Changes.md
+
+# local guide for Claude / agents building the front-end
+/CLAUDE.md
+
+# logo source files (store listing, extension icons)
+/logo/

@@ -1,133 +1,242 @@
-import Image from "next/image";
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import {
+  ArrowRight,
+  Check,
+  Download,
+  Info,
+  LayoutDashboard,
+  MousePointerClick,
+  NotebookPen,
+  Puzzle,
+  ShieldCheck,
+  Timer,
+} from "lucide-react";
 
-const workflowScreens = [
+import { Button } from "@/components/ui/button";
+import ExtensionSteps from "@/components/extension/ExtensionSteps";
+import { EXTENSION_STORE_URL } from "@/constants/links";
+import { cn } from "@/lib/utils";
+
+const FEATURES = [
   {
-    title: "Open Popup",
-    description:
-      "Open the extension popup on a LeetCode problem to link the current problem in one click.",
-    image: "/extension/start.png",
-    alt: "CPTracker extension popup opened on a LeetCode problem",
+    icon: MousePointerClick,
+    title: "One click to add",
+    body: "Open the extention on a LeetCode problem and it’s added to your tracker.",
   },
   {
-    title: "Track While Solving",
-    description:
-      "Run the timer as you solve and capture notes, time complexity, and space complexity.",
-    image: "/extension/solving.png",
-    alt: "CPTracker extension popup with active timer and notes while solving",
+    icon: Timer,
+    title: "Real solve times",
+    body: "The timer runs while you code, so your dashboard shows how long problems actually take.",
   },
   {
-    title: "Mark Solved",
-    description:
-      "Stop the timer and mark the problem as Solved so your session is saved to CPTracker analytics.",
-    image: "/extension/solved.png",
-    alt: "CPTracker extension popup after a problem is solved",
+    icon: NotebookPen,
+    title: "Notes in place",
+    body: "Write your approach while it’s fresh. Markdown works, and notes are saved with the problem.",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Synced to your dashboard",
+    body: "Mark it Tried or Solved and the result, time and notes show up on your dashboard and profile.",
+  },
+];
+
+// answers follow the extension privacy policy
+const FAQS = [
+  {
+    question: "Do I need a CPTracker account?",
+    answer:
+      "Yes. Sign in on cptracker.org first. The extension uses that sign-in, so it never asks for a password.",
+  },
+  {
+    question: "What does it read from my browser?",
+    answer:
+      "Only the address of the current tab, to add the problem to your CPTracker account.",
+  },
+  {
+    question: "Where does my data go?",
+    answer: "To your CPTracker account. It isn’t sold or used for ads.",
   },
 ];
 
 /**
- * In extension page, workflow of the extension
- * @param isAuth whether the component is imported to authenticated users page
- * @returns
+ * Why and how to use the Chrome extension.
+ * Shared by /extension (signed out) and /extension-auth (signed in).
  */
 export default function ExtensionBody({ isAuth }: { isAuth: boolean }) {
+  const privacyHref = isAuth
+    ? "/extension-auth/privacy-policy"
+    : "/extension/privacy-policy";
+
   return (
-    <div>
-      <section className="landing-section-outer border-t-0!">
-        <RoundedBoxedTitle title="Chrome extension" />
+    <div className="flex flex-col">
+      <Hero privacyHref={privacyHref} />
 
-        <h1 className="mt-7 mb-5 max-w-4xl text-4xl text-white font-extrabold leading-[0.93] tracking-[-0.04em] md:text-5xl">
-          CPTracker Extension brings CPTracker
-          <br />
-          <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-            Directly into your LeetCode flow
-          </span>
-        </h1>
+      <Section eyebrow="Why use it" title="No tab switching between CPTracker and LeetCode.">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map(({ icon: Icon, title, body }) => (
+            <article key={title} className="flex flex-col gap-3.5 rounded-xl border bg-card p-5.5">
+              <span className="flex size-9.5 items-center justify-center rounded-lg bg-muted">
+                <Icon className="size-4.5" />
+              </span>
+              <h3 className="text-base font-semibold">{title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
 
-        <p className="my-5 text-neutral-300 text-base sm:text-lg">
-          Removes tab-switching friction while you solve.
-        </p>
+      <Section
+        eyebrow="How it works"
+        title="Three steps, all on the problem page."
+        aside={
+          <div className="flex gap-3 rounded-lg border bg-card px-4 py-3.5 text-sm leading-relaxed text-muted-foreground lg:max-w-[480px]">
+            <Info className="mt-0.5 size-4 shrink-0 text-foreground" />
+            <p>
+              <span className="font-medium text-foreground">Before you start:</span>{" "}
+              add the extension, then sign in on cptracker.org in the same
+              Chrome profile. The extension uses that sign-in and never asks for
+              a password.
+            </p>
+          </div>
+        }
+      >
+        <ExtensionSteps />
+      </Section>
 
-        <div className="flex flex-wrap items-start md:flex-row md:items-center gap-3 mt-10 md:mt-20">
-          <Link
-            href="https://chromewebstore.google.com/detail/ojpjlobnleonmgehlhoibaicokoadcnm?utm_source=item-share-cb"
-            target="_blank"
-            rel="noreferrer"
-            className="landing-button landing-button-orange"
-          >
-            Install extension
-            <ArrowRight size={16} />
-          </Link>
-          <Link
-            href={
-              isAuth
-                ? "/extension-auth/privacy-policy"
-                : "/extension/privacy-policy"
-            }
-            className="landing-button landing-button-transparent"
-          >
-            Privacy policy
-            <ChevronRight size={13} />
-          </Link>
+      <section aria-labelledby="extension-faq" className="flex flex-col gap-8 border-t py-16 md:py-18">
+        <h2 id="extension-faq" className="text-2xl font-semibold tracking-tight md:text-[28px]">
+          Questions
+        </h2>
+        <div className="grid gap-8 md:grid-cols-3 md:gap-10">
+          {FAQS.map(({ question, answer }, i) => (
+            <div key={question} className="flex flex-col gap-2">
+              <h3 className="text-base font-semibold">{question}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {answer}
+                {i === FAQS.length - 1 && (
+                  <>
+                    {" "}
+                    <Link
+                      href={privacyHref}
+                      className="text-foreground underline decoration-input underline-offset-4 hover:text-primary"
+                    >
+                      Read the privacy policy
+                    </Link>
+                    .
+                  </>
+                )}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Why install it */}
-      <section className="landing-section-outer">
-        <p className="landing-section-title-desc">Why install it.</p>
-        <h2 className="landing-section-title">Motivation.</h2>
-        <p className="text-neutral-300">
-          Stay focused on coding in LeetCode while still capturing the data you
-          need for reflection and improvement. Your tracked sessions power
-          CPTracker analytics like total time spent, average solve duration, and
-          progress by difficulty.
-        </p>
-      </section>
-
-      {/* How to use it */}
-      <section className="landing-section-outer">
-        <p className="landing-section-title-desc">How to use it</p>
-        <h2 className="landing-section-title">Workflow.</h2>
-        <div className="mt-5 space-y-8 md:space-y-10">
-          {workflowScreens.map((screen, index) => {
-            const isLeft = index % 2 === 0;
-
-            return (
-              <div key={screen.title}>
-                <article
-                  className={`landing-box w-full flex flex-col md:items-center md:justify-between md:gap-10 ${
-                    isLeft ? "md:flex-row" : "md:flex-row-reverse"
-                  }`}
-                >
-                  <div className="max-w-80 md:flex-1">
-                    <p className="text-xs font-semibold tracking-wide text-amber-400 uppercase">
-                      Step {index + 1}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-bold text-white">
-                      {screen.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-300">
-                      {screen.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-white/10 bg-neutral-950/80 md:mt-0 md:w-110 lg:w-140 md:shrink-0">
-                    <Image
-                      src={screen.image}
-                      alt={screen.alt}
-                      width={1800}
-                      height={1100}
-                      className="h-auto w-full object-cover"
-                    />
-                  </div>
-                </article>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <CallToAction isAuth={isAuth} />
     </div>
+  );
+}
+
+function Hero({ privacyHref }: { privacyHref: string }) {
+  return (
+    <section
+      aria-labelledby="extension-title"
+      className="grid items-center gap-10 pt-4 pb-16 md:pt-10 md:pb-18 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:gap-16"
+    >
+      <div className="flex flex-col gap-6">
+        <span className="inline-flex h-7 items-center gap-1.5 self-start rounded-md border border-input px-2.5 text-[13px] font-medium text-foreground/75">
+          <Puzzle className="size-3.5" />
+          Chrome extension
+        </span>
+        <h1
+          id="extension-title"
+          className="max-w-[640px] text-4xl leading-[1.05] font-semibold tracking-[-0.035em] md:text-5xl xl:text-[52px]"
+        >
+          Track problems without leaving LeetCode.
+        </h1>
+        <p className="max-w-[470px] text-base leading-relaxed text-muted-foreground md:text-lg">
+          A small panel on the problem page with a timer and notes. Everything
+          you track shows up on your CPTracker dashboard.
+        </p>
+
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <InstallButton />
+          <Button variant="outline" asChild className="h-10.5 px-4 text-[15px]">
+            <Link href={privacyHref}>
+              <ShieldCheck />
+              Privacy policy
+            </Link>
+          </Button>
+        </div>
+
+        <p className="text-[13px] text-muted-foreground md:hidden">
+          Works in Chrome on a computer. Open this page there to install.
+        </p>
+      </div>
+    </section >
+  );
+}
+
+function Section({
+  eyebrow,
+  title,
+  aside,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  aside?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-8 border-t py-16 md:gap-9 md:py-18">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+        <div className="flex max-w-[640px] flex-col gap-2.5">
+          <p className="text-[13px] font-medium text-primary">{eyebrow}</p>
+          <h2 className="text-[26px] leading-tight font-semibold tracking-tight md:text-[34px]">
+            {title}
+          </h2>
+        </div>
+        {aside}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function InstallButton({ className }: { className?: string }) {
+  return (
+    <Button asChild className={cn("h-10.5 px-4.5 text-[15px] font-semibold", className)}>
+      <a href={EXTENSION_STORE_URL} target="_blank" rel="noreferrer">
+        <Download />
+        Add to Chrome
+      </a>
+    </Button>
+  );
+}
+
+function CallToAction({ isAuth }: { isAuth: boolean }) {
+  return (
+    <section aria-labelledby="extension-cta" className="pb-16 md:pb-20">
+      <div className="flex flex-col gap-6 rounded-2xl border bg-card p-7 md:flex-row md:items-center md:justify-between md:p-10">
+        <div className="flex flex-col gap-2">
+          <h2 id="extension-cta" className="text-2xl font-semibold tracking-tight md:text-[28px]">
+            Ready for your next problem?
+          </h2>
+          <p className="text-muted-foreground md:text-base">
+            Install it once, then open any LeetCode problem.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <InstallButton />
+          <Button variant="outline" asChild className="h-10.5 px-4 text-[15px]">
+            <Link href={isAuth ? "/dashboard" : "/auth"}>
+              {isAuth ? "Go to dashboard" : "Sign in"}
+              <ArrowRight />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -10,12 +10,18 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DIFFICULTY_COLORS as COLORS } from "@/constants/difficulty";
+
+import AnalyticsCard from "@/components/analytics/AnalyticsCard";
+import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
+import { CHART_COLORS, CHART_TICK_STYLE } from "@/constants/analytics";
+import {
+  DIFFICULTIES,
+  DIFFICULTY_COLORS,
+  type ProblemDifficulty,
+} from "@/constants/difficulty";
 import { toRoundedMinutes } from "@/lib/date";
 import { Difficulty } from "@/prisma/generated/prisma/enums";
 import type { TopicRadarEntry } from "@/types/analytics";
-import AnalyticsCard from "@/components/analytics/AnalyticsCard";
-import DifficultyStatsTooltip from "@/components/analytics/DifficultyStatsTooltip";
 import AnalyticsEmptyState from "./AnalyticsEmptyState";
 import DifficultyModeSelector, {
   DIFFICULTY_MODE_TO_DIFFICULTY,
@@ -26,95 +32,63 @@ type Props = {
   data: TopicRadarEntry[];
 };
 
-type DisplayDifficulty = Exclude<Difficulty, "All">;
+const ROW_HEIGHT = 36;
 
-const DISPLAY_DIFFICULTIES: DisplayDifficulty[] = [
-  Difficulty.Easy,
-  Difficulty.Medium,
-  Difficulty.Hard,
-];
-
-function getSegmentDifficulties(
-  selectedDifficulty: Difficulty,
-): DisplayDifficulty[] {
-  return selectedDifficulty === Difficulty.All
-    ? DISPLAY_DIFFICULTIES
-    : [selectedDifficulty as DisplayDifficulty];
+function getSegmentDifficulties(selected: Difficulty): ProblemDifficulty[] {
+  return selected === Difficulty.All ? DIFFICULTIES : [selected as ProblemDifficulty];
 }
 
-function getTooltipDifficulties(selectedDifficulty: Difficulty): Difficulty[] {
-  return selectedDifficulty === Difficulty.All
-    ? Object.values(Difficulty)
-    : [selectedDifficulty];
+function getTooltipDifficulties(selected: Difficulty): Difficulty[] {
+  return selected === Difficulty.All ? Object.values(Difficulty) : [selected];
 }
 
-function getBarValue(
-  row: TopicRadarEntry,
-  difficulty: DisplayDifficulty,
-  selectedDifficulty: Difficulty,
-): number {
-  const avgMin = toRoundedMinutes(
-    row.difficultyEntries[difficulty].avgSolveDuration,
-  );
+/**
+ * Minutes for one bar segment. For "All" the bar length is the topic's overall
+ * average, split between difficulties in proportion to their own averages.
+ */
+function getBarValue(row: TopicRadarEntry, difficulty: ProblemDifficulty, selected: Difficulty) {
+  const avgMinutes = toRoundedMinutes(row.difficultyEntries[difficulty].avgSolveDuration);
+  if (selected !== Difficulty.All) return avgMinutes;
 
-  if (selectedDifficulty !== Difficulty.All) {
-    return avgMin;
-  }
-
-  const allAvgMin = toRoundedMinutes(
-    row.difficultyEntries[Difficulty.All].avgSolveDuration,
-  );
-  const sumAvgMin = DISPLAY_DIFFICULTIES.reduce(
-    (sum, item) =>
-      sum + toRoundedMinutes(row.difficultyEntries[item].avgSolveDuration),
+  const allAvgMinutes = toRoundedMinutes(row.difficultyEntries[Difficulty.All].avgSolveDuration);
+  const sumAvgMinutes = DIFFICULTIES.reduce(
+    (sum, d) => sum + toRoundedMinutes(row.difficultyEntries[d].avgSolveDuration),
     0,
   );
 
-  return sumAvgMin > 0 ? (avgMin / sumAvgMin) * allAvgMin : 0;
+  return sumAvgMinutes > 0 ? (avgMinutes / sumAvgMinutes) * allAvgMinutes : 0;
 }
 
 export default function AvgSolveTimeByTopic({ data }: Props) {
   const [mode, setMode] = useState<DifficultyMode>("all");
-  const selectedDifficulty = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
-  const segmentDifficulties = getSegmentDifficulties(selectedDifficulty);
-  const chartHeight = Math.max(220, data.length * 36);
+  const selected = DIFFICULTY_MODE_TO_DIFFICULTY[mode];
+  const segments = getSegmentDifficulties(selected);
+  const chartHeight = Math.max(220, data.length * ROW_HEIGHT);
 
   return (
     <AnalyticsCard
-      title="Avg Solve Time by Topic"
-      description="time spent per topic"
-      actions={<DifficultyModeSelector value={mode} onChange={setMode} />}
+      title="Average solve time by topic"
+      description="Minutes per solved problem, split by difficulty"
+      actions={
+        data.length > 0 && <DifficultyModeSelector value={mode} onChange={setMode} />
+      }
     >
       {data.length === 0 ? (
         <AnalyticsEmptyState>No topic data yet</AnalyticsEmptyState>
       ) : (
-        <div className="relative min-w-0 w-full" style={{ height: chartHeight }}>
-          <ResponsiveContainer
-            width="100%"
-            height={chartHeight}
-            minWidth={0}
-            minHeight={0}
-          >
+        <div className="min-w-0" style={{ height: chartHeight }}>
+          <ResponsiveContainer width="100%" height={chartHeight} minWidth={0} minHeight={0}>
             <BarChart
               data={data}
               layout="vertical"
-              margin={{ top: 4, right: 16, bottom: 4, left: 12 }}
-              barCategoryGap={18}
+              margin={{ top: 0, right: 8, bottom: 0, left: 0 }}
+              barCategoryGap={14}
             >
-              <CartesianGrid
-                stroke="#1e1e1e"
-                strokeDasharray="3 3"
-                horizontal={false}
-              />
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" horizontal={false} />
               <XAxis
                 type="number"
                 tickFormatter={(value) => `${Number(value).toFixed(0)}m`}
-                tick={{
-                  fill: "var(--color-zinc-300)",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  fontFamily: "monospace",
-                }}
+                tick={CHART_TICK_STYLE}
                 axisLine={false}
                 tickLine={false}
                 allowDecimals={false}
@@ -123,51 +97,37 @@ export default function AvgSolveTimeByTopic({ data }: Props) {
                 type="category"
                 dataKey="topic"
                 width={140}
-                tick={{
-                  fill: "var(--color-stone-300)",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  fontFamily: "monospace",
-                }}
+                tick={{ ...CHART_TICK_STYLE, fill: "#e8eaeb", fontFamily: "var(--font-geist-sans)", fontSize: 13 }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                cursor={{ fill: CHART_COLORS.cursor }}
                 content={({ active, payload, label }) => {
-                  if (!active || !payload?.length) return null;
-                  const row = payload[0]?.payload as
-                    | TopicRadarEntry
-                    | undefined;
-                  if (!row) return null;
+                  const row = payload?.[0]?.payload as TopicRadarEntry | undefined;
+                  if (!active || !row) return null;
 
                   return (
                     <DifficultyStatsTooltip
                       title={String(label)}
                       difficultyEntries={row.difficultyEntries}
-                      difficulties={getTooltipDifficulties(selectedDifficulty)}
+                      difficulties={getTooltipDifficulties(selected)}
                     />
                   );
                 }}
               />
-              {segmentDifficulties.map((difficulty, index) => {
-                const isLastSegment = index === segmentDifficulties.length - 1;
-
-                return (
-                  <Bar
-                    key={difficulty}
-                    dataKey={(row: TopicRadarEntry) =>
-                      getBarValue(row, difficulty, selectedDifficulty)
-                    }
-                    name={difficulty}
-                    stackId="avg"
-                    fill={COLORS[difficulty]}
-                    radius={isLastSegment ? [0, 4, 4, 0] : [0, 0, 0, 0]}
-                    barSize={6}
-                    background={{ fill: "#1a1a1a", radius: 4 }}
-                  />
-                );
-              })}
+              {segments.map((difficulty, index) => (
+                <Bar
+                  key={difficulty}
+                  dataKey={(row: TopicRadarEntry) => getBarValue(row, difficulty, selected)}
+                  name={difficulty}
+                  stackId="avg"
+                  fill={DIFFICULTY_COLORS[difficulty]}
+                  radius={index === segments.length - 1 ? [0, 3, 3, 0] : 0}
+                  barSize={10}
+                  background={index === 0 ? { fill: CHART_COLORS.track, radius: 3 } : undefined}
+                />
+              ))}
             </BarChart>
           </ResponsiveContainer>
         </div>

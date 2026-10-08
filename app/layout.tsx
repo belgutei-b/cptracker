@@ -43,10 +43,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    // the app only has a dark theme
+    <html
+      lang="en"
+      className={`dark ${geistSans.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">
         <QueryProvider>
           <ToastProvider />
           {/* <Navbar /> */}

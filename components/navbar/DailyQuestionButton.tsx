@@ -2,9 +2,16 @@
 
 import { Swords } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
 import { useDailyProblemMutation } from "@/hooks/problems/useDailyProblemMutation";
 
-export default function DailyQuestionButton() {
+/** adds today's LeetCode daily question and goes to the dashboard */
+export default function DailyQuestionButton({
+  iconOnly = false,
+}: {
+  iconOnly?: boolean;
+}) {
   const dailyProblemMutation = useDailyProblemMutation();
   const pathname = usePathname();
   const router = useRouter();
@@ -17,14 +24,16 @@ export default function DailyQuestionButton() {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size={iconOnly ? "icon-lg" : "default"}
       onClick={handleClick}
       disabled={dailyProblemMutation.isPending}
-      className="landing-button landing-button-orange font-normal!"
+      aria-label={iconOnly ? "Add today's daily question" : undefined}
     >
-      <Swords size={16} />
-      Daily Question
-    </button>
+      <Swords />
+      {!iconOnly && "Daily question"}
+    </Button>
   );
 }

@@ -1,251 +1,34 @@
-import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import { Inter, Share_Tech_Mono } from "next/font/google";
-import Extension from "@/components/no-auth/Extension";
-import LandingTotalTimeBarChart from "@/components/no-auth/LandingTotalTimeBarChart";
-import RoundedBoxedTitle from "@/components/no-auth/RoundedBoxedTitle";
+import type { Metadata } from "next";
 
-const inter = Inter({ subsets: ["latin"] });
-const shareTechMono = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
+import AnalyticsSection from "@/components/landing/AnalyticsSection";
+import ExtensionBand from "@/components/landing/ExtensionBand";
+import FeatureStrip from "@/components/landing/FeatureStrip";
+import FinalCta from "@/components/landing/FinalCta";
+import HowItWorks from "@/components/landing/HowItWorks";
+import LandingFaq from "@/components/landing/LandingFaq";
+import LandingHero from "@/components/landing/LandingHero";
+import WhyTimeSection from "@/components/landing/WhyTimeSection";
+import { getSession } from "@/lib/session";
 
-const goals = [
-  {
-    number: "01",
-    title: "Count + time = the real picture",
-    desc: "Solved count is useful. But it doesn't tell you if you spent 20 minutes or 3 hours. Time is the missing half of the metric — and CPTracker tracks both together.",
-  },
-  {
-    number: "02",
-    title: "Every attempt counts",
-    desc: "Spent 90 minutes on a problem you didn't submit? That's not a failure — that's real work. Mark it as tried. It still counts toward your total time and keeps your progress honest.",
-  },
-  {
-    number: "03",
-    title: "Progress you can see",
-    desc: "Daily breakdowns, weekly totals, average time per difficulty. When your progress is visible, you always know if you're moving forward — or just going through the motions.",
-  },
-];
-
-const setupSteps = [
-  {
-    number: "01",
-    title: "Paste a LeetCode problem URL",
-    desc: "The problem is added to your dashboard.",
-  },
-  {
-    number: "02",
-    title: "Start the timer",
-    desc: "Start solving the problem.",
-  },
-  {
-    number: "03",
-    title: "Log notes & mark status",
-    desc: "Write your approach and observations. Mark the problem Tried or Solved when you're done.",
-  },
-  {
-    number: "04",
-    title: "Watch it add up",
-    desc: "Your total time grows every session. Check your weekly breakdown anytime.",
-  },
-];
+export const metadata: Metadata = {
+  title: "CPTracker - LeetCode time tracker and analytics",
+  description:
+    "Time every LeetCode problem, tried or solved, and see your average solve time by difficulty and topic.",
+};
 
 export default async function Page() {
+  const isSignedIn = !!(await getSession());
+
   return (
-    <main className={`${inter.className} overflow-hidden text-white`}>
-      {/* Hero */}
-      <section className="landing-section-outer border-t-0!">
-        <RoundedBoxedTitle title="Competitive programming tracker" />
-
-        <h1 className="mt-7 mb-5 max-w-4xl text-5xl font-extrabold leading-[0.93] tracking-[-0.04em] md:text-[70px]">
-          Solve count is good
-          <br />
-          <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-            With time it is even better
-          </span>
-        </h1>
-
-        <p className="mb-3 max-w-xl text-[15px] leading-relaxed text-zinc-400">
-          Solved count burns people out. You grind for hours, submit nothing,
-          and the number doesn&apos;t move.{" "}
-          <span className="text-zinc-200">Time always moves.</span> Every
-          session, tried or solved, adds to a total you can actually see grow.
-        </p>
-
-        <p
-          className={"mb-8 max-w-lg text-[13px] leading-relaxed text-zinc-600"}
-        >
-          Think of it like XP. In a game you always know if you&apos;re leveling
-          up. CPTracker gives you that for your journey.
-        </p>
-
-        <div className="flex flex-wrap flex-col items-start md:flex-row md:items-center gap-3">
-          <Link href="/auth" className="landing-button landing-button-orange">
-            Start tracking
-            <ArrowRight size={16} />
-          </Link>
-          <Link
-            href="/extension"
-            className="landing-button landing-button-transparent"
-          >
-            Chrome extension
-            <ChevronRight size={13} />
-          </Link>
-        </div>
-
-        {/* Mock session + stats cards */}
-        <div className="mt-14 grid md:grid-cols-3 gap-4">
-          {/* Active session card */}
-          <div className="md:col-span-2 rounded-2xl bg-neutral-900/70 border border-white/10 p-6 backdrop-blur">
-            <div className="flex items-start justify-between gap-4 mb-5">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">
-                  Current Session
-                </p>
-                <h3 className="text-base font-bold text-white leading-snug">
-                  Longest Substring Without Repeating Characters
-                </h3>
-                <span className="mt-2 inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-400">
-                  Medium
-                </span>
-              </div>
-              <div className="shrink-0 flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-bold text-emerald-400">Live</span>
-              </div>
-            </div>
-
-            <div
-              className={`${shareTechMono.className} my-5 text-5xl font-bold tracking-wider text-amber-400`}
-            >
-              00:23:47
-            </div>
-
-            <div className="rounded-xl bg-neutral-800/60 p-4 min-h-[80px]">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">
-                Notes
-              </p>
-              <p className="text-sm text-neutral-400 leading-relaxed">
-                Sliding window. Keep a hashmap of char → index. Move left
-                pointer when we see a repeat...
-              </p>
-            </div>
-          </div>
-
-          {/* Weekly stats + streak */}
-          <div className="flex flex-col gap-4">
-            <div className="rounded-2xl bg-neutral-900/70 border border-white/10 p-5 backdrop-blur flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-3">
-                This Week
-              </p>
-              <div className="text-3xl font-bold text-white">14h 32m</div>
-              <p className="text-neutral-500 text-xs mt-1">total time spent</p>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <div className="text-lg font-bold text-[#00af9b]">8</div>
-                  <div className="text-xs text-neutral-500">Easy</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-[#ffb800]">12</div>
-                  <div className="text-xs text-neutral-500">Med</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-[#ff2d55]">3</div>
-                  <div className="text-xs text-neutral-500">Hard</div>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-neutral-900/70 border border-white/10 p-5 backdrop-blur">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">
-                Streak
-              </p>
-              <div className="text-3xl font-bold text-amber-400">6 days</div>
-              <p className="text-neutral-500 text-xs mt-1">keep it going</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="landing-section-outer">
-        <p className="landing-section-title-desc">How it works</p>
-        <h2 className="landing-section-title">Setup steps.</h2>
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-white/10 md:grid-cols-4">
-          {setupSteps.map((step, i) => (
-            <div
-              key={step.number}
-              className={`bg-neutral-900/70 p-4 md:p-6 ${
-                i < setupSteps.length - 1
-                  ? "border-[#1e1e1e] border-r border-b md:border-b-0"
-                  : ""
-              }`}
-            >
-              <p className={`${shareTechMono.className} landing-box-number`}>
-                {step.number}
-              </p>
-              <p className="mb-1.5 landing-box-title">{step.title}</p>
-              <p className="landing-box-desc">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Analytics */}
-      <section className="landing-section-outer">
-        <p className="landing-section-title-desc">Analytics</p>
-        <h2 className="landing-section-title">Your time, at a glance.</h2>
-
-        <LandingTotalTimeBarChart />
-      </section>
-
-      {/* Goal */}
-      <section className="landing-section-outer">
-        <p className="landing-section-title-desc">Goal</p>
-        <h2 className="landing-section-title">Built around what matters.</h2>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {goals.map((goal) => (
-            <div key={goal.number} className="landing-box">
-              <div className={`${shareTechMono.className} landing-box-number`}>
-                {goal.number}
-              </div>
-              <h3 className="landing-box-title">{goal.title}</h3>
-              <p className="mt-3 landing-box-desc">{goal.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Chrome extension */}
-      <Extension />
-
-      {/* Bottom CTA */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16 border-t border-white/5">
-        <div className="relative overflow-hidden rounded-3xl border border-amber-500/15 bg-[#111113] px-8 py-12 text-center md:px-12 md:py-16">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(245,158,11,0.09),transparent_58%)]" />
-
-          <div className="relative">
-            <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-[-0.03em] leading-[1.05] text-white md:text-5xl">
-              Ready to see how much time
-              <br />
-              <span className="bg-linear-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-                you&apos;re really putting in?
-              </span>
-            </h2>
-
-            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-neutral-400">
-              Start tracking your sessions today. Free to use, no setup needed.
-            </p>
-
-            <Link
-              href="/auth"
-              className="landing-button landing-button-orange mt-6"
-            >
-              Get started
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
+    <main>
+      <LandingHero isSignedIn={isSignedIn} />
+      <FeatureStrip />
+      <AnalyticsSection />
+      <WhyTimeSection />
+      <HowItWorks />
+      <ExtensionBand />
+      <LandingFaq />
+      <FinalCta isSignedIn={isSignedIn} />
     </main>
   );
 }
