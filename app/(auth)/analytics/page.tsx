@@ -60,11 +60,8 @@ export default async function Page({
       <DailyTotalTimeBarChart data={dailyBarChart} numberOfDays={numberOfDays} />
       <AvgSolveTimeCards data={avgSolveTime} numberOfDays={numberOfDays} />
 
-      <div className="grid items-start gap-6 xl:grid-cols-2">
-        <SpeedVsAverageByTag data={tagsReceivedData} />
-        <AvgSolveTimeByTopic data={tagsReceivedData} />
-      </div>
-
+      <SpeedVsAverageByTag data={tagsReceivedData} />
+      <AvgSolveTimeByTopic data={tagsReceivedData} />
       <TagPerformanceRadar data={tagsReceivedData} />
     </main>
   );
