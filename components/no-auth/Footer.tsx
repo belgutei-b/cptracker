@@ -9,7 +9,6 @@ const FOOTER_SECTIONS = [
     links: [
       { href: "/auth", label: "Sign in" },
       { href: "/#analytics", label: "Analytics" },
-      { href: "/upcoming", label: "Roadmap" },
     ],
   },
   {

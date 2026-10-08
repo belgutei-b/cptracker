@@ -163,26 +163,6 @@
   background-image: linear-gradient(to bottom, var(--card), var(--background) 560px);
 }
 
-/* ---------- roadmap page (old landing styles) ---------- */
-
-.landing-section-outer {
-  @apply relative z-10 mx-auto max-w-6xl px-5 py-16 border-t border-white/5;
-}
-
-.landing-box {
-  @apply rounded-2xl bg-neutral-900/65 p-4 md:p-6;
-  @apply ring-1 ring-white/10 backdrop-blur transition duration-300;
-  @apply hover:-translate-y-1 hover:ring-amber-400/40;
-}
-
-.landing-box-title {
-  @apply text-base font-bold tracking-tight text-zinc-100;
-}
-
-.landing-box-desc {
-  @apply text-sm leading-relaxed text-zinc-500;
-}
-
 /* ---------- problem notes (rendered markdown) ---------- */
 
 .problem-note-markdown {
