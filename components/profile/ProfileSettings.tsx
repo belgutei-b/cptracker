@@ -1,9 +1,6 @@
 import type { ReactNode } from "react";
-import { Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import DeviceList, { type Device } from "@/components/profile/DeviceList";
-import ExportData from "@/components/profile/ExportData";
 import ProviderIcon, {
   SIGN_IN_PROVIDERS,
   getProviderLabel,
@@ -12,8 +9,8 @@ import SignOutButton from "@/components/profile/SignOutButton";
 
 /*
  * Parts without a backend yet (editing the profile, linking accounts,
- * choosing a time zone, deleting the account) are shown read-only or
- * disabled with a "Coming soon" note. See Changes.md.
+ * choosing a time zone) are shown read-only with a "Coming soon" note.
+ * See Changes.md.
  */
 export default function ProfileSettings({
   name,
@@ -60,15 +57,8 @@ export default function ProfileSettings({
         <DeviceList devices={devices} />
       </SettingsSection>
 
-      <SettingsSection
-        title="Export data"
-        description="JSON has your problems, notes and every solve session. CSV has one row per problem."
-      >
-        <ExportData />
-      </SettingsSection>
-
-      <SettingsSection title="Account" description="Sign out here, or remove your account.">
-        <div className="divide-y rounded-lg border bg-card">
+      <SettingsSection title="Account" description="Sign out here.">
+        <div className="rounded-lg border bg-card">
           <div className="flex items-center gap-4 p-4">
             <div className="flex flex-1 flex-col gap-0.5">
               <span className="text-sm font-medium">Sign out</span>
@@ -77,18 +67,6 @@ export default function ProfileSettings({
               </span>
             </div>
             <SignOutButton />
-          </div>
-          <div className="flex items-center gap-4 p-4">
-            <div className="flex flex-1 flex-col gap-0.5">
-              <span className="text-sm font-medium text-destructive">Delete account</span>
-              <span className="text-[13px] text-muted-foreground">
-                Permanently removes your problems, notes and solve sessions. Coming soon.
-              </span>
-            </div>
-            <Button variant="destructive" disabled>
-              <Trash2 />
-              Delete account
-            </Button>
           </div>
         </div>
       </SettingsSection>

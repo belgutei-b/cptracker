@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy - CPTracker",
   description:
-    "Learn what data CPTracker collects, how it is used, and how to request deletion.",
+    "Learn what data CPTracker collects and how it is used.",
 };
 
 export default function Page() {
